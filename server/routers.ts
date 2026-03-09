@@ -15,6 +15,7 @@ import { generateVulnerabilityExplanation } from "./aiExplainer";
 import { generateAndStorePdfReport } from "./pdfGenerator";
 import { notifyOwner } from "./_core/notification";
 import { invokeLLM } from "./_core/llm";
+import { stripeRouter } from "./routers/stripe";
 
 // Admin middleware
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -223,31 +224,7 @@ export const appRouter = router({
   }),
 
   // ─── Stripe / Payments ────────────────────────────────────────────────────────
-  stripe: router({
-    createCheckoutSession: protectedProcedure
-      .input(z.object({
-        scanId: z.number(),
-        plan: z.enum(["report", "basic", "professional", "enterprise"]).optional().default("report"),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        // Stripe integration placeholder - returns mock session for now
-        // Real implementation requires STRIPE_SECRET_KEY
-        const scan = await getScanById(input.scanId);
-        if (!scan) throw new TRPCError({ code: "NOT_FOUND" });
-        if (scan.userId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN" });
-
-        // For demo: mark scan as paid directly
-        await updateScan(input.scanId, { isPaid: true });
-        return { success: true, scanId: input.scanId, demo: true };
-      }),
-
-    createSubscriptionSession: protectedProcedure
-      .input(z.object({ plan: z.enum(["basic", "professional", "enterprise"]) }))
-      .mutation(async ({ ctx, input }) => {
-        // Stripe subscription placeholder
-        return { success: true, plan: input.plan, demo: true, message: "Integración Stripe pendiente de configuración." };
-      }),
-  }),
+  stripe: stripeRouter,
 });
 
 export type AppRouter = typeof appRouter;

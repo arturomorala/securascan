@@ -53,3 +53,13 @@
 - [x] Escaneo de puertos abiertos (top 100 puertos comunes)
 - [x] Nuevas categorías de vulnerabilidades (Infrastructure, Certificates)
 - [x] Pruebas unitarias para nuevas funcionalidades (17 tests pasando)
+
+
+## Fase 8: Integración de Stripe
+- [x] Configurar secretos de Stripe (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET)
+- [x] Instalar dependencias (stripe, @stripe/stripe-js)
+- [x] Crear módulo stripe.ts con helpers para clientes y sesiones
+- [x] Crear router de Stripe con procedimientos (getPlans, createCheckout, getCurrentSubscription, cancelSubscription)
+- [x] Implementar página de checkout con planes disponibles
+- [x] Corregir inicialización lazy de Stripe para evitar errores en pruebas
+- [x] Todas las pruebas pasando (35 tests)
