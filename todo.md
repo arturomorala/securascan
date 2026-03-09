@@ -63,3 +63,13 @@
 - [x] Implementar página de checkout con planes disponibles
 - [x] Corregir inicialización lazy de Stripe para evitar errores en pruebas
 - [x] Todas las pruebas pasando (35 tests)
+
+
+## Fase 9: Webhook Handler de Stripe
+- [x] Crear endpoint /api/stripe/webhook
+- [x] Implementar handlers para payment_intent.succeeded
+- [x] Implementar handlers para customer.subscription.updated
+- [x] Implementar handlers para customer.subscription.deleted
+- [x] Actualizar base de datos con información de suscripciones
+- [x] Pruebas unitarias para webhook handler (11 tests pasando)
+- [x] Registrar webhook endpoint en Express server
