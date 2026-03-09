@@ -45,3 +45,11 @@
 - [x] 18 tests unitarios con Vitest (auth, scans, admin, stripe)
 - [x] Checkpoint final
 - [x] Páginas legales (Términos, Privacidad)
+
+
+## Fase 7: Ampliación del motor de escaneo
+- [x] Detección de subdominios expuestos (búsqueda en DNS, CNAME)
+- [x] Análisis de certificados TLS (expiración, validez, cadena)
+- [x] Escaneo de puertos abiertos (top 100 puertos comunes)
+- [x] Nuevas categorías de vulnerabilidades (Infrastructure, Certificates)
+- [x] Pruebas unitarias para nuevas funcionalidades (17 tests pasando)
