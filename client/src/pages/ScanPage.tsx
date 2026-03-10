@@ -106,7 +106,7 @@ export default function ScanPage() {
         window.location.href = data.url;
       }
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: any) => toast.error(`Error: ${err.message}`),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -318,7 +318,7 @@ export default function ScanPage() {
                         <span key={f} className="text-xs bg-primary/15 text-primary border border-primary/30 px-2 py-1 rounded-full">{f}</span>
                       ))}
                     </div>
-                    <Button className="cyber-glow px-8 h-11 font-semibold" onClick={() => unlockReport.mutate({ planId: "basic" })} disabled={unlockReport.isPending}>
+                    <Button className="cyber-glow px-8 h-11 font-semibold" onClick={() => unlockReport.mutate({ planId: "basic", origin: window.location.origin })} disabled={unlockReport.isPending}>
                       {unlockReport.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando...</> : <><Shield className="w-4 h-4 mr-2" />Desbloquear informe — 29€</>}
                     </Button>
                     <p className="text-xs text-muted-foreground mt-3">Pago único. Sin suscripción obligatoria.</p>

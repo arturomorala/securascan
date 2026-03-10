@@ -5,18 +5,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Check, AlertCircle } from "lucide-react";
-import { useLocation, useRoute } from "wouter";
+import { useLocation } from "wouter";
 import { toast } from "sonner";
 
 export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
-  const [, params] = useRoute("/checkout/success?session_id=:sessionId");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const plansQuery = trpc.stripe.getPlans.useQuery();
   const checkoutMutation = trpc.stripe.createCheckout.useMutation();
   const currentSubQuery = trpc.stripe.getCurrentSubscription.useQuery();
+
+  // Parsear session_id desde query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get("session_id");
+    if (sid) {
+      setSessionId(sid);
+    }
+  }, []);
 
   // Redirigir si no está autenticado
   useEffect(() => {
@@ -27,11 +36,11 @@ export default function CheckoutPage() {
 
   // Verificar estado del checkout si hay session_id
   useEffect(() => {
-    if (params?.sessionId && currentSubQuery.data) {
+    if (sessionId && currentSubQuery.data) {
       toast.success("¡Pago completado! Tu suscripción está activa.");
       setTimeout(() => navigate("/dashboard"), 2000);
     }
-  }, [params?.sessionId, currentSubQuery.data, navigate]);
+  }, [sessionId, currentSubQuery.data, navigate]);
 
   const handleSelectPlan = async (planId: string) => {
     setIsProcessing(true);
@@ -51,7 +60,7 @@ export default function CheckoutPage() {
   }
 
   // Mostrar estado de pago procesado
-  if (params?.sessionId && currentSubQuery.data) {
+  if (sessionId && currentSubQuery.data) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -78,7 +87,7 @@ export default function CheckoutPage() {
   }
 
   // Mostrar error de pago
-  if (params?.sessionId && !currentSubQuery.data && !currentSubQuery.isLoading) {
+  if (sessionId && !currentSubQuery.data && !currentSubQuery.isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">

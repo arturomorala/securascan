@@ -12,6 +12,7 @@ import AdminPanel from "./pages/AdminPanel";
 import PricingPage from "./pages/PricingPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import CheckoutPage from "./pages/CheckoutPage";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/scan" component={ScanPage} />
       <Route path="/scan/:id" component={ScanPage} />
       <Route path="/report/:id" component={ReportPage} />
+      <Route path="/checkout/success" component={CheckoutPage} />
       <Route path="/admin" component={AdminPanel} />
       <Route path="/pricing" component={PricingPage} />
       <Route path="/terms" component={TermsPage} />

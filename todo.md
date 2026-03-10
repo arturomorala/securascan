@@ -73,3 +73,7 @@
 - [x] Actualizar base de datos con información de suscripciones
 - [x] Pruebas unitarias para webhook handler (11 tests pasando)
 - [x] Registrar webhook endpoint en Express server
+
+
+## Bugs Corregidos
+- [x] Error NotFoundError al desbloquear informe - Corregido: returnUrl ahora usa window.location.origin, CheckoutPage registrada en rutas, session_id parseado correctamente desde query params

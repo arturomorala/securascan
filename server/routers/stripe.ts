@@ -52,7 +52,7 @@ export const stripeRouter = router({
    * Crear sesión de checkout para suscripción
    */
   createCheckout: protectedProcedure
-    .input(z.object({ planId: z.enum(["basic", "professional", "enterprise"]) }))
+    .input(z.object({ planId: z.enum(["basic", "professional", "enterprise"]), origin: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
       try {
         const plan = PLANS[input.planId];
@@ -68,7 +68,8 @@ export const stripeRouter = router({
         );
 
         // Crear sesión de checkout
-        const returnUrl = `${process.env.VITE_FRONTEND_URL || "https://securascan.manus.space"}/checkout/success`;
+        const origin = input.origin || process.env.VITE_FRONTEND_URL || "https://securascan.manus.space";
+        const returnUrl = `${origin}/checkout/success`;
         const session = await createCheckoutSession(
           customer.id,
           plan.id,
