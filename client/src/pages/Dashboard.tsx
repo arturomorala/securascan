@@ -80,9 +80,9 @@ export default function Dashboard() {
           </Link>
           <div className="flex items-center gap-3">
             {user?.role === "admin" && (
-              <Link href="/admin"><Button variant="ghost" size="sm" className="text-xs text-orange-400 hover:text-orange-300">Admin</Button></Link>
+              <Link href="/admin"><a><Button variant="ghost" size="sm" className="text-xs text-orange-400 hover:text-orange-300">Admin</Button></a></Link>
             )}
-            <Link href="/scan"><Button size="sm" className="cyber-glow text-xs"><Plus className="w-3.5 h-3.5 mr-1" />Nuevo escaneo</Button></Link>
+            <Link href="/scan"><a><Button size="sm" className="cyber-glow text-xs"><Plus className="w-3.5 h-3.5 mr-1" />Nuevo escaneo</Button></a></Link>
             <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={logout}>Salir</Button>
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function Dashboard() {
               <Shield className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
               <h3 className="font-semibold mb-2">Sin análisis todavía</h3>
               <p className="text-sm text-muted-foreground mb-6">Realiza tu primer análisis de seguridad para ver los resultados aquí.</p>
-              <Link href="/scan"><Button className="cyber-glow"><Plus className="w-4 h-4 mr-2" />Iniciar primer análisis</Button></Link>
+              <Link href="/scan"><a><Button className="cyber-glow"><Plus className="w-4 h-4 mr-2" />Iniciar primer análisis</Button></a></Link>
             </div>
           ) : (
             <div className="divide-y divide-border/30">

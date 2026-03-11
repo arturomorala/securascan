@@ -80,7 +80,7 @@ export default function PricingPage() {
             </div>
             <span className="font-bold text-sm"><span className="gradient-text">Secura</span>Scan</span>
           </Link>
-          <Link href="/"><Button variant="ghost" size="sm" className="text-xs text-muted-foreground"><ArrowLeft className="w-3.5 h-3.5 mr-1" />Inicio</Button></Link>
+          <Link href="/"><a><Button variant="ghost" size="sm" className="text-xs text-muted-foreground"><ArrowLeft className="w-3.5 h-3.5 mr-1" />Inicio</Button></a></Link>
         </div>
       </nav>
 

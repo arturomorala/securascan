@@ -135,7 +135,7 @@ export default function ScanPage() {
           <h2 className="text-2xl font-bold mb-3">Inicia sesión para escanear</h2>
           <p className="text-muted-foreground mb-6">Necesitas una cuenta para realizar análisis de seguridad.</p>
           <a href={getLoginUrl()}><Button className="w-full cyber-glow"><Shield className="w-4 h-4 mr-2" />Iniciar sesión</Button></a>
-          <Link href="/"><Button variant="ghost" className="w-full mt-3 text-muted-foreground"><ArrowLeft className="w-4 h-4 mr-2" />Volver al inicio</Button></Link>
+          <Link href="/"><a><Button variant="ghost" className="w-full mt-3 text-muted-foreground"><ArrowLeft className="w-4 h-4 mr-2" />Volver al inicio</Button></a></Link>
         </div>
       </div>
     );
@@ -152,7 +152,7 @@ export default function ScanPage() {
             <span className="font-bold text-sm"><span className="gradient-text">Secura</span>Scan</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/dashboard"><Button variant="ghost" size="sm" className="text-muted-foreground text-xs">Panel</Button></Link>
+            <Link href="/dashboard"><a><Button variant="ghost" size="sm" className="text-muted-foreground text-xs">Panel</Button></a></Link>
             <span className="text-xs text-muted-foreground hidden sm:block">{user?.name || user?.email}</span>
           </div>
         </div>
@@ -190,9 +190,9 @@ export default function ScanPage() {
                   </div>
                   <div className="flex items-start gap-3">
                     <Checkbox id="terms" checked={termsAccepted} onCheckedChange={v => setTermsAccepted(!!v)} className="mt-0.5" />
-                    <Label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                      Acepto los <Link href="/terms" className="text-primary hover:underline">Términos de uso</Link> y la <Link href="/privacy" className="text-primary hover:underline">Política de privacidad</Link>.
-                    </Label>
+                    <div className="text-sm text-muted-foreground leading-relaxed">
+                      Acepto los <a href="/terms" className="text-primary hover:underline cursor-pointer">Términos de uso</a> y la <a href="/privacy" className="text-primary hover:underline cursor-pointer">Política de privacidad</a>.
+                    </div>
                   </div>
                 </div>
                 <div className="bg-muted/20 border border-border/30 rounded-xl p-4 flex items-start gap-3">
@@ -337,7 +337,7 @@ export default function ScanPage() {
                 )}
                 <div className="flex gap-3 mt-4">
                   <Button variant="outline" className="flex-1" onClick={() => { setPhase("form"); setScanId(null); navigate("/scan"); }}>Nuevo análisis</Button>
-                  <Link href="/dashboard" className="flex-1"><Button variant="ghost" className="w-full text-muted-foreground">Ver historial</Button></Link>
+                  <Link href="/dashboard" className="flex-1"><a><Button variant="ghost" className="w-full text-muted-foreground">Ver historial</Button></a></Link>
                 </div>
               </div>
             )}

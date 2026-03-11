@@ -145,7 +145,7 @@ export default function Home() {
               ))}
               <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
                 {isAuthenticated ? (
-                  <Link href="/dashboard"><Button className="w-full">Panel de control</Button></Link>
+                  <Link href="/dashboard"><a className="w-full"><Button className="w-full">Panel de control</Button></a></Link>
                 ) : (
                   <>
                     <a href={getLoginUrl()}><Button variant="outline" className="w-full">Iniciar sesión</Button></a>
