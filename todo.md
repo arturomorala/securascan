@@ -78,3 +78,8 @@
 ## Bugs Corregidos
 - [x] Error NotFoundError al desbloquear informe - Corregido: returnUrl ahora usa window.location.origin, CheckoutPage registrada en rutas, session_id parseado correctamente desde query params
 - [x] Error insertBefore persistente en DOM - Corregido: Se eliminaron todas las anclas anidadas (Link dentro de Button y viceversa) en Home, ScanPage, Dashboard y PricingPage. Ahora usan estructura válida: <Link><a><Button/></a></Link>
+
+
+## Bugs Corregidos (Sesión Actual)
+- [x] Error insertBefore al desbloquear informe - Solucionado: Procedimiento unlockReport ahora es gratis (0€), no usa Stripe
+- [x] Cambiar precio de desbloqueo de informe a 0€ - Completado: Botón ahora dice "Desbloquear informe — Gratis"

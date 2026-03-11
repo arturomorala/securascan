@@ -148,6 +148,18 @@ export const appRouter = router({
         await updateScan(input.scanId, { reportPdfUrl: pdfUrl });
         return { url: pdfUrl };
       }),
+
+    unlockReport: protectedProcedure
+      .input(z.object({ scanId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const scan = await getScanById(input.scanId);
+        if (!scan) throw new TRPCError({ code: "NOT_FOUND" });
+        if (scan.userId !== ctx.user.id && ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        await updateScan(input.scanId, { isPaid: true });
+        return { success: true };
+      }),
   }),
 
   // ─── AI Explanations ─────────────────────────────────────────────────────────
