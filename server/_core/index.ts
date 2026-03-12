@@ -31,6 +31,34 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Security Headers Middleware
+  app.use((req, res, next) => {
+    // HSTS - Enforce HTTPS
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    
+    // CSP - Prevent XSS
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+    
+    // X-Frame-Options - Prevent Clickjacking
+    res.setHeader('X-Frame-Options', 'DENY');
+    
+    // X-Content-Type-Options - Prevent MIME sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
+    // Referrer-Policy - Control referrer information
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Permissions-Policy - Restrict browser APIs
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+    
+    // Hide server version
+    res.removeHeader('X-Powered-By');
+    res.setHeader('Server', 'SecuraScan');
+    
+    next();
+  });
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
