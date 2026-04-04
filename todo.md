@@ -116,3 +116,10 @@
 - [x] Implementar detección de patrones sospechosos y alertas
 - [x] Escribir pruebas unitarias para logging de seguridad
 - [x] Crear página de auditoría en panel de admin (procedimientos tRPC: securityStats, auditLog)
+
+## Fase 13: Soporte Multiidioma (Inglés/Español)
+- [x] Crear sistema de traducción i18n con i18next
+- [x] Traducir contenido de páginas principales (Home, Scan, Dashboard)
+- [x] Implementar selector de idioma en la interfaz
+- [x] Agregar persistencia de idioma en localStorage (automático con i18next-browser-languagedetector)
+- [x] Integrar LanguageSwitcher en Home.tsx

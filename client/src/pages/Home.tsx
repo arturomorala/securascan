@@ -9,6 +9,8 @@ import {
   ArrowRight, Star, Users, BarChart3, Clock, Download, Menu, X
 } from "lucide-react";
 import { useState } from "react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const NAV_LINKS = [
   { label: "Cómo funciona", href: "#how-it-works" },
@@ -64,6 +66,7 @@ const STATS = [
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleCTA = () => {
     if (isAuthenticated) {
@@ -99,6 +102,7 @@ export default function Home() {
             </div>
 
             <div className="hidden md:flex items-center gap-3">
+              <LanguageSwitcher />
               {isAuthenticated ? (
                 <>
                   <Link href="/dashboard">
