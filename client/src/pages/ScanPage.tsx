@@ -134,8 +134,8 @@ export default function ScanPage() {
           </div>
           <h2 className="text-2xl font-bold mb-3">Inicia sesión para escanear</h2>
           <p className="text-muted-foreground mb-6">Necesitas una cuenta para realizar análisis de seguridad.</p>
-          <a href={getLoginUrl()}><Button className="w-full cyber-glow"><Shield className="w-4 h-4 mr-2" />Iniciar sesión</Button></a>
-          <Link href="/"><a><Button variant="ghost" className="w-full mt-3 text-muted-foreground"><ArrowLeft className="w-4 h-4 mr-2" />Volver al inicio</Button></a></Link>
+          <a href={getLoginUrl()} className="block"><Button className="w-full cyber-glow"><Shield className="w-4 h-4 mr-2" />Iniciar sesión</Button></a>
+          <Link href="/" className="block mt-3"><Button variant="ghost" className="w-full text-muted-foreground"><ArrowLeft className="w-4 h-4 mr-2" />Volver al inicio</Button></Link>
         </div>
       </div>
     );
@@ -152,7 +152,7 @@ export default function ScanPage() {
             <span className="font-bold text-sm"><span className="gradient-text">Secura</span>Scan</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/dashboard"><a><Button variant="ghost" size="sm" className="text-muted-foreground text-xs">Panel</Button></a></Link>
+            <Link href="/dashboard"><Button variant="ghost" size="sm" className="text-muted-foreground text-xs">Panel</Button></Link>
             <span className="text-xs text-muted-foreground hidden sm:block">{user?.name || user?.email}</span>
           </div>
         </div>
