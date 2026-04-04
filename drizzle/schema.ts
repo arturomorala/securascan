@@ -120,3 +120,36 @@ export const payments = mysqlTable("payments", {
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
+
+export const securityLogs = mysqlTable("securityLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  eventType: mysqlEnum("eventType", [
+    "login_success",
+    "login_failed",
+    "login_brute_force",
+    "scan_created",
+    "scan_suspicious",
+    "admin_access",
+    "admin_user_modified",
+    "payment_attempted",
+    "payment_failed",
+    "webhook_received",
+    "webhook_failed",
+    "rate_limit_exceeded",
+    "unauthorized_access",
+    "data_export",
+    "suspicious_ip",
+  ]).notNull(),
+  severity: mysqlEnum("severity", ["info", "warning", "critical"]).default("info").notNull(),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  email: varchar("email", { length: 320 }),
+  description: text("description").notNull(),
+  metadata: json("metadata"),
+  isAnomalous: boolean("isAnomalous").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SecurityLog = typeof securityLogs.$inferSelect;
+export type InsertSecurityLog = typeof securityLogs.$inferInsert;

@@ -4,6 +4,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { logSecurityEvent, checkBruteForcePattern, checkSuspiciousScanPattern, getSecurityStats, getRecentSecurityEvents } from "./lib/security-logger";
 import {
   getUserById, getScansByUserId, getScanById, createScan, updateScan,
   getVulnerabilitiesByScanId, createVulnerabilities, updateVulnerability,
@@ -16,6 +17,7 @@ import { generateAndStorePdfReport } from "./pdfGenerator";
 import { notifyOwner } from "./_core/notification";
 import { invokeLLM } from "./_core/llm";
 import { stripeRouter } from "./routers/stripe";
+
 
 // Admin middleware
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -63,6 +65,22 @@ export const appRouter = router({
         termsAccepted: z.boolean().refine(v => v === true, "Debes aceptar los términos de uso."),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Check for suspicious scan patterns
+        const isSuspicious = await checkSuspiciousScanPattern(ctx.user.id, 60);
+        if (isSuspicious) {
+          await logSecurityEvent({
+            userId: ctx.user.id,
+            eventType: "scan_suspicious",
+            severity: "warning",
+            ipAddress: ctx.req.ip,
+            userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+            email: ctx.user.email || undefined,
+            description: `Usuario intentando crear demasiados escaneos (>20 en 60 minutos)`,
+            isAnomalous: true,
+          });
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Demasiados escaneos en poco tiempo. Intenta más tarde." });
+        }
+
         // Validate URL is not internal/private
         const url = new URL(input.url);
         const hostname = url.hostname.toLowerCase();
@@ -76,6 +94,18 @@ export const appRouter = router({
           url: input.url,
           status: "pending",
           progress: 0,
+        });
+
+        // Log scan creation
+        await logSecurityEvent({
+          userId: ctx.user.id,
+          eventType: "scan_created",
+          severity: "info",
+          ipAddress: ctx.req.ip,
+          userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+          email: ctx.user.email || undefined,
+          description: `Nuevo escaneo creado para: ${input.url}`,
+          metadata: { url: input.url },
         });
 
         // Start scan asynchronously
@@ -212,26 +242,92 @@ export const appRouter = router({
 
   // ─── Admin ────────────────────────────────────────────────────────────────────
   admin: router({
-    stats: adminProcedure.query(async () => {
+    stats: adminProcedure.query(async ({ ctx }) => {
+      await logSecurityEvent({
+        userId: ctx.user.id,
+        eventType: "admin_access",
+        severity: "info",
+        ipAddress: ctx.req.ip,
+        userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+        email: ctx.user.email || undefined,
+        description: "Admin accedió a estadísticas del panel",
+      });
       return getAdminStats();
     }),
 
     users: adminProcedure
       .input(z.object({ limit: z.number().default(50), offset: z.number().default(0) }).optional())
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await logSecurityEvent({
+          userId: ctx.user.id,
+          eventType: "admin_access",
+          severity: "info",
+          ipAddress: ctx.req.ip,
+          userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+          email: ctx.user.email || undefined,
+          description: "Admin consultó lista de usuarios",
+        });
         return getAllUsers(input?.limit ?? 50, input?.offset ?? 0);
       }),
 
     scans: adminProcedure
       .input(z.object({ limit: z.number().default(50), offset: z.number().default(0) }).optional())
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await logSecurityEvent({
+          userId: ctx.user.id,
+          eventType: "admin_access",
+          severity: "info",
+          ipAddress: ctx.req.ip,
+          userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+          email: ctx.user.email || undefined,
+          description: "Admin consultó lista de escaneos",
+        });
         return getAllScans(input?.limit ?? 50, input?.offset ?? 0);
       }),
 
     recentScans: adminProcedure
       .input(z.object({ limit: z.number().default(10) }).optional())
-      .query(async ({ input }) => {
+      .query(async ({ ctx, input }) => {
+        await logSecurityEvent({
+          userId: ctx.user.id,
+          eventType: "admin_access",
+          severity: "info",
+          ipAddress: ctx.req.ip,
+          userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+          email: ctx.user.email || undefined,
+          description: "Admin consultó escaneos recientes",
+        });
         return getRecentScans(input?.limit ?? 10);
+      }),
+
+    securityStats: adminProcedure
+      .input(z.object({ hoursBack: z.number().min(1).max(720).default(24) }).optional())
+      .query(async ({ ctx, input }) => {
+        await logSecurityEvent({
+          userId: ctx.user.id,
+          eventType: "admin_access",
+          severity: "info",
+          ipAddress: ctx.req.ip,
+          userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+          email: ctx.user.email || undefined,
+          description: "Admin consultó estadísticas de seguridad",
+        });
+        return getSecurityStats(input?.hoursBack ?? 24);
+      }),
+
+    auditLog: adminProcedure
+      .input(z.object({ limit: z.number().min(1).max(500).default(100), userId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        await logSecurityEvent({
+          userId: ctx.user.id,
+          eventType: "admin_access",
+          severity: "info",
+          ipAddress: ctx.req.ip,
+          userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+          email: ctx.user.email || undefined,
+          description: "Admin consultó registro de auditoría",
+        });
+        return getRecentSecurityEvents(input?.limit ?? 100, input?.userId);
       }),
   }),
 

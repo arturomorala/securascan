@@ -15,6 +15,13 @@
       "when": 1773088394768,
       "tag": "0001_damp_stryfe",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1775300653541,
+      "tag": "0002_cheerful_celestials",
+      "breakpoints": true
     }
   ]
 }

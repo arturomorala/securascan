@@ -108,3 +108,11 @@
 - [x] Aplicar Rate Limiting a webhook de Stripe (100 requests/min)
 - [x] Escribir pruebas unitarias para Rate Limiting (8 tests pasando)
 - [x] Verificar que Rate Limiting funciona correctamente (52 tests totales pasando)
+
+## Fase 12: Logging de Seguridad y Auditoría
+- [x] Diseñar esquema de logging de seguridad y actualizar base de datos
+- [x] Crear helpers y middleware para registrar eventos de seguridad
+- [x] Integrar logging en endpoints críticos (login, escaneo, admin)
+- [x] Implementar detección de patrones sospechosos y alertas
+- [x] Escribir pruebas unitarias para logging de seguridad
+- [x] Crear página de auditoría en panel de admin (procedimientos tRPC: securityStats, auditLog)
