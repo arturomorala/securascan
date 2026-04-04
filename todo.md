@@ -100,3 +100,11 @@
 - [x] Referrer-Policy no configurado - Agregado header strict-origin-when-cross-origin
 - [x] Permissions-Policy no configurado - Agregado header para restricción de APIs
 - [x] Versión del servidor expuesta - Oculto header Server
+
+
+## Fase 11: Rate Limiting y Protección contra Ataques
+- [x] Crear middleware de Rate Limiting en memoria
+- [x] Aplicar Rate Limiting a endpoints de escaneo (10 escaneos/hora por usuario)
+- [x] Aplicar Rate Limiting a webhook de Stripe (100 requests/min)
+- [x] Escribir pruebas unitarias para Rate Limiting (8 tests pasando)
+- [x] Verificar que Rate Limiting funciona correctamente (52 tests totales pasando)

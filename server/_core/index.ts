@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { handleStripeWebhook } from "../webhooks/stripe";
+import { scanLimiter, webhookLimiter, startRateLimitCleanup } from "../middleware/rateLimit";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -37,11 +38,11 @@ async function startServer() {
     // HSTS - Enforce HTTPS
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     
-    // CSP - Prevent XSS
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+    // CSP - Prevent XSS (allow iframe for Manus preview)
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https:; frame-ancestors 'self' https:; base-uri 'self'; form-action 'self'");
     
-    // X-Frame-Options - Prevent Clickjacking
-    res.setHeader('X-Frame-Options', 'DENY');
+    // X-Frame-Options - Allow iframes from same origin (for Manus preview)
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     
     // X-Content-Type-Options - Prevent MIME sniffing
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -62,32 +63,40 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
-  // Stripe webhook - MUST be before express.json() for raw body
-  app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
+  // Stripe webhook handler with rate limiting (must be before express.json)
+  app.post('/api/stripe/webhook', webhookLimiter, express.raw({type: 'application/json'}), handleStripeWebhook);
   
-  // tRPC API
+  // Apply scan rate limiting to tRPC endpoint
+  app.use('/api/trpc', scanLimiter);
+
+  // tRPC middleware
   app.use(
-    "/api/trpc",
+    '/api/trpc',
     createExpressMiddleware({
       router: appRouter,
       createContext,
-    })
+    }),
   );
-  // development mode uses Vite, production mode uses static files
+
+  // Development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
+  // Start rate limit cleanup
+  startRateLimitCleanup();
+
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
 
   if (port !== preferredPort) {
-    console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
+    console.log(`Port ${preferredPort} is in use, using port ${port} instead`);
   }
 
   server.listen(port, () => {
