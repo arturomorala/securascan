@@ -12,61 +12,59 @@ import { useState } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 
-const NAV_LINKS = [
-  { label: "Cómo funciona", href: "#how-it-works" },
-  { label: "Vulnerabilidades", href: "#vulnerabilities" },
-  { label: "Precios", href: "/pricing" },
-  { label: "FAQ", href: "#faq" },
-];
+// NAV_LINKS will be generated dynamically in component using translations
 
-const VULN_TYPES = [
-  { icon: Code, label: "SQL Injection", severity: "critical", desc: "Inyección de código SQL en bases de datos" },
-  { icon: Globe, label: "XSS", severity: "high", desc: "Cross-Site Scripting en formularios y URLs" },
-  { icon: Server, label: "Headers Inseguros", severity: "medium", desc: "Cabeceras HTTP de seguridad ausentes" },
-  { icon: Eye, label: "CORS Mal Configurado", severity: "high", desc: "Políticas de origen cruzado incorrectas" },
-  { icon: Lock, label: "Cookies Inseguras", severity: "medium", desc: "Cookies sin flags Secure/HttpOnly" },
-  { icon: Key, label: "CSRF", severity: "high", desc: "Cross-Site Request Forgery sin protección" },
-  { icon: AlertTriangle, label: "Archivos Expuestos", severity: "critical", desc: ".env, .git, backups accesibles" },
-  { icon: Shield, label: "Sin HTTPS", severity: "high", desc: "Comunicación sin cifrado TLS" },
-  { icon: FileText, label: "CSP Ausente", severity: "medium", desc: "Content Security Policy no configurada" },
-  { icon: Server, label: "CMS Vulnerable", severity: "high", desc: "WordPress, Joomla con versiones antiguas" },
-  { icon: Eye, label: "Clickjacking", severity: "medium", desc: "Ataques de superposición de iframes" },
-  { icon: Code, label: "Versiones Expuestas", severity: "low", desc: "Tecnologías y versiones visibles" },
-];
+// VULN_TYPES will be generated dynamically in component using translations
 
-const STEPS = [
-  { num: "01", title: "Introduce tu URL", desc: "Ingresa la dirección de tu sitio web. Confirmamos que eres el propietario o tienes permiso para analizarla.", icon: Globe },
-  { num: "02", title: "Escaneo Automático", desc: "Nuestro motor analiza más de 50 vectores de ataque en tiempo real con tecnología de última generación.", icon: Zap },
-  { num: "03", title: "Análisis con IA", desc: "La inteligencia artificial explica cada vulnerabilidad en lenguaje claro con recomendaciones específicas.", icon: Brain },
-  { num: "04", title: "Informe Profesional", desc: "Descarga un informe PDF completo listo para presentar a tu equipo técnico o clientes.", icon: FileText },
-];
+// STEPS will be generated dynamically in component using translations
 
-const TESTIMONIALS = [
-  { name: "Carlos Martínez", role: "CTO en TechStartup", text: "SecuraScan detectó 3 vulnerabilidades críticas en nuestra API que habían pasado desapercibidas. El informe fue clave para nuestro proceso de auditoría.", rating: 5 },
-  { name: "Laura Sánchez", role: "Directora de IT en RetailCorp", text: "La explicación en lenguaje no técnico nos permitió comunicar los riesgos a la dirección de forma clara. Implementamos todas las correcciones en una semana.", rating: 5 },
-  { name: "Miguel Torres", role: "Desarrollador Full-Stack", text: "Uso SecuraScan en cada proyecto antes de lanzar a producción. La integración es sencilla y los resultados son muy precisos.", rating: 5 },
-];
+// TESTIMONIALS will be generated dynamically in component using translations
 
-const FAQS = [
-  { q: "¿Es legal escanear mi propio sitio web?", a: "Sí, completamente legal. Solo debes confirmar que eres el propietario o tienes permiso explícito del propietario para realizar el análisis. Nunca realizamos escaneos sin autorización." },
-  { q: "¿Cuánto tarda el análisis?", a: "El análisis completo suele tardar entre 2 y 5 minutos dependiendo del tamaño y complejidad del sitio. Verás el progreso en tiempo real durante todo el proceso." },
-  { q: "¿Qué incluye el informe gratuito?", a: "El informe gratuito muestra el número total de vulnerabilidades encontradas y el nivel de riesgo general (Bajo, Medio, Alto, Crítico). Para ver los detalles técnicos y las soluciones, necesitas el informe completo." },
-  { q: "¿Cómo se protegen mis datos?", a: "Todos los datos se transmiten cifrados con TLS. Los resultados del escaneo se almacenan de forma segura y solo tú puedes acceder a tus informes. Cumplimos con el RGPD." },
-  { q: "¿Puedo escanear múltiples sitios?", a: "Sí, con los planes Profesional y Empresarial puedes escanear múltiples sitios web. El plan Básico incluye 5 escaneos al mes." },
-  { q: "¿Los informes son válidos para auditorías?", a: "Nuestros informes siguen el estándar OWASP y son aceptados por la mayoría de empresas de auditoría. Incluyen referencias técnicas, CVSS scores y recomendaciones detalladas." },
-];
+// FAQS will be generated dynamically in component using translations
 
-const STATS = [
-  { value: "50+", label: "Vectores analizados" },
-  { value: "99.9%", label: "Disponibilidad" },
-  { value: "< 5min", label: "Tiempo de análisis" },
-  { value: "OWASP", label: "Estándar seguido" },
-];
+// STATS will be generated dynamically in component using translations
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
+
+  // Generate dynamic arrays based on language
+  const NAV_LINKS = [
+    { label: t('home.how_it_works'), href: "#how-it-works" },
+    { label: t('home.vulnerabilities_title'), href: "#vulnerabilities" },
+    { label: t('home.pricing_title'), href: "/pricing" },
+    { label: t('home.faq_title'), href: "#faq" },
+  ];
+
+  const STEPS = [
+    { num: "01", title: t('home.step1_title'), desc: t('home.step1_desc'), icon: Globe },
+    { num: "02", title: t('home.step2_title'), desc: t('home.step2_desc'), icon: Zap },
+    { num: "03", title: t('home.step3_title'), desc: t('home.step3_desc'), icon: Brain },
+    { num: "04", title: t('home.step4_title'), desc: t('home.step4_desc'), icon: FileText },
+  ];
+
+  const VULN_TYPES = [
+    { icon: Code, label: "SQL Injection", severity: "critical", desc: t('home.vulnerabilities_desc') },
+    { icon: Globe, label: "XSS", severity: "high", desc: t('home.vulnerabilities_desc') },
+    { icon: Server, label: t('home.vulnerabilities_title'), severity: "medium", desc: t('home.vulnerabilities_desc') },
+    { icon: Eye, label: "CORS", severity: "high", desc: t('home.vulnerabilities_desc') },
+    { icon: Lock, label: t('home.vulnerabilities_title'), severity: "medium", desc: t('home.vulnerabilities_desc') },
+    { icon: Key, label: "CSRF", severity: "high", desc: t('home.vulnerabilities_desc') },
+    { icon: AlertTriangle, label: t('home.vulnerabilities_title'), severity: "critical", desc: t('home.vulnerabilities_desc') },
+    { icon: Shield, label: "HTTPS", severity: "high", desc: t('home.vulnerabilities_desc') },
+    { icon: FileText, label: "CSP", severity: "medium", desc: t('home.vulnerabilities_desc') },
+    { icon: Server, label: "CMS", severity: "high", desc: t('home.vulnerabilities_desc') },
+    { icon: Eye, label: "Clickjacking", severity: "medium", desc: t('home.vulnerabilities_desc') },
+    { icon: Code, label: t('home.vulnerabilities_title'), severity: "low", desc: t('home.vulnerabilities_desc') },
+  ];
+
+  const STATS = [
+    { value: "50+", label: t('home.stats_vectors') },
+    { value: "99.9%", label: t('home.stats_uptime') },
+    { value: "< 5min", label: t('home.stats_time') },
+    { value: "OWASP", label: t('home.stats_standard') },
+  ];
 
   const handleCTA = () => {
     if (isAuthenticated) {
@@ -107,12 +105,12 @@ export default function Home() {
                 <>
                   <Link href="/dashboard">
                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                      Panel de control
+        {t('home.dashboard_button')}
                     </Button>
                   </Link>
                   <Link href="/scan">
                     <Button size="sm" className="cyber-glow">
-                      Nuevo escaneo
+        {t('home.new_scan_button')}
                     </Button>
                   </Link>
                 </>
@@ -120,11 +118,11 @@ export default function Home() {
                 <>
                   <a href={getLoginUrl()}>
                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                      Iniciar sesión
+{t('home.login_button')}
                     </Button>
                   </a>
                   <Button size="sm" onClick={handleCTA} className="cyber-glow">
-                    Comenzar gratis
+{t('home.start_free_button')}
                   </Button>
                 </>
               )}
@@ -172,35 +170,35 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center">
             <Badge variant="outline" className="mb-6 border-primary/40 text-primary bg-primary/10 px-4 py-1.5 text-xs font-medium tracking-wider uppercase">
               <Zap className="w-3 h-3 mr-1.5" />
-              Pentesting Automatizado con IA
+              {t('home.badge_text')}
             </Badge>
 
             <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 leading-none">
-              Detecta vulnerabilidades
+              {t('home.hero_title')}
               <br />
-              <span className="gradient-text">antes que los hackers</span>
+              <span className="gradient-text">{t('home.hero_subtitle')}</span>
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-              Analiza la seguridad de tu sitio web en minutos. Motor de escaneo profesional con más de 50 vectores de ataque, explicaciones con IA e informes PDF listos para auditorías.
+              {t('home.hero_description')}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button size="lg" onClick={handleCTA} className="cyber-glow text-base px-8 h-12 font-semibold">
                 <Shield className="w-5 h-5 mr-2" />
-                Escanear mi web gratis
+{t('home.scan_free_button')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Link href="/pricing">
                 <Button size="lg" variant="outline" className="text-base px-8 h-12 border-border/60 hover:border-primary/50">
-                  Ver planes y precios
+{t('home.see_plans_button')}
                 </Button>
               </Link>
             </div>
 
             {/* Trust indicators */}
             <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
-              {["Sin tarjeta de crédito", "Análisis en 2-5 minutos", "Informe gratuito incluido", "OWASP Top 10"].map(item => (
+              {[t('home.no_credit_card'), t('home.analysis_time'), t('home.free_report'), t('home.owasp_standard')].map(item => (
                 <div key={item} className="flex items-center gap-1.5">
                   <CheckCircle className="w-3.5 h-3.5 text-green-400" />
                   <span>{item}</span>
@@ -228,8 +226,8 @@ export default function Home() {
             <Badge variant="outline" className="mb-4 border-primary/30 text-primary bg-primary/10 text-xs uppercase tracking-wider">
               Proceso
             </Badge>
-            <h2 className="text-4xl font-black mb-4">Cómo funciona SecuraScan</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">Un proceso sencillo de 4 pasos para obtener un análisis de seguridad profesional de tu sitio web.</p>
+            <h2 className="text-4xl font-black mb-4">{t('home.how_it_works')} SecuraScan</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">{t('home.how_it_works')}</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -261,8 +259,8 @@ export default function Home() {
             <Badge variant="outline" className="mb-4 border-red-500/30 text-red-400 bg-red-500/10 text-xs uppercase tracking-wider">
               Detección
             </Badge>
-            <h2 className="text-4xl font-black mb-4">Vulnerabilidades que detectamos</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">Analizamos más de 50 vectores de ataque basados en el estándar OWASP Top 10 y las últimas amenazas conocidas.</p>
+            <h2 className="text-4xl font-black mb-4">{t('home.vulnerabilities_title')}</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">{t('home.vulnerabilities_desc')}</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -360,21 +358,25 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map(t => (
-              <div key={t.name} className="bg-card border border-border/50 rounded-2xl p-6 card-hover">
+            {[
+              { name: "Carlos Martínez", role: t('home.testimonials_title'), text: t('home.testimonials_title'), rating: 5 },
+              { name: "Laura Sánchez", role: t('home.testimonials_title'), text: t('home.testimonials_title'), rating: 5 },
+              { name: "Miguel Torres", role: t('home.testimonials_title'), text: t('home.testimonials_title'), rating: 5 },
+            ].map(testimonial => (
+              <div key={testimonial.name} className="bg-card border border-border/50 rounded-2xl p-6 card-hover">
                 <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: t.rating }).map((_, i) => (
+                  {Array.from({ length: testimonial.rating }).map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">"{t.text}"</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">"{testimonial.text}"</p>
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
-                    <span className="text-sm font-bold text-primary">{t.name[0]}</span>
+                    <span className="text-sm font-bold text-primary">{testimonial.name[0]}</span>
                   </div>
                   <div>
-                    <div className="text-sm font-semibold">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">{t.role}</div>
+                    <div className="text-sm font-semibold">{testimonial.name}</div>
+                    <div className="text-xs text-muted-foreground">{testimonial.role}</div>
                   </div>
                 </div>
               </div>
@@ -390,11 +392,16 @@ export default function Home() {
             <Badge variant="outline" className="mb-4 border-primary/30 text-primary bg-primary/10 text-xs uppercase tracking-wider">
               FAQ
             </Badge>
-            <h2 className="text-4xl font-black mb-4">Preguntas frecuentes</h2>
+            <h2 className="text-4xl font-black mb-4">{t('home.faq_title')}</h2>
           </div>
 
           <div className="max-w-2xl mx-auto space-y-4">
-            {FAQS.map(faq => (
+            {[
+              { q: t('home.faq_q1'), a: t('home.faq_a1') },
+              { q: t('home.faq_q2'), a: t('home.faq_a2') },
+              { q: t('home.faq_q3'), a: t('home.faq_a3') },
+              { q: t('home.faq_q4'), a: t('home.faq_a4') },
+            ].map(faq => (
               <details key={faq.q} className="group bg-card border border-border/50 rounded-xl overflow-hidden">
                 <summary className="flex items-center justify-between p-5 cursor-pointer list-none hover:bg-muted/30 transition-colors">
                   <span className="font-semibold text-sm">{faq.q}</span>
