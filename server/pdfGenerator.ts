@@ -27,30 +27,27 @@ function getSeverityColor(severity: string): string {
   }
 }
 
-function getSeverityLabel(severity: string): string {
-  switch (severity) {
-    case "critical": return "CRÍTICO";
-    case "high": return "ALTO";
-    case "medium": return "MEDIO";
-    case "low": return "BAJO";
-    default: return severity.toUpperCase();
-  }
+function getSeverityLabel(severity: string, lang: string = 'es'): string {
+  const labels: Record<string, Record<string, string>> = {
+    es: { critical: "CRÍTICO", high: "ALTO", medium: "MEDIO", low: "BAJO" },
+    en: { critical: "CRITICAL", high: "HIGH", medium: "MEDIUM", low: "LOW" },
+  };
+  return labels[lang]?.[severity] || severity.toUpperCase();
 }
 
-function getRiskLabel(risk: string | null): string {
-  switch (risk) {
-    case "critical": return "CRÍTICO";
-    case "high": return "ALTO";
-    case "medium": return "MEDIO";
-    case "low": return "BAJO";
-    default: return "N/A";
-  }
+function getRiskLabel(risk: string | null, lang: string = 'es'): string {
+  const labels: Record<string, Record<string, string>> = {
+    es: { critical: "CRÍTICO", high: "ALTO", medium: "MEDIO", low: "BAJO" },
+    en: { critical: "CRITICAL", high: "HIGH", medium: "MEDIUM", low: "LOW" },
+  };
+  return labels[lang]?.[risk || 'unknown'] || "N/A";
 }
 
 export async function generateAndStorePdfReport(
   scan: Scan,
   vulnerabilities: Vulnerability[],
-  user: User | undefined
+  user: User | undefined,
+  language: string = 'es'
 ): Promise<string> {
   const executiveSummary = await generateExecutiveSummary(
     scan.url,
@@ -63,7 +60,7 @@ export async function generateAndStorePdfReport(
     scan.totalVulnerabilities
   );
 
-  const pdfBuffer = await generatePdfBuffer(scan, vulnerabilities, user, executiveSummary);
+  const pdfBuffer = await generatePdfBuffer(scan, vulnerabilities, user, executiveSummary, language);
 
   const fileKey = `reports/scan-${scan.id}-${Date.now()}.pdf`;
   const { url } = await storagePut(fileKey, pdfBuffer, "application/pdf");
@@ -75,7 +72,8 @@ async function generatePdfBuffer(
   scan: Scan,
   vulnerabilities: Vulnerability[],
   user: User | undefined,
-  executiveSummary: string
+  executiveSummary: string,
+  language: string = 'es'
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
@@ -95,9 +93,45 @@ async function generatePdfBuffer(
     doc.on("error", reject);
 
     const pageWidth = doc.page.width - 100;
-    const scanDate = new Date(scan.createdAt).toLocaleDateString("es-ES", {
+    const locale = language === 'en' ? 'en-US' : 'es-ES';
+    const scanDate = new Date(scan.createdAt).toLocaleDateString(locale, {
       year: "numeric", month: "long", day: "numeric",
     });
+    
+    // Translation strings
+    const t: Record<string, Record<string, string>> = {
+      es: {
+        title: "INFORME DE SEGURIDAD",
+        subtitle: "Análisis de Vulnerabilidades Web",
+        site_analyzed: "SITIO ANALIZADO",
+        analysis_date: "Fecha de análisis:",
+        security_score: "SECURITY SCORE",
+        risk_level: "NIVEL DE RIESGO",
+        vulnerabilities: "VULNERABILIDADES",
+        executive_summary: "RESUMEN EJECUTIVO",
+        details: "DETALLES TÉCNICOS",
+        critical: "CRÍTICO",
+        high: "ALTO",
+        medium: "MEDIO",
+        low: "BAJO",
+      },
+      en: {
+        title: "SECURITY REPORT",
+        subtitle: "Web Vulnerability Analysis",
+        site_analyzed: "ANALYZED SITE",
+        analysis_date: "Analysis date:",
+        security_score: "SECURITY SCORE",
+        risk_level: "RISK LEVEL",
+        vulnerabilities: "VULNERABILITIES",
+        executive_summary: "EXECUTIVE SUMMARY",
+        details: "TECHNICAL DETAILS",
+        critical: "CRITICAL",
+        high: "HIGH",
+        medium: "MEDIUM",
+        low: "LOW",
+      },
+    };
+    const texts = t[language] || t.es;
 
     // ─── Cover Page ──────────────────────────────────────────────────────────────
     doc.rect(0, 0, doc.page.width, doc.page.height).fill("#0a0a0f");
@@ -107,41 +141,41 @@ async function generatePdfBuffer(
 
     // Logo area
     doc.fontSize(32).fillColor("#6366f1").font("Helvetica-Bold").text("SecuraScan", 50, 80);
-    doc.fontSize(11).fillColor("#64748b").font("Helvetica").text("Plataforma de Pentesting Automatizado", 50, 120);
+    doc.fontSize(11).fillColor("#64748b").font("Helvetica").text(language === 'en' ? "Automated Pentesting Platform" : "Plataforma de Pentesting Automatizado", 50, 120);
 
     // Title
     doc.moveDown(4);
-    doc.fontSize(28).fillColor("#e2e8f0").font("Helvetica-Bold").text("INFORME DE SEGURIDAD", 50, 200);
-    doc.fontSize(14).fillColor("#94a3b8").font("Helvetica").text("Análisis de Vulnerabilidades Web", 50, 240);
+    doc.fontSize(28).fillColor("#e2e8f0").font("Helvetica-Bold").text(texts.title, 50, 200);
+    doc.fontSize(14).fillColor("#94a3b8").font("Helvetica").text(texts.subtitle, 50, 240);
 
     // Target info box
     doc.rect(50, 280, pageWidth, 80).fill("#111118").stroke("#1e293b");
-    doc.fontSize(10).fillColor("#64748b").font("Helvetica").text("SITIO ANALIZADO", 70, 295);
+    doc.fontSize(10).fillColor("#64748b").font("Helvetica").text(texts.site_analyzed, 70, 295);
     doc.fontSize(14).fillColor("#e2e8f0").font("Helvetica-Bold").text(scan.url, 70, 312, { width: pageWidth - 40 });
-    doc.fontSize(10).fillColor("#64748b").font("Helvetica").text(`Fecha de análisis: ${scanDate}`, 70, 340);
+    doc.fontSize(10).fillColor("#64748b").font("Helvetica").text(`${texts.analysis_date} ${scanDate}`, 70, 340);
 
     // Security Score
     const score = scan.securityScore ?? 0;
     const scoreColor = score >= 80 ? "#22c55e" : score >= 60 ? "#eab308" : score >= 40 ? "#f97316" : "#ef4444";
     doc.rect(50, 380, pageWidth, 100).fill("#111118").stroke("#1e293b");
-    doc.fontSize(12).fillColor("#64748b").font("Helvetica").text("SECURITY SCORE", 70, 395);
+    doc.fontSize(12).fillColor("#64748b").font("Helvetica").text(texts.security_score, 70, 395);
     doc.fontSize(48).fillColor(scoreColor).font("Helvetica-Bold").text(`${score}`, 70, 410);
     const scoreWidth = String(score).length * 28;
     doc.fontSize(20).fillColor("#64748b").font("Helvetica").text("/100", 70 + scoreWidth + 5, 430);
 
     // Risk level
     const riskColor = getSeverityColor(scan.riskLevel ?? "low");
-    doc.fontSize(12).fillColor("#64748b").font("Helvetica").text("NIVEL DE RIESGO", 250, 395);
-    doc.fontSize(24).fillColor(riskColor).font("Helvetica-Bold").text(getRiskLabel(scan.riskLevel), 250, 415);
+    doc.fontSize(12).fillColor("#64748b").font("Helvetica").text(texts.risk_level, 250, 395);
+    doc.fontSize(24).fillColor(riskColor).font("Helvetica-Bold").text(getRiskLabel(scan.riskLevel, language), 250, 415);
 
     // Vulnerability counts
     doc.rect(50, 500, pageWidth, 70).fill("#111118").stroke("#1e293b");
     const countBoxWidth = pageWidth / 4;
     const counts = [
-      { label: "CRÍTICO", count: scan.criticalCount, color: "#ef4444" },
-      { label: "ALTO", count: scan.highCount, color: "#f97316" },
-      { label: "MEDIO", count: scan.mediumCount, color: "#eab308" },
-      { label: "BAJO", count: scan.lowCount, color: "#3b82f6" },
+      { label: texts.critical, count: scan.criticalCount, color: "#ef4444" },
+      { label: texts.high, count: scan.highCount, color: "#f97316" },
+      { label: texts.medium, count: scan.mediumCount, color: "#eab308" },
+      { label: texts.low, count: scan.lowCount, color: "#3b82f6" },
     ];
     counts.forEach((c, i) => {
       const x = 50 + i * countBoxWidth + 20;

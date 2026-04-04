@@ -117,9 +117,11 @@
 - [x] Escribir pruebas unitarias para logging de seguridad
 - [x] Crear página de auditoría en panel de admin (procedimientos tRPC: securityStats, auditLog)
 
-## Fase 13: Soporte Multiidioma (Inglés/Español)
+## Fase 13: Soporte Multiidioma Completo (Inglés/Español)
 - [x] Crear sistema de traducción i18n con i18next
 - [x] Traducir contenido de páginas principales (Home, Scan, Dashboard)
-- [x] Implementar selector de idioma en la interfaz
-- [x] Agregar persistencia de idioma en localStorage (automático con i18next-browser-languagedetector)
+- [x] Implementar selector de idioma con banderas de países (🇪🇸/🇬🇧)
+- [x] Agregar persistencia de idioma en localStorage
 - [x] Integrar LanguageSwitcher en Home.tsx
+- [x] Traducir generación de PDFs según idioma seleccionado
+- [x] Agregar soporte de idioma en pdfGenerator.ts

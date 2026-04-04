@@ -178,7 +178,8 @@ export const appRouter = router({
         if (scan.reportPdfUrl) return { url: scan.reportPdfUrl };
         const user = await getUserById(ctx.user.id);
         const vulns = await getVulnerabilitiesByScanId(input.scanId);
-        const pdfUrl = await generateAndStorePdfReport(scan, vulns, user);
+        const language = ctx.req.headers['accept-language']?.includes('en') ? 'en' : 'es';
+        const pdfUrl = await generateAndStorePdfReport(scan, vulns, user, language);
         await updateScan(input.scanId, { reportPdfUrl: pdfUrl });
         return { url: pdfUrl };
       }),

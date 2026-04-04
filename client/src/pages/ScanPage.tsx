@@ -7,6 +7,7 @@ import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import { Link, useParams, useLocation } from "wouter";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
   Shield, ShieldCheck, AlertTriangle, CheckCircle, Loader2,
@@ -69,6 +70,7 @@ function ScoreGauge({ score }: { score: number }) {
 
 export default function ScanPage() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { t, i18n } = useTranslation();
   const params = useParams<{ id?: string }>();
   const [, navigate] = useLocation();
 
@@ -166,41 +168,41 @@ export default function ScanPage() {
               <div className="w-16 h-16 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center mx-auto mb-5 cyber-glow">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h1 className="text-3xl font-black mb-3">Analizar sitio web</h1>
-              <p className="text-muted-foreground">Introduce la URL del sitio que deseas analizar. El análisis tarda entre 2 y 5 minutos.</p>
+              <h1 className="text-3xl font-black mb-3">{t('scan.title')}</h1>
+              <p className="text-muted-foreground">{t('scan.subtitle')}</p>
             </div>
             <div className="bg-card border border-border/50 rounded-2xl p-6">
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <Label htmlFor="url" className="text-sm font-medium mb-2 block">URL del sitio web *</Label>
+                  <Label htmlFor="url" className="text-sm font-medium mb-2 block">{t('scan.url_label')} *</Label>
                   <div className="relative">
                     <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input id="url" type="url" placeholder="https://ejemplo.com" value={url}
+                    <Input id="url" type="url" placeholder={t('scan.url_placeholder')} value={url}
                       onChange={e => setUrl(e.target.value)}
                       className="pl-10 bg-muted/30 border-border/50 focus:border-primary/50" required />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1.5">Solo URLs públicas. No se permiten IPs privadas ni localhost.</p>
+                  <p className="text-xs text-muted-foreground mt-1.5">{t('scan.url_placeholder')}</p>
                 </div>
                 <div className="space-y-3 pt-1">
                   <div className="flex items-start gap-3">
                     <Checkbox id="owner" checked={ownerConfirmation} onCheckedChange={v => setOwnerConfirmation(!!v)} className="mt-0.5" />
                     <Label htmlFor="owner" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                      Confirmo que soy el propietario de este sitio o tengo autorización explícita para realizar este análisis.
+                      {t('scan.owner_confirmation')}
                     </Label>
                   </div>
                   <div className="flex items-start gap-3">
                     <Checkbox id="terms" checked={termsAccepted} onCheckedChange={v => setTermsAccepted(!!v)} className="mt-0.5" />
                     <div className="text-sm text-muted-foreground leading-relaxed">
-                      Acepto los <a href="/terms" className="text-primary hover:underline cursor-pointer">Términos de uso</a> y la <a href="/privacy" className="text-primary hover:underline cursor-pointer">Política de privacidad</a>.
+                      {t('scan.terms_accepted')} <a href="/terms" className="text-primary hover:underline cursor-pointer">{t('common.save')}</a> {t('common.cancel')} <a href="/privacy" className="text-primary hover:underline cursor-pointer">{t('common.close')}</a>.
                     </div>
                   </div>
                 </div>
                 <div className="bg-muted/20 border border-border/30 rounded-xl p-4 flex items-start gap-3">
                   <Zap className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-muted-foreground">El análisis suele tardar entre <strong className="text-foreground">2 y 5 minutos</strong> dependiendo del tamaño y complejidad del sitio. Verás el progreso en tiempo real.</p>
+                  <p className="text-xs text-muted-foreground">{t('scan.scanning')}</p>
                 </div>
                 <Button type="submit" className="w-full cyber-glow h-11 font-semibold" disabled={createScan.isPending}>
-                  {createScan.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Iniciando...</> : <><Shield className="w-4 h-4 mr-2" />Iniciar análisis<ArrowRight className="w-4 h-4 ml-2" /></>}
+                  {createScan.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('common.loading')}</> : <><Shield className="w-4 h-4 mr-2" />{t('scan.submit_button')}<ArrowRight className="w-4 h-4 ml-2" /></>}
                 </Button>
               </form>
             </div>
