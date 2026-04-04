@@ -40,13 +40,12 @@ export function createRateLimiter(
     res.setHeader('X-RateLimit-Remaining', Math.max(0, maxRequests - store[key].count).toString());
     res.setHeader('X-RateLimit-Reset', store[key].resetTime.toString());
 
-    if (store[key].count > maxRequests) {
-      res.status(429).json({
-        error: 'Too many requests',
-        retryAfter: Math.ceil((store[key].resetTime - now) / 1000),
-      });
-      return;
-    }
+  if (store[key].count > maxRequests) {
+    // Store rate limit info in request for middleware to handle
+    (req as any).rateLimitExceeded = true;
+    (req as any).rateLimitReset = store[key].resetTime;
+    (req as any).rateLimitRetryAfter = Math.ceil((store[key].resetTime - now) / 1000);
+  }
 
     next();
   };
@@ -81,12 +80,10 @@ export const scanLimiter = (req: Request & { user?: User }, res: Response, next:
   res.setHeader('X-RateLimit-Reset', store[key].resetTime.toString());
 
   if (store[key].count > maxRequests) {
-    res.status(429).json({
-      error: 'Too many scan requests',
-      message: `Maximum 10 scans per hour. Please try again later.`,
-      retryAfter: Math.ceil((store[key].resetTime - now) / 1000),
-    });
-    return;
+    // Store rate limit info in request for tRPC middleware to handle
+    (req as any).rateLimitExceeded = true;
+    (req as any).rateLimitReset = store[key].resetTime;
+    (req as any).rateLimitRetryAfter = Math.ceil((store[key].resetTime - now) / 1000);
   }
 
   next();

@@ -46,7 +46,8 @@ describe('Rate Limiting Middleware', () => {
     expect(nextCalled).toBe(true);
 
     limiter(mockReq, mockRes, next);
-    expect(mockRes.statusCode).toBe(429);
+    expect(mockReq.rateLimitExceeded).toBe(true);
+    expect(nextCalled).toBe(true); // next is still called, error handled by tRPC
   });
 
   it('should set rate limit headers', () => {
@@ -68,7 +69,8 @@ describe('Rate Limiting Middleware', () => {
     expect(nextCalled).toBe(true);
 
     limiter(mockReq, mockRes, next);
-    expect(mockRes.statusCode).toBe(429);
+    expect(mockReq.rateLimitExceeded).toBe(true);
+    expect(nextCalled).toBe(true);
   });
 
   it('scan limiter should limit by user ID', () => {
@@ -81,7 +83,8 @@ describe('Rate Limiting Middleware', () => {
     }
 
     scanLimiter(mockReq, mockRes, next);
-    expect(mockRes.statusCode).toBe(429);
+    expect(mockReq.rateLimitExceeded).toBe(true);
+    expect(nextCalled).toBe(true);
   });
 
   it('webhook limiter should limit requests', () => {
@@ -94,6 +97,7 @@ describe('Rate Limiting Middleware', () => {
     }
 
     webhookLimiter(mockReq, mockRes, next);
-    expect(mockRes.statusCode).toBe(429);
+    expect(mockReq.rateLimitExceeded).toBe(true);
+    expect(nextCalled).toBe(true);
   });
 });

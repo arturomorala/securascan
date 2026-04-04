@@ -8,7 +8,22 @@ const t = initTRPC.context<TrpcContext>().create({
 });
 
 export const router = t.router;
-export const publicProcedure = t.procedure;
+
+const checkRateLimit = t.middleware(async opts => {
+  const { ctx, next } = opts;
+  const req = ctx.req as any;
+
+  if (req.rateLimitExceeded) {
+    throw new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: `Maximum 10 scans per hour. Please try again in ${req.rateLimitRetryAfter} seconds.`,
+    });
+  }
+
+  return next();
+});
+
+export const publicProcedure = t.procedure.use(checkRateLimit);
 
 const requireUser = t.middleware(async opts => {
   const { ctx, next } = opts;
@@ -25,9 +40,9 @@ const requireUser = t.middleware(async opts => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(requireUser);
+export const protectedProcedure = t.procedure.use(checkRateLimit).use(requireUser);
 
-export const adminProcedure = t.procedure.use(
+export const adminProcedure = t.procedure.use(checkRateLimit).use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
 
