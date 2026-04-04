@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router, rateLimitedProcedure } from "./_core/trpc";
 import { logSecurityEvent, checkBruteForcePattern, checkSuspiciousScanPattern, getSecurityStats, getRecentSecurityEvents } from "./lib/security-logger";
 import {
   getUserById, getScansByUserId, getScanById, createScan, updateScan,
@@ -58,7 +58,11 @@ export const appRouter = router({
         return scan;
       }),
 
-    create: protectedProcedure
+    create: rateLimitedProcedure
+      .use(({ ctx, next }) => {
+        if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED", message: "Debes estar autenticado." });
+        return next({ ctx: { ...ctx, user: ctx.user } });
+      })
       .input(z.object({
         url: z.string().url("URL inválida").max(2048),
         ownerConfirmation: z.boolean().refine(v => v === true, "Debes confirmar que eres propietario o tienes permiso para analizar esta web."),

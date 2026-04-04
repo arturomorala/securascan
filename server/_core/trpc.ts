@@ -9,7 +9,7 @@ const t = initTRPC.context<TrpcContext>().create({
 
 export const router = t.router;
 
-const checkRateLimit = t.middleware(async opts => {
+export const checkRateLimitMiddleware = t.middleware(async opts => {
   const { ctx, next } = opts;
   const req = ctx.req as any;
 
@@ -23,7 +23,9 @@ const checkRateLimit = t.middleware(async opts => {
   return next();
 });
 
-export const publicProcedure = t.procedure.use(checkRateLimit);
+export const rateLimitedProcedure = t.procedure.use(checkRateLimitMiddleware);
+
+export const publicProcedure = t.procedure;
 
 const requireUser = t.middleware(async opts => {
   const { ctx, next } = opts;
@@ -40,9 +42,9 @@ const requireUser = t.middleware(async opts => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(checkRateLimit).use(requireUser);
+export const protectedProcedure = t.procedure.use(requireUser);
 
-export const adminProcedure = t.procedure.use(checkRateLimit).use(
+export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
 
