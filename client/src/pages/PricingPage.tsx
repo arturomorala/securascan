@@ -3,72 +3,77 @@ import { Link } from "wouter";
 import { Shield, ShieldCheck, Check, Zap, Building2, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
+import { useTranslation } from "react-i18next";
 
-const plans = [
-  {
-    name: "Básico",
-    price: "19",
-    period: "por informe",
-    description: "Para análisis puntuales y pequeños proyectos.",
-    icon: Shield,
-    color: "text-blue-400",
-    borderColor: "border-blue-500/30",
-    bgColor: "bg-blue-500/5",
-    features: [
-      "1 análisis completo",
-      "Informe PDF descargable",
-      "Detección de vulnerabilidades OWASP Top 10",
-      "Explicación básica con IA",
-      "Válido 30 días",
-    ],
-    cta: "Comprar análisis",
-    popular: false,
-  },
-  {
-    name: "Profesional",
-    price: "49",
-    period: "al mes",
-    description: "Para desarrolladores y equipos de seguridad.",
-    icon: Zap,
-    color: "text-primary",
-    borderColor: "border-primary/50",
-    bgColor: "bg-primary/5",
-    features: [
-      "10 análisis al mes",
-      "Informes PDF ilimitados",
-      "Explicaciones técnicas con IA",
-      "Historial de escaneos",
-      "Alertas de vulnerabilidades críticas",
-      "Soporte prioritario",
-    ],
-    cta: "Comenzar ahora",
-    popular: true,
-  },
-  {
-    name: "Empresarial",
-    price: "199",
-    period: "al mes",
-    description: "Para empresas con múltiples proyectos web.",
-    icon: Building2,
-    color: "text-purple-400",
-    borderColor: "border-purple-500/30",
-    bgColor: "bg-purple-500/5",
-    features: [
-      "Análisis ilimitados",
-      "Informes PDF con marca personalizada",
-      "Explicaciones de nivel experto con IA",
-      "Panel de administración multi-usuario",
-      "API de integración",
-      "SLA garantizado",
-      "Soporte dedicado 24/7",
-    ],
-    cta: "Contactar ventas",
-    popular: false,
-  },
-];
+// Plans will be generated dynamically with translations
 
 export default function PricingPage() {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
+
+  // Generate plans dynamically with translations
+  const plans = [
+    {
+      name: t('pricing.basic'),
+      price: "19",
+      period: t('pricing.per_month'),
+      description: "Para análisis puntuales y pequeños proyectos.",
+      icon: Shield,
+      color: "text-blue-400",
+      borderColor: "border-blue-500/30",
+      bgColor: "bg-blue-500/5",
+      features: [
+        "1 análisis completo",
+        "Informe PDF descargable",
+        "Detección de vulnerabilidades OWASP Top 10",
+        "Explicación básica con IA",
+        "Válido 30 días",
+      ],
+      cta: "Comprar análisis",
+      popular: false,
+    },
+    {
+      name: t('pricing.professional'),
+      price: "49",
+      period: t('pricing.per_month'),
+      description: "Para desarrolladores y equipos de seguridad.",
+      icon: Zap,
+      color: "text-primary",
+      borderColor: "border-primary/50",
+      bgColor: "bg-primary/5",
+      features: [
+        "10 análisis al mes",
+        "Informes PDF ilimitados",
+        "Explicaciones técnicas con IA",
+        "Historial de escaneos",
+        "Alertas de vulnerabilidades críticas",
+        "Soporte prioritario",
+      ],
+      cta: "Comenzar ahora",
+      popular: true,
+    },
+    {
+      name: t('pricing.enterprise'),
+      price: "99",
+      period: t('pricing.per_month'),
+      description: "Para empresas con múltiples proyectos web.",
+      icon: Building2,
+      color: "text-purple-400",
+      borderColor: "border-purple-500/30",
+      bgColor: "bg-purple-500/5",
+      features: [
+        "Análisis ilimitados",
+        "Informes PDF con marca personalizada",
+        "Explicaciones de nivel experto con IA",
+        "Panel de administración multi-usuario",
+        "API de integración",
+        "SLA garantizado",
+        "Soporte dedicado 24/7",
+      ],
+      cta: "Contactar ventas",
+      popular: false,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,14 +85,14 @@ export default function PricingPage() {
             </div>
             <span className="font-bold text-sm"><span className="gradient-text">Secura</span>Scan</span>
           </Link>
-          <Link href="/"><a><Button variant="ghost" size="sm" className="text-xs text-muted-foreground"><ArrowLeft className="w-3.5 h-3.5 mr-1" />Inicio</Button></a></Link>
+            <Link href="/"><Button variant="ghost" size="sm" className="text-xs text-muted-foreground"><ArrowLeft className="w-3.5 h-3.5 mr-1" />{t('home.hero_title')}</Button></Link>
         </div>
       </nav>
 
       <div className="container py-16 max-w-5xl mx-auto">
         <div className="text-center mb-14">
-          <h1 className="text-4xl font-black mb-4">Planes y precios</h1>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">Elige el plan que mejor se adapte a tus necesidades de seguridad web.</p>
+          <h1 className="text-4xl font-black mb-4">{t('pricing.title')}</h1>
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t('pricing.subtitle')}</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -95,7 +100,7 @@ export default function PricingPage() {
             <div key={plan.name} className={`relative border ${plan.borderColor} ${plan.bgColor} rounded-2xl p-6 ${plan.popular ? "ring-1 ring-primary/50" : ""}`}>
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">Más popular</span>
+                  <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">{t('pricing.most_popular')}</span>
                 </div>
               )}
               <div className="mb-5">
@@ -133,9 +138,9 @@ export default function PricingPage() {
         </div>
 
         <div className="mt-14 bg-card border border-border/50 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-3">¿Necesitas un plan personalizado?</h2>
-          <p className="text-muted-foreground mb-6">Para empresas con necesidades específicas, ofrecemos planes personalizados con soporte dedicado y características a medida.</p>
-          <Button variant="outline" className="px-8">Contactar con ventas</Button>
+          <h2 className="text-2xl font-bold mb-3">{t('pricing.custom_plan')}</h2>
+          <p className="text-muted-foreground mb-6">{t('pricing.custom_plan_desc')}</p>
+          <Button variant="outline" className="px-8">{t('pricing.contact_sales')}</Button>
         </div>
       </div>
     </div>

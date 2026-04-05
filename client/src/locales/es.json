@@ -160,7 +160,9 @@
     "get_started": "Comenzar",
     "billed_monthly": "Facturado mensualmente",
     "billed_annually": "Facturado anualmente",
-    "save_20_percent": "Ahorra 20%"
+    "save_20_percent": "Ahorra 20%",
+    "custom_plan": "¿Necesitas un plan personalizado?",
+    "custom_plan_desc": "Para empresas con necesidades específicas, ofrecemos planes personalizados con soporte dedicado y características a medida."
   },
   "admin": {
     "title": "Panel de administrador",

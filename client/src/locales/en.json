@@ -160,7 +160,9 @@
     "get_started": "Get Started",
     "billed_monthly": "Billed monthly",
     "billed_annually": "Billed annually",
-    "save_20_percent": "Save 20%"
+    "save_20_percent": "Save 20%",
+    "custom_plan": "Need a custom plan?",
+    "custom_plan_desc": "For companies with specific needs, we offer customized plans with dedicated support and tailored features."
   },
   "admin": {
     "title": "Admin Panel",
