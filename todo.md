@@ -125,3 +125,6 @@
 - [x] Integrar LanguageSwitcher en Home.tsx
 - [x] Traducir generación de PDFs según idioma seleccionado
 - [x] Agregar soporte de idioma en pdfGenerator.ts
+- [x] Traducir ScanPage completamente (pasos, niveles de riesgo, scores)
+- [x] Traducir DashboardLayout con soporte i18n
+- [x] Actualizar archivos de traducción (es.json y en.json) con todas las claves

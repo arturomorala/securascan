@@ -14,18 +14,7 @@ import {
   Globe, Lock, ArrowRight, ArrowLeft, FileText, Zap, Eye, Server, Code
 } from "lucide-react";
 
-const SCAN_STEPS_DISPLAY = [
-  { label: "Analizando headers de seguridad HTTP", icon: Shield },
-  { label: "Verificando configuración HTTPS/TLS", icon: Lock },
-  { label: "Detectando tecnologías y versiones", icon: Code },
-  { label: "Analizando política de cookies", icon: Eye },
-  { label: "Verificando Content Security Policy", icon: ShieldCheck },
-  { label: "Comprobando configuración CORS", icon: Globe },
-  { label: "Buscando archivos sensibles expuestos", icon: AlertTriangle },
-  { label: "Analizando formularios y endpoints", icon: Server },
-  { label: "Evaluando configuración del servidor", icon: Zap },
-  { label: "Generando resultados del análisis", icon: FileText },
-];
+// SCAN_STEPS_DISPLAY will be generated dynamically with translations
 
 function getRiskColor(risk: string | null | undefined) {
   switch (risk) {
@@ -37,19 +26,25 @@ function getRiskColor(risk: string | null | undefined) {
   }
 }
 
-function getRiskLabel(risk: string | null | undefined) {
+function getRiskLabel(risk: string | null | undefined, t: any) {
   switch (risk) {
-    case "critical": return "CRÍTICO";
-    case "high": return "ALTO";
-    case "medium": return "MEDIO";
-    case "low": return "BAJO";
+    case "critical": return t('scan.critical');
+    case "high": return t('scan.high');
+    case "medium": return t('scan.medium');
+    case "low": return t('scan.low');
     default: return "N/A";
   }
 }
 
-function ScoreGauge({ score }: { score: number }) {
+function ScoreGauge({ score, t }: { score: number; t: any }) {
   const color = score >= 80 ? "#22c55e" : score >= 60 ? "#eab308" : score >= 40 ? "#f97316" : "#ef4444";
-  const label = score >= 80 ? "Bueno" : score >= 60 ? "Moderado" : score >= 40 ? "Deficiente" : "Crítico";
+  const labels: { [key: string]: string } = {
+    good: t('scan.score_good') || "Good",
+    moderate: t('scan.score_moderate') || "Moderate",
+    poor: t('scan.score_poor') || "Poor",
+    critical: t('scan.score_critical') || "Critical"
+  };
+  const label = score >= 80 ? labels.good : score >= 60 ? labels.moderate : score >= 40 ? labels.poor : labels.critical;
   return (
     <div className="flex flex-col items-center">
       <div className="relative w-28 h-28">
@@ -73,6 +68,20 @@ export default function ScanPage() {
   const { t, i18n } = useTranslation();
   const params = useParams<{ id?: string }>();
   const [, navigate] = useLocation();
+
+  // Generate SCAN_STEPS_DISPLAY dynamically with translations
+  const SCAN_STEPS_DISPLAY = [
+    { label: t('scan.analyzing_headers'), icon: Shield },
+    { label: t('scan.verifying_https'), icon: Lock },
+    { label: t('scan.detecting_technologies'), icon: Code },
+    { label: t('scan.analyzing_cookies'), icon: Eye },
+    { label: t('scan.verifying_csp'), icon: ShieldCheck },
+    { label: t('scan.checking_cors'), icon: Globe },
+    { label: t('scan.finding_exposed_files'), icon: AlertTriangle },
+    { label: t('scan.analyzing_forms'), icon: Server },
+    { label: t('scan.evaluating_server'), icon: Zap },
+    { label: t('scan.generating_results'), icon: FileText },
+  ];
 
   const [url, setUrl] = useState("");
   const [ownerConfirmation, setOwnerConfirmation] = useState(false);
@@ -283,13 +292,13 @@ export default function ScanPage() {
                       <p className="text-sm text-muted-foreground">Se han encontrado <span className="font-bold text-foreground">{scanSummary.totalVulnerabilities} vulnerabilidades</span>.</p>
                     </div>
                     {scanSummary.securityScore !== null && scanSummary.securityScore !== undefined && (
-                      <ScoreGauge score={scanSummary.securityScore} />
+                      <ScoreGauge score={scanSummary.securityScore} t={t} />
                     )}
                   </div>
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-muted/20 rounded-xl p-4 text-center">
                       <p className="text-xs text-muted-foreground mb-1">Nivel de riesgo</p>
-                      <span className={`text-xl font-black ${getRiskColor(scanSummary.riskLevel)}`}>{getRiskLabel(scanSummary.riskLevel)}</span>
+                      <span className={`text-xl font-black ${getRiskColor(scanSummary.riskLevel)}`}>{getRiskLabel(scanSummary.riskLevel, t)}</span>
                     </div>
                     <div className="bg-muted/20 rounded-xl p-4 text-center">
                       <p className="text-xs text-muted-foreground mb-1">Total vulnerabilidades</p>
