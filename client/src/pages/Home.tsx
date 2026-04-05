@@ -302,22 +302,22 @@ export default function Home() {
         <div className="container">
           <div className="text-center mb-16">
             <Badge variant="outline" className="mb-4 border-primary/30 text-primary bg-primary/10 text-xs uppercase tracking-wider">
-              Precios
+              {t('pricing.title')}
             </Badge>
-            <h2 className="text-4xl font-black mb-4">Planes simples y transparentes</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">Sin costes ocultos. Cancela cuando quieras.</p>
+            <h2 className="text-4xl font-black mb-4">{t('home.pricing_simple_transparent')}</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">{t('home.pricing_no_hidden_costs')}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
-              { name: "Básico", price: "19", period: "mes", scans: "5 escaneos/mes", features: ["Informe PDF completo", "Análisis con IA", "50+ vulnerabilidades", "Soporte por email"], popular: false, color: "border-border/50" },
-              { name: "Profesional", price: "49", period: "mes", scans: "25 escaneos/mes", features: ["Todo lo del Básico", "Historial ilimitado", "API de integración", "Soporte prioritario", "Escaneos programados"], popular: true, color: "border-primary/50" },
-              { name: "Empresarial", price: "99", period: "mes", scans: "Escaneos ilimitados", features: ["Todo lo del Profesional", "Multi-dominio", "SLA garantizado", "Onboarding dedicado", "Informes personalizados"], popular: false, color: "border-border/50" },
+              { name: t('pricing.basic'), price: "19", period: t('pricing.per_month'), scans: t('pricing.basic_scans'), features: [t('pricing.basic_feature_1'), t('pricing.basic_feature_2'), t('pricing.basic_feature_3'), t('pricing.basic_feature_4')], popular: false, color: "border-border/50" },
+              { name: t('pricing.professional'), price: "49", period: t('pricing.per_month'), scans: t('pricing.professional_scans'), features: [t('pricing.professional_feature_1'), t('pricing.professional_feature_2'), t('pricing.professional_feature_3'), t('pricing.professional_feature_4'), t('pricing.professional_feature_5')], popular: true, color: "border-primary/50" },
+              { name: t('pricing.enterprise'), price: "99", period: t('pricing.per_month'), scans: t('pricing.enterprise_scans'), features: [t('pricing.enterprise_feature_1'), t('pricing.enterprise_feature_2'), t('pricing.enterprise_feature_3'), t('pricing.enterprise_feature_4'), t('pricing.enterprise_feature_5')], popular: false, color: "border-border/50" },
             ].map(plan => (
               <div key={plan.name} className={`relative bg-card border-2 ${plan.color} rounded-2xl p-6 card-hover ${plan.popular ? 'cyber-glow' : ''}`}>
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-primary text-primary-foreground text-xs font-semibold px-3">Más popular</Badge>
+                    <Badge className="bg-primary text-primary-foreground text-xs font-semibold px-3">{t('pricing.most_popular')}</Badge>
                   </div>
                 )}
                 <div className="mb-6">
@@ -329,8 +329,8 @@ export default function Home() {
                   <p className="text-sm text-muted-foreground mt-1">{plan.scans}</p>
                 </div>
                 <ul className="space-y-2 mb-6">
-                  {plan.features.map(f => (
-                    <li key={f} className="flex items-center gap-2 text-sm">
+                  {plan.features.map((f, idx) => (
+                    <li key={`${plan.name}-${idx}`} className="flex items-center gap-2 text-sm">
                       <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                       <span>{f}</span>
                     </li>
@@ -338,7 +338,7 @@ export default function Home() {
                 </ul>
                 <Link href="/pricing">
                   <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
-                    Empezar ahora
+                    {t('pricing.get_started')}
                   </Button>
                 </Link>
               </div>

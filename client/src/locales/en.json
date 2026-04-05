@@ -61,7 +61,9 @@
     "features": "No credit card required",
     "features2": "Analysis in 2-5 minutes",
     "features3": "Free report included",
-    "features4": "OWASP Top 10"
+    "features4": "OWASP Top 10",
+    "pricing_simple_transparent": "Simple and transparent plans",
+    "pricing_no_hidden_costs": "No hidden costs. Cancel anytime."
   },
   "scan": {
     "title": "Analyze website",
@@ -187,7 +189,10 @@
     "enterprise_feature_6": "Guaranteed SLA",
     "enterprise_feature_7": "Dedicated 24/7 support",
     "enterprise_cta": "Contact sales",
-    "custom_plan_title": "Need a custom plan?"
+    "custom_plan_title": "Need a custom plan?",
+    "basic_scans": "5 scans/month",
+    "professional_scans": "25 scans/month",
+    "enterprise_scans": "Unlimited scans"
   },
   "admin": {
     "title": "Admin Panel",
