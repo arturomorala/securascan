@@ -264,8 +264,8 @@ export default function Home() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {VULN_TYPES.map(vuln => (
-              <div key={vuln.label} className="bg-card border border-border/50 rounded-xl p-4 card-hover flex items-start gap-3">
+            {VULN_TYPES.map((vuln, idx) => (
+              <div key={`vuln-${idx}`} className="bg-card border border-border/50 rounded-xl p-4 card-hover flex items-start gap-3">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                   vuln.severity === 'critical' ? 'bg-red-500/15 border border-red-500/30' :
                   vuln.severity === 'high' ? 'bg-orange-500/15 border border-orange-500/30' :
