@@ -449,36 +449,36 @@ export default function Home() {
                 <span className="font-bold"><span className="gradient-text">Secura</span>Scan</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Plataforma profesional de pentesting automatizado. Protege tu presencia digital con tecnología de seguridad de última generación.
+                {t('footer.description')}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-3">Producto</h4>
+              <h4 className="font-semibold text-sm mb-3">{t('footer.product')}</h4>
               <ul className="space-y-2 text-xs text-muted-foreground">
-                <li><a href="#how-it-works" className="hover:text-foreground transition-colors">Cómo funciona</a></li>
-                <li><Link href="/pricing" className="hover:text-foreground transition-colors">Precios</Link></li>
-                <li><a href="#vulnerabilities" className="hover:text-foreground transition-colors">Vulnerabilidades</a></li>
+                <li><a href="#how-it-works" className="hover:text-foreground transition-colors">{t('footer.how_it_works')}</a></li>
+                <li><Link href="/pricing" className="hover:text-foreground transition-colors">{t('footer.pricing')}</Link></li>
+                <li><a href="#vulnerabilities" className="hover:text-foreground transition-colors">{t('footer.vulnerabilities')}</a></li>
                 <li><a href="#faq" className="hover:text-foreground transition-colors">FAQ</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-3">Cuenta</h4>
+              <h4 className="font-semibold text-sm mb-3">{t('footer.account')}</h4>
               <ul className="space-y-2 text-xs text-muted-foreground">
-                <li><a href={getLoginUrl()} className="hover:text-foreground transition-colors">Iniciar sesión</a></li>
-                <li><Link href="/dashboard" className="hover:text-foreground transition-colors">Panel de control</Link></li>
-                <li><Link href="/scan" className="hover:text-foreground transition-colors">Nuevo escaneo</Link></li>
+                <li><a href={getLoginUrl()} className="hover:text-foreground transition-colors">{t('footer.login')}</a></li>
+                <li><Link href="/dashboard" className="hover:text-foreground transition-colors">{t('footer.control_panel')}</Link></li>
+                <li><Link href="/scan" className="hover:text-foreground transition-colors">{t('footer.new_scan')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-sm mb-3">Legal</h4>
+              <h4 className="font-semibold text-sm mb-3">{t('footer.legal')}</h4>
               <ul className="space-y-2 text-xs text-muted-foreground">
-                <li><Link href="/terms" className="hover:text-foreground transition-colors">Términos de uso</Link></li>
-                <li><Link href="/privacy" className="hover:text-foreground transition-colors">Política de privacidad</Link></li>
+                <li><Link href="/terms" className="hover:text-foreground transition-colors">{t('footer.terms')}</Link></li>
+                <li><Link href="/privacy" className="hover:text-foreground transition-colors">{t('footer.privacy')}</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-border/30 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">© 2025 SecuraScan. Todos los derechos reservados.</p>
+            <p className="text-xs text-muted-foreground">© 2025 SecuraScan. {t('footer.all_rights_reserved')}</p>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5"><ShieldCheck className="w-3 h-3 text-green-400" />OWASP Compliant</span>
               <span className="flex items-center gap-1.5"><Lock className="w-3 h-3 text-primary" />RGPD Compliant</span>
