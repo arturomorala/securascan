@@ -58,8 +58,16 @@ export const loginLimiter = createRateLimiter(5, 5 * 60 * 1000);
 
 /**
  * Rate limiter for scan endpoint (10 scans per hour per user)
+ * Admins are exempt from rate limiting
  */
 export const scanLimiter = (req: Request & { user?: User }, res: Response, next: NextFunction) => {
+  // Admins have unlimited scans
+  if (req.user?.role === 'admin') {
+    res.setHeader('X-RateLimit-Limit', 'unlimited');
+    res.setHeader('X-RateLimit-Remaining', 'unlimited');
+    return next();
+  }
+
   const userId = req.user?.id?.toString() || req.ip || 'unknown';
   const key = `scan:${userId}`;
   const now = Date.now();

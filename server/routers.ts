@@ -69,20 +69,23 @@ export const appRouter = router({
         termsAccepted: z.boolean().refine(v => v === true, "Debes aceptar los términos de uso."),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Check for suspicious scan patterns
-        const isSuspicious = await checkSuspiciousScanPattern(ctx.user.id, 60);
-        if (isSuspicious) {
-          await logSecurityEvent({
-            userId: ctx.user.id,
-            eventType: "scan_suspicious",
-            severity: "warning",
-            ipAddress: ctx.req.ip,
-            userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
-            email: ctx.user.email || undefined,
-            description: `Usuario intentando crear demasiados escaneos (>20 en 60 minutos)`,
-            isAnomalous: true,
-          });
-          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Demasiados escaneos en poco tiempo. Intenta más tarde." });
+        // Admins have unlimited scans - skip all limits
+        if (ctx.user.role !== 'admin') {
+          // Check for suspicious scan patterns
+          const isSuspicious = await checkSuspiciousScanPattern(ctx.user.id, 60);
+          if (isSuspicious) {
+            await logSecurityEvent({
+              userId: ctx.user.id,
+              eventType: "scan_suspicious",
+              severity: "warning",
+              ipAddress: ctx.req.ip,
+              userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
+              email: ctx.user.email || undefined,
+              description: `Usuario intentando crear demasiados escaneos (>20 en 60 minutos)`,
+              isAnomalous: true,
+            });
+            throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Demasiados escaneos en poco tiempo. Intenta más tarde." });
+          }
         }
 
         // Validate URL is not internal/private
