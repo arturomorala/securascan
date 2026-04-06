@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { FooterLanguageSwitcher } from "@/components/FooterLanguageSwitcher";
 import { useTranslation } from "react-i18next";
 
 // NAV_LINKS will be generated dynamically in component using translations
@@ -478,7 +479,12 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-border/30 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">© 2025 SecuraScan. {t('footer.all_rights_reserved')}</p>
+            <div className="flex items-center gap-4">
+              <p className="text-xs text-muted-foreground">© 2025 SecuraScan. {t('footer.all_rights_reserved')}</p>
+              <div className="border-l border-border/30 pl-4">
+                <FooterLanguageSwitcher />
+              </div>
+            </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5"><ShieldCheck className="w-3 h-3 text-green-400" />OWASP Compliant</span>
               <span className="flex items-center gap-1.5"><Lock className="w-3 h-3 text-primary" />RGPD Compliant</span>

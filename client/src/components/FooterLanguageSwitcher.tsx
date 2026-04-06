@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 
-export function LanguageSwitcher() {
+export function FooterLanguageSwitcher() {
   const { i18n } = useTranslation();
 
   const toggleLanguage = () => {
@@ -23,7 +23,7 @@ export function LanguageSwitcher() {
       title={title}
     >
       <span className="text-base">{flag}</span>
-      <span className="font-medium hidden sm:inline">{label}</span>
+      <span className="font-medium">{label}</span>
     </Button>
   );
 }
