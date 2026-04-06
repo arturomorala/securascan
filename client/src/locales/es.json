@@ -217,7 +217,16 @@
     "security_logs": "Logs de seguridad",
     "event_type": "Tipo de evento",
     "severity": "Severidad",
-    "timestamp": "Marca de tiempo"
+    "timestamp": "Marca de tiempo",
+    "critical": "Crítico",
+    "high": "Alto",
+    "medium": "Medio",
+    "low": "Bajo",
+    "total": "total",
+    "no_scans": "Sin escaneos todavía",
+    "paid": "Pagado",
+    "no_users": "Sin usuarios todavía",
+    "no_name": "Sin nombre"
   },
   "auth": {
     "login": "Iniciar sesión",

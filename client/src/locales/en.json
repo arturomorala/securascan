@@ -217,7 +217,16 @@
     "security_logs": "Security Logs",
     "event_type": "Event Type",
     "severity": "Severity",
-    "timestamp": "Timestamp"
+    "timestamp": "Timestamp",
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "total": "total",
+    "no_scans": "No scans yet",
+    "paid": "Paid",
+    "no_users": "No users yet",
+    "no_name": "No name"
   },
   "auth": {
     "login": "Sign In",

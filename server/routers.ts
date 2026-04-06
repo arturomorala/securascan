@@ -203,6 +203,7 @@ export const appRouter = router({
       .input(z.object({
         vulnerabilityId: z.number(),
         level: z.enum(["basic", "technical", "expert"]),
+        language: z.enum(["es", "en"]).default("es"),
       }))
       .mutation(async ({ ctx, input }) => {
         const db_vulns = await getVulnerabilitiesByScanId(0); // placeholder
@@ -221,7 +222,7 @@ export const appRouter = router({
           input.level === "technical" ? vuln.aiExplanationTechnical : vuln.aiExplanationExpert;
         if (existingField) return { explanation: existingField };
 
-        const explanation = await generateVulnerabilityExplanation(vuln, input.level);
+        const explanation = await generateVulnerabilityExplanation(vuln, input.level, input.language);
         const updateField = input.level === "basic" ? { aiExplanationBasic: explanation } :
           input.level === "technical" ? { aiExplanationTechnical: explanation } :
           { aiExplanationExpert: explanation };
