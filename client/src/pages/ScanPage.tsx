@@ -125,7 +125,7 @@ export default function ScanPage() {
     if (!url.trim()) { toast.error("Introduce una URL válida"); return; }
     if (!ownerConfirmation) { toast.error("Debes confirmar que eres propietario o tienes permiso"); return; }
     if (!termsAccepted) { toast.error("Debes aceptar los términos de uso"); return; }
-    createScan.mutate({ url: url.trim(), ownerConfirmation, termsAccepted });
+    createScan.mutate({ url: url.trim(), ownerConfirmation, termsAccepted, language: i18n.language as 'es' | 'en' });
   };
 
   if (authLoading) {

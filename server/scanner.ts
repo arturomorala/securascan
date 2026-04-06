@@ -55,7 +55,7 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function performSecurityScan(scanId: number, targetUrl: string, user: User): Promise<void> {
+export async function performSecurityScan(scanId: number, targetUrl: string, user: User, language: 'es' | 'en' = 'es'): Promise<void> {
   await updateScan(scanId, { status: "running", progress: 5, currentStep: "Iniciando análisis de seguridad..." });
 
   const vulnerabilities: VulnResult[] = [];

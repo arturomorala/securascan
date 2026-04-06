@@ -67,6 +67,7 @@ export const appRouter = router({
         url: z.string().url("URL inválida").max(2048),
         ownerConfirmation: z.boolean().refine(v => v === true, "Debes confirmar que eres propietario o tienes permiso para analizar esta web."),
         termsAccepted: z.boolean().refine(v => v === true, "Debes aceptar los términos de uso."),
+        language: z.enum(['es', 'en']).default('es'),
       }))
       .mutation(async ({ ctx, input }) => {
         // Admins have unlimited scans - skip all limits
@@ -117,7 +118,7 @@ export const appRouter = router({
 
         // Start scan asynchronously
         const insertId = (scan as any).insertId as number;
-        performSecurityScan(insertId, input.url, ctx.user).catch(err => {
+        performSecurityScan(insertId, input.url, ctx.user, input.language).catch(err => {
           console.error("[Scanner] Error performing scan:", err);
           updateScan(insertId, { status: "failed", errorMessage: String(err) });
         });
