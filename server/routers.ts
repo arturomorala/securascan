@@ -89,12 +89,14 @@ export const appRouter = router({
           }
         }
 
-        // Validate URL is not internal/private
+        // Validate URL is not internal/private (skip for admins)
         const url = new URL(input.url);
         const hostname = url.hostname.toLowerCase();
-        const privatePatterns = [/^localhost$/, /^127\./, /^10\./, /^192\.168\./, /^172\.(1[6-9]|2\d|3[01])\./, /^::1$/, /^0\.0\.0\.0$/];
-        if (privatePatterns.some(p => p.test(hostname))) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "No se pueden escanear direcciones IP privadas o localhost." });
+        if (ctx.user.role !== 'admin') {
+          const privatePatterns = [/^localhost$/, /^127\./, /^10\./, /^192\.168\./, /^172\.(1[6-9]|2\d|3[01])\./, /^::1$/, /^0\.0\.0\.0$/];
+          if (privatePatterns.some(p => p.test(hostname))) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "No se pueden escanear direcciones IP privadas o localhost." });
+          }
         }
 
         const scan = await createScan({
