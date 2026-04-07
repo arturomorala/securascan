@@ -49,6 +49,7 @@ export const scans = mysqlTable("scans", {
   isPaid: boolean("isPaid").default(false).notNull(),
   paymentIntentId: varchar("paymentIntentId", { length: 255 }),
   reportPdfUrl: varchar("reportPdfUrl", { length: 2048 }),
+  language: mysqlEnum("language", ["es", "en"]).default("es").notNull(),
   reportPdfKey: varchar("reportPdfKey", { length: 1024 }),
   scanDuration: int("scanDuration"),
   errorMessage: text("errorMessage"),

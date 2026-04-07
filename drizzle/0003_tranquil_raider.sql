@@ -1,0 +1,1 @@
+ALTER TABLE `scans` ADD `language` enum('es','en') DEFAULT 'es' NOT NULL;
