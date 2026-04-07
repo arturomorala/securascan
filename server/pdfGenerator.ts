@@ -57,7 +57,8 @@ export async function generateAndStorePdfReport(
     scan.highCount,
     scan.mediumCount,
     scan.lowCount,
-    scan.totalVulnerabilities
+    scan.totalVulnerabilities,
+    language as 'es' | 'en'
   );
 
   const pdfBuffer = await generatePdfBuffer(scan, vulnerabilities, user, executiveSummary, language || 'es');
