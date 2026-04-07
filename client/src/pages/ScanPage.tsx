@@ -192,21 +192,17 @@ export default function ScanPage() {
                   </div>
                   <p className="text-xs text-muted-foreground mt-1.5">{t('scan.url_placeholder')}</p>
                 </div>
-                <div className="space-y-3 pt-4">
-                  <div className="border-2 border-white/30 hover:border-white/50 rounded-lg p-4 transition-colors">
-                    <div className="flex items-start gap-3">
-                      <Checkbox id="owner" checked={ownerConfirmation} onCheckedChange={v => setOwnerConfirmation(!!v)} className="mt-1 w-5 h-5" />
-                      <Label htmlFor="owner" className="text-sm text-foreground leading-relaxed cursor-pointer font-medium">
-                        {t('scan.owner_confirmation')}
-                      </Label>
-                    </div>
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-start gap-3">
+                    <Checkbox id="owner" checked={ownerConfirmation} onCheckedChange={v => setOwnerConfirmation(!!v)} className="mt-0.5 w-5 h-5 border-2 border-white/50" />
+                    <Label htmlFor="owner" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+                      {t('scan.owner_confirmation')}
+                    </Label>
                   </div>
-                  <div className="border-2 border-white/30 hover:border-white/50 rounded-lg p-4 transition-colors">
-                    <div className="flex items-start gap-3">
-                      <Checkbox id="terms" checked={termsAccepted} onCheckedChange={v => setTermsAccepted(!!v)} className="mt-1 w-5 h-5" />
-                      <div className="text-sm text-foreground leading-relaxed font-medium">
-                        {t('scan.terms_accepted')} <a href="/terms" className="text-primary hover:underline cursor-pointer">{t('common.save')}</a> {t('common.cancel')} <a href="/privacy" className="text-primary hover:underline cursor-pointer">{t('common.close')}</a>.
-                      </div>
+                  <div className="flex items-start gap-3">
+                    <Checkbox id="terms" checked={termsAccepted} onCheckedChange={v => setTermsAccepted(!!v)} className="mt-0.5 w-5 h-5 border-2 border-white/50" />
+                    <div className="text-sm text-muted-foreground leading-relaxed">
+                      {t('scan.terms_accepted')} <a href="/terms" className="text-primary hover:underline cursor-pointer">{t('common.save')}</a> {t('common.cancel')} <a href="/privacy" className="text-primary hover:underline cursor-pointer">{t('common.close')}</a>.
                     </div>
                   </div>
                 </div>
