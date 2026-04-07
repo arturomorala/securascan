@@ -89,14 +89,12 @@ export const appRouter = router({
           }
         }
 
-        // Validate URL is not internal/private (skip for admins)
+        // Validate URL is not internal/private
         const url = new URL(input.url);
         const hostname = url.hostname.toLowerCase();
-        if (ctx.user.role !== 'admin') {
-          const privatePatterns = [/^localhost$/, /^127\./, /^10\./, /^192\.168\./, /^172\.(1[6-9]|2\d|3[01])\./, /^::1$/, /^0\.0\.0\.0$/];
-          if (privatePatterns.some(p => p.test(hostname))) {
-            throw new TRPCError({ code: "BAD_REQUEST", message: "No se pueden escanear direcciones IP privadas o localhost." });
-          }
+        const privatePatterns = [/^localhost$/, /^127\./, /^10\./, /^192\.168\./, /^172\.(1[6-9]|2\d|3[01])\./, /^::1$/, /^0\.0\.0\.0$/];
+        if (privatePatterns.some(p => p.test(hostname))) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "No se pueden escanear direcciones IP privadas o localhost." });
         }
 
         const scan = await createScan({
@@ -340,56 +338,6 @@ export const appRouter = router({
           description: "Admin consultó registro de auditoría",
         });
         return getRecentSecurityEvents(input?.limit ?? 100, input?.userId);
-      }),
-  }),
-
-  // ─── Testimonials ────────────────────────────────────────────────────────────
-  testimonials: router({
-    create: protectedProcedure
-      .input(z.object({
-        rating: z.number().min(1).max(5),
-        title: z.string().min(5).max(255),
-        content: z.string().min(10).max(1000),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const db = require("./db").db;
-        const { testimonials } = require("../drizzle/schema");
-        
-        const result = await db.insert(testimonials).values({
-          userId: ctx.user.id,
-          rating: input.rating,
-          title: input.title,
-          content: input.content,
-          isPublished: true,
-        });
-        
-        return { success: true, id: result[0].insertId };
-      }),
-
-    list: publicProcedure
-      .input(z.object({ limit: z.number().min(1).max(50).default(10), offset: z.number().min(0).default(0) }).optional())
-      .query(async ({ input }) => {
-        const db = require("./db").db;
-        const { testimonials, users } = require("../drizzle/schema");
-        const { eq } = require("drizzle-orm");
-        
-        const result = await db
-          .select({
-            id: testimonials.id,
-            rating: testimonials.rating,
-            title: testimonials.title,
-            content: testimonials.content,
-            userName: users.name,
-            createdAt: testimonials.createdAt,
-          })
-          .from(testimonials)
-          .innerJoin(users, eq(testimonials.userId, users.id))
-          .where(eq(testimonials.isPublished, true))
-          .orderBy(testimonials.createdAt)
-          .limit(input?.limit ?? 10)
-          .offset(input?.offset ?? 0);
-        
-        return result;
       }),
   }),
 

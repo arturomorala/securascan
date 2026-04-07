@@ -194,13 +194,13 @@ export default function ScanPage() {
                 </div>
                 <div className="space-y-3 pt-1">
                   <div className="flex items-start gap-3">
-                    <Checkbox id="owner" checked={ownerConfirmation} onCheckedChange={v => setOwnerConfirmation(!!v)} className="mt-0.5 w-5 h-5 border-2 border-white/50" />
+                    <Checkbox id="owner" checked={ownerConfirmation} onCheckedChange={v => setOwnerConfirmation(!!v)} className="mt-0.5" />
                     <Label htmlFor="owner" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
                       {t('scan.owner_confirmation')}
                     </Label>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Checkbox id="terms" checked={termsAccepted} onCheckedChange={v => setTermsAccepted(!!v)} className="mt-0.5 w-5 h-5 border-2 border-white/50" />
+                    <Checkbox id="terms" checked={termsAccepted} onCheckedChange={v => setTermsAccepted(!!v)} className="mt-0.5" />
                     <div className="text-sm text-muted-foreground leading-relaxed">
                       {t('scan.terms_accepted')} <a href="/terms" className="text-primary hover:underline cursor-pointer">{t('common.save')}</a> {t('common.cancel')} <a href="/privacy" className="text-primary hover:underline cursor-pointer">{t('common.close')}</a>.
                     </div>

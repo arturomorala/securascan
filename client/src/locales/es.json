@@ -43,18 +43,6 @@
     "step4_desc": "Descarga un informe PDF completo listo para presentar a tu equipo técnico o clientes.",
     "vulnerabilities_title": "Vulnerabilidades que detectamos",
     "vulnerabilities_desc": "Analizamos más de 50 vectores de ataque basados en el estándar OWASP Top 10 y las últimas amenazas conocidas.",
-    "vuln_sql_injection": "Permite a atacantes ejecutar comandos SQL maliciosos en la base de datos para acceder, modificar o eliminar datos.",
-    "vuln_xss": "Inyección de código JavaScript en páginas web para robar datos de usuarios, sesiones o realizar acciones maliciosas.",
-    "vuln_csrf": "Ataque que fuerza a usuarios autenticados a realizar acciones no deseadas en sitios web donde tienen sesión activa.",
-    "vuln_cors": "Configuración incorrecta de CORS permite que sitios maliciosos accedan a recursos protegidos de tu dominio.",
-    "vuln_https": "Conexión no cifrada expone datos sensibles a intercepciones y ataques man-in-the-middle durante la transmisión.",
-    "vuln_auth": "Mecanismos de autenticación débiles permiten acceso no autorizado a cuentas de usuario y datos confidenciales.",
-    "vuln_headers": "Headers de seguridad HTTP faltantes dejan el sitio vulnerable a clickjacking, XSS y otros ataques comunes.",
-    "vuln_ssl": "Certificados SSL/TLS débiles o mal configurados comprometen la seguridad de la conexión y la identidad del sitio.",
-    "vuln_csp": "Content Security Policy ausente o débil permite inyección de scripts maliciosos y otros ataques de contenido.",
-    "vuln_cms": "Identificación de CMS y versiones permite a atacantes dirigirse a vulnerabilidades conocidas del software.",
-    "vuln_clickjacking": "Sitio vulnerable a ataques de clickjacking donde usuarios son engañados para hacer clic en elementos ocultos.",
-    "vuln_disclosure": "Información sensible expuesta públicamente como versiones de software, rutas internas o datos de configuración.",
     "pricing_title": "Precios",
     "testimonials_title": "Lo que dicen nuestros clientes",
     "faq_title": "Preguntas frecuentes",
@@ -147,8 +135,7 @@
     "score_good": "Bueno",
     "score_moderate": "Moderado",
     "score_poor": "Deficiente",
-    "score_critical": "Crítico",
-    "no_vulnerabilities_desc": "Tu sitio web pasó el análisis de seguridad sin vulnerabilidades críticas detectadas."
+    "score_critical": "Crítico"
   },
   "dashboard": {
     "completed": "Completados",

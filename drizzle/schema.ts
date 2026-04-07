@@ -154,17 +154,3 @@ export const securityLogs = mysqlTable("securityLogs", {
 
 export type SecurityLog = typeof securityLogs.$inferSelect;
 export type InsertSecurityLog = typeof securityLogs.$inferInsert;
-
-export const testimonials = mysqlTable("testimonials", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  rating: int("rating").notNull(), // 1-5 stars
-  title: varchar("title", { length: 255 }).notNull(),
-  content: text("content").notNull(),
-  isPublished: boolean("isPublished").default(true).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Testimonial = typeof testimonials.$inferSelect;
-export type InsertTestimonial = typeof testimonials.$inferInsert;
