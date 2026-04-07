@@ -63,7 +63,19 @@
     "features3": "Free report included",
     "features4": "OWASP Top 10",
     "pricing_simple_transparent": "Simple and transparent plans",
-    "pricing_no_hidden_costs": "No hidden costs. Cancel anytime."
+    "pricing_no_hidden_costs": "No hidden costs. Cancel anytime.",
+    "vuln_sql_injection": "Allows attackers to execute malicious SQL commands in the database to access, modify or delete data.",
+    "vuln_xss": "Injection of JavaScript code into web pages to steal user data, sessions or perform malicious actions.",
+    "vuln_csrf": "Attack that forces authenticated users to perform unwanted actions on websites where they have an active session.",
+    "vuln_cors": "Incorrect CORS configuration allows malicious sites to access protected resources from your domain.",
+    "vuln_https": "Unencrypted connection exposes sensitive data to interception and man-in-the-middle attacks during transmission.",
+    "vuln_auth": "Weak authentication mechanisms allow unauthorized access to user accounts and confidential data.",
+    "vuln_headers": "Missing HTTP security headers leave the site vulnerable to clickjacking, XSS and other common attacks.",
+    "vuln_ssl": "Weak or misconfigured SSL/TLS certificates compromise connection security and site identity.",
+    "vuln_csp": "Absent or weak Content Security Policy allows injection of malicious scripts and other content attacks.",
+    "vuln_cms": "CMS and version identification allows attackers to target known software vulnerabilities.",
+    "vuln_clickjacking": "Site vulnerable to clickjacking attacks where users are tricked into clicking hidden elements.",
+    "vuln_disclosure": "Sensitive information exposed publicly such as software versions, internal paths or configuration data."
   },
   "scan": {
     "title": "Analyze website",

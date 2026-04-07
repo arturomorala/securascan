@@ -46,18 +46,18 @@ export default function Home() {
   ];
 
   const VULN_TYPES = [
-    { icon: Code, label: "SQL Injection", severity: "critical", desc: t('home.vulnerabilities_desc') },
-    { icon: Globe, label: "XSS", severity: "high", desc: t('home.vulnerabilities_desc') },
-    { icon: Server, label: t('home.vulnerabilities_title'), severity: "medium", desc: t('home.vulnerabilities_desc') },
-    { icon: Eye, label: "CORS", severity: "high", desc: t('home.vulnerabilities_desc') },
-    { icon: Lock, label: t('home.vulnerabilities_title'), severity: "medium", desc: t('home.vulnerabilities_desc') },
-    { icon: Key, label: "CSRF", severity: "high", desc: t('home.vulnerabilities_desc') },
-    { icon: AlertTriangle, label: t('home.vulnerabilities_title'), severity: "critical", desc: t('home.vulnerabilities_desc') },
-    { icon: Shield, label: "HTTPS", severity: "high", desc: t('home.vulnerabilities_desc') },
-    { icon: FileText, label: "CSP", severity: "medium", desc: t('home.vulnerabilities_desc') },
-    { icon: Server, label: "CMS", severity: "high", desc: t('home.vulnerabilities_desc') },
-    { icon: Eye, label: "Clickjacking", severity: "medium", desc: t('home.vulnerabilities_desc') },
-    { icon: Code, label: t('home.vulnerabilities_title'), severity: "low", desc: t('home.vulnerabilities_desc') },
+    { icon: Code, label: "SQL Injection", severity: "critical", desc: t('home.vuln_sql_injection') },
+    { icon: Globe, label: "XSS", severity: "high", desc: t('home.vuln_xss') },
+    { icon: Server, label: "CSRF", severity: "high", desc: t('home.vuln_csrf') },
+    { icon: Eye, label: "CORS", severity: "high", desc: t('home.vuln_cors') },
+    { icon: Lock, label: "HTTPS", severity: "high", desc: t('home.vuln_https') },
+    { icon: Key, label: "Authentication", severity: "high", desc: t('home.vuln_auth') },
+    { icon: AlertTriangle, label: "Security Headers", severity: "critical", desc: t('home.vuln_headers') },
+    { icon: Shield, label: "SSL/TLS", severity: "high", desc: t('home.vuln_ssl') },
+    { icon: FileText, label: "CSP", severity: "medium", desc: t('home.vuln_csp') },
+    { icon: Server, label: "CMS Detection", severity: "medium", desc: t('home.vuln_cms') },
+    { icon: Eye, label: "Clickjacking", severity: "medium", desc: t('home.vuln_clickjacking') },
+    { icon: Code, label: "Information Disclosure", severity: "low", desc: t('home.vuln_disclosure') },
   ];
 
   const STATS = [
