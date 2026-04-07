@@ -14,7 +14,7 @@ function SeverityBadge({ severity, t }: { severity: string; t: any }) {
   return <span className={`text-xs px-2 py-0.5 rounded font-medium ${map[severity] || ""}`}>{labels[severity] || severity}</span>;
 }
 
-function VulnerabilityCard({ vuln, t }: { vuln: any; t: any }) {
+function VulnerabilityCard({ vuln, t, language }: { vuln: any; t: any; language: string }) {
   const [expanded, setExpanded] = useState(false);
   const [aiLevel, setAiLevel] = useState<"basic" | "technical" | "expert" | null>(null);
   const [aiContent, setAiContent] = useState<string | null>(null);
@@ -27,7 +27,7 @@ function VulnerabilityCard({ vuln, t }: { vuln: any; t: any }) {
   const handleExplain = (level: "basic" | "technical" | "expert") => {
     setAiLevel(level);
     setAiContent(null);
-    explainMutation.mutate({ vulnerabilityId: vuln.id, level });
+    explainMutation.mutate({ vulnerabilityId: vuln.id, level, language: language as 'es' | 'en' });
   };
 
   const borderColor = vuln.severity === "critical" ? "border-red-500/30" : vuln.severity === "high" ? "border-orange-500/30" : vuln.severity === "medium" ? "border-yellow-500/30" : "border-blue-500/30";
@@ -90,7 +90,7 @@ function VulnerabilityCard({ vuln, t }: { vuln: any; t: any }) {
           )}
 
           {/* AI Explanation */}
-            <div className="border-t border-white/5 pt-4">
+          <div className="border-t border-white/5 pt-4">
             <div className="flex items-center gap-2 mb-3">
               <Brain className="w-4 h-4 text-primary" />
               <span className="text-sm font-semibold">{t('scan.ai_explanation')}</span>
@@ -124,7 +124,7 @@ function VulnerabilityCard({ vuln, t }: { vuln: any; t: any }) {
 }
 
 export default function ReportPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const params = useParams<{ id: string }>();
   const scanId = parseInt(params.id);
@@ -234,40 +234,31 @@ export default function ReportPage() {
               { label: t('scan.low_count'), count: scan.lowCount, cls: "severity-low" },
             ].map(item => (
               <div key={item.label} className={`rounded-xl p-3 text-center ${item.cls}`}>
-                <div className="text-xl font-black">{item.count}</div>
-                <div className="text-xs">{item.label}</div>
+                <div className="text-xl font-bold">{item.count}</div>
+                <div className="text-xs text-muted-foreground">{item.label}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Vulnerabilities */}
-        {!scan.isPaid ? (
-          <div className="bg-gradient-to-br from-primary/10 to-purple-500/5 border border-primary/30 rounded-2xl p-8 text-center cyber-glow">
-            <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-3">{t('scan.report_locked')}</h3>
-            <p className="text-muted-foreground mb-6">{t('scan.report_locked_desc')}</p>
-            <Link href={`/scan/${scanId}`}><Button className="cyber-glow px-8">{t('scan.unlock_report')}</Button></Link>
-          </div>
-        ) : vulnsLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 text-primary animate-spin" />
-          </div>
-        ) : vulnerabilities && vulnerabilities.length > 0 ? (
-          <div>
+        {vulnerabilities && vulnerabilities.length > 0 ? (
+          <div className="bg-card border border-border/50 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">{t('scan.detected_vulnerabilities')}</h2>
               <span className="text-sm text-muted-foreground">{vulnerabilities.length} {t('scan.total_vulnerabilities')}</span>
             </div>
             <div className="space-y-3">
-              {vulnerabilities.map(vuln => <VulnerabilityCard key={vuln.id} vuln={vuln} t={t} />)}
+              {vulnerabilities?.map((vuln) => (
+                <VulnerabilityCard key={vuln.id} vuln={vuln} t={t} language={i18n.language} />
+              ))}
             </div>
           </div>
         ) : (
           <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-8 text-center">
             <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
             <h3 className="text-xl font-bold mb-3">{t('scan.no_vulnerabilities')}</h3>
-            <p className="text-muted-foreground">{t('scan.no_vulnerabilities')}</p>
+            <p className="text-muted-foreground">{t('scan.no_vulnerabilities_desc')}</p>
           </div>
         )}
       </div>
