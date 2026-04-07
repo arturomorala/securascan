@@ -1,5 +1,6 @@
 import { updateScan, createVulnerabilities, getScanById } from "./db";
 import { notifyOwner } from "./_core/notification";
+import { translateVulnerability } from "./lib/vulnerabilities-i18n";
 import type { User } from "../drizzle/schema";
 
 interface ScanStep {
@@ -55,6 +56,17 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getTranslatedVuln(name: string, lang: 'es' | 'en'): Partial<VulnResult> {
+  return {
+    name: translateVulnerability(name, 'name', lang) || name,
+    description: translateVulnerability(name, 'description', lang),
+    impact: translateVulnerability(name, 'impact', lang),
+    detectionMethod: translateVulnerability(name, 'detectionMethod', lang),
+    remediation: translateVulnerability(name, 'remediation', lang),
+    owaspReference: translateVulnerability(name, 'owaspReference', lang),
+  };
+}
+
 export async function performSecurityScan(scanId: number, targetUrl: string, user: User, language: 'es' | 'en' = 'es'): Promise<void> {
   await updateScan(scanId, { status: "running", progress: 5, currentStep: "Iniciando análisis de seguridad..." });
 
@@ -80,74 +92,74 @@ export async function performSecurityScan(scanId: number, targetUrl: string, use
     // Step 2: Analyze Security Headers
     await updateScan(scanId, { progress: 15, currentStep: SCAN_STEPS[0].name });
     await sleep(600);
-    const headerVulns = analyzeSecurityHeaders(headers, finalUrl);
+    const headerVulns = analyzeSecurityHeaders(headers, finalUrl, language);
     vulnerabilities.push(...headerVulns);
 
     // Step 3: Check HTTPS
     await updateScan(scanId, { progress: 22, currentStep: SCAN_STEPS[1].name });
     await sleep(500);
-    const httpsVulns = analyzeHttps(targetUrl, finalUrl);
+    const httpsVulns = analyzeHttps(targetUrl, finalUrl, language);
     vulnerabilities.push(...httpsVulns);
 
     // Step 4: Detect technologies
     await updateScan(scanId, { progress: 32, currentStep: SCAN_STEPS[2].name });
     await sleep(700);
     const body = await response.text().catch(() => "");
-    const techVulns = analyzeTechnologies(headers, body, finalUrl);
+    const techVulns = analyzeTechnologies(headers, body, finalUrl, language);
     vulnerabilities.push(...techVulns);
 
     // Step 5: Analyze cookies
     await updateScan(scanId, { progress: 42, currentStep: SCAN_STEPS[3].name });
     await sleep(500);
-    const cookieVulns = analyzeCookies(headers);
+    const cookieVulns = analyzeCookies(headers, language);
     vulnerabilities.push(...cookieVulns);
 
     // Step 6: Check CSP
     await updateScan(scanId, { progress: 52, currentStep: SCAN_STEPS[4].name });
     await sleep(600);
-    const cspVulns = analyzeCSP(headers);
+    const cspVulns = analyzeCSP(headers, language);
     vulnerabilities.push(...cspVulns);
 
     // Step 7: Check CORS
     await updateScan(scanId, { progress: 62, currentStep: SCAN_STEPS[5].name });
     await sleep(500);
-    const corsVulns = analyzeCORS(headers);
+    const corsVulns = analyzeCORS(headers, language);
     vulnerabilities.push(...corsVulns);
 
     // Step 8: Check sensitive files
     await updateScan(scanId, { progress: 72, currentStep: SCAN_STEPS[6].name });
     await sleep(800);
-    const sensitiveVulns = await checkSensitiveFiles(finalUrl);
+    const sensitiveVulns = await checkSensitiveFiles(finalUrl, language);
     vulnerabilities.push(...sensitiveVulns);
 
     // Step 9: Analyze forms and content
     await updateScan(scanId, { progress: 82, currentStep: SCAN_STEPS[7].name });
     await sleep(600);
-    const contentVulns = analyzeContent(body, headers);
+    const contentVulns = analyzeContent(body, headers, language);
     vulnerabilities.push(...contentVulns);
 
     // Step 10: Server analysis
     await updateScan(scanId, { progress: 85, currentStep: SCAN_STEPS[8].name });
     await sleep(500);
-    const serverVulns = analyzeServer(headers);
+    const serverVulns = analyzeServer(headers, language);
     vulnerabilities.push(...serverVulns);
 
     // Step 11: Detect subdomains
     await updateScan(scanId, { progress: 88, currentStep: SCAN_STEPS[9].name });
     await sleep(700);
-    const subdomainVulns = await detectSubdomains(targetUrl);
+    const subdomainVulns = await detectSubdomains(targetUrl, language);
     vulnerabilities.push(...subdomainVulns);
 
     // Step 12: Analyze TLS certificate
     await updateScan(scanId, { progress: 91, currentStep: SCAN_STEPS[10].name });
     await sleep(600);
-    const tlsVulns = await analyzeTLSCertificate(targetUrl);
+    const tlsVulns = await analyzeTLSCertificate(targetUrl, language);
     vulnerabilities.push(...tlsVulns);
 
     // Step 13: Scan open ports
     await updateScan(scanId, { progress: 94, currentStep: SCAN_STEPS[11].name });
     await sleep(800);
-    const portVulns = await scanOpenPorts(targetUrl);
+    const portVulns = await scanOpenPorts(targetUrl, language);
     vulnerabilities.push(...portVulns);
 
     // Calculate scores
@@ -219,23 +231,24 @@ export async function performSecurityScan(scanId: number, targetUrl: string, use
   }
 }
 
-function analyzeSecurityHeaders(headers: Headers, url: string): VulnResult[] {
+function analyzeSecurityHeaders(headers: Headers, url: string, language: 'es' | 'en' = 'es'): VulnResult[] {
   const vulns: VulnResult[] = [];
 
   const strictTransportSecurity = headers.get("strict-transport-security");
   if (!strictTransportSecurity && url.startsWith("https://")) {
+    const translation = getTranslatedVuln("HSTS no configurado", language);
     vulns.push({
-      name: "HSTS no configurado",
+      name: translation.name || "HSTS no configurado",
       category: "Security Headers",
       severity: "high",
-      description: "El encabezado HTTP Strict-Transport-Security (HSTS) no está configurado. Esto permite ataques de downgrade de HTTPS a HTTP.",
-      detectionMethod: "Análisis de cabeceras HTTP de respuesta",
-      impact: "Los usuarios pueden ser redirigidos a versiones HTTP inseguras del sitio mediante ataques man-in-the-middle.",
-      technicalDetails: "El servidor no envía el header 'Strict-Transport-Security' en sus respuestas HTTPS.",
-      remediation: "Añadir el header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload",
-      owaspReference: "OWASP A05:2021 - Security Misconfiguration",
+      description: translation.description || "El encabezado HTTP Strict-Transport-Security (HSTS) no está configurado. Esto permite ataques de downgrade de HTTPS a HTTP.",
+      detectionMethod: translation.detectionMethod || "Análisis de cabeceras HTTP de respuesta",
+      impact: translation.impact || "Los usuarios pueden ser redirigidos a versiones HTTP inseguras del sitio mediante ataques man-in-the-middle.",
+      technicalDetails: language === 'en' ? "The server does not send the 'Strict-Transport-Security' header in its HTTPS responses." : "El servidor no envía el header 'Strict-Transport-Security' en sus respuestas HTTPS.",
+      remediation: translation.remediation || "Añadir el header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload",
+      owaspReference: translation.owaspReference || "OWASP A05:2021 - Security Misconfiguration",
       cvssScore: "7.4",
-      evidence: `Header 'Strict-Transport-Security' ausente en ${url}`,
+      evidence: language === 'en' ? `Header 'Strict-Transport-Security' missing from ${url}` : `Header 'Strict-Transport-Security' ausente en ${url}`,
     });
   }
 
@@ -243,76 +256,80 @@ function analyzeSecurityHeaders(headers: Headers, url: string): VulnResult[] {
   const csp = headers.get("content-security-policy");
   const hasFrameProtection = xFrameOptions || (csp && csp.includes("frame-ancestors"));
   if (!hasFrameProtection) {
+    const translation = getTranslatedVuln("Protección Clickjacking ausente", language);
     vulns.push({
-      name: "Protección Clickjacking ausente",
+      name: translation.name || "Protección Clickjacking ausente",
       category: "Security Headers",
       severity: "medium",
-      description: "El sitio no implementa protección contra ataques de clickjacking. No se encontró X-Frame-Options ni frame-ancestors en CSP.",
-      detectionMethod: "Análisis de cabeceras X-Frame-Options y Content-Security-Policy",
-      impact: "Atacantes pueden incrustar el sitio en iframes maliciosos para engañar a usuarios y capturar clics.",
-      technicalDetails: `X-Frame-Options: ${xFrameOptions || 'ausente'}. CSP frame-ancestors: no configurado.`,
-      remediation: "Añadir: X-Frame-Options: DENY o Content-Security-Policy: frame-ancestors 'none'",
-      owaspReference: "OWASP A05:2021 - Security Misconfiguration",
+      description: translation.description || "El sitio no implementa protección contra ataques de clickjacking. No se encontró X-Frame-Options ni frame-ancestors en CSP.",
+      detectionMethod: translation.detectionMethod || "Análisis de cabeceras X-Frame-Options y Content-Security-Policy",
+      impact: translation.impact || "Atacantes pueden incrustar el sitio en iframes maliciosos para engañar a usuarios y capturar clics.",
+      technicalDetails: language === 'en' ? `X-Frame-Options: ${xFrameOptions || 'missing'}. CSP frame-ancestors: not configured.` : `X-Frame-Options: ${xFrameOptions || 'ausente'}. CSP frame-ancestors: no configurado.`,
+      remediation: translation.remediation || "Añadir: X-Frame-Options: DENY o Content-Security-Policy: frame-ancestors 'none'",
+      owaspReference: translation.owaspReference || "OWASP A05:2021 - Security Misconfiguration",
       cvssScore: "6.1",
-      evidence: "Headers X-Frame-Options y frame-ancestors en CSP no encontrados",
+      evidence: language === 'en' ? "X-Frame-Options and frame-ancestors in CSP headers not found" : "Headers X-Frame-Options y frame-ancestors en CSP no encontrados",
     });
   }
 
   const xContentTypeOptions = headers.get("x-content-type-options");
   if (!xContentTypeOptions || xContentTypeOptions !== "nosniff") {
+    const translation = getTranslatedVuln("X-Content-Type-Options no configurado", language);
     vulns.push({
-      name: "X-Content-Type-Options no configurado",
+      name: translation.name || "X-Content-Type-Options no configurado",
       category: "Security Headers",
       severity: "low",
-      description: "El header X-Content-Type-Options: nosniff no está configurado, permitiendo ataques de MIME sniffing.",
-      detectionMethod: "Análisis de cabeceras HTTP",
-      impact: "El navegador puede interpretar archivos con tipos MIME incorrectos, facilitando ataques XSS.",
-      technicalDetails: `X-Content-Type-Options: ${xContentTypeOptions || 'ausente'}`,
-      remediation: "Añadir el header: X-Content-Type-Options: nosniff",
-      owaspReference: "OWASP A05:2021 - Security Misconfiguration",
+      description: translation.description || "El header X-Content-Type-Options: nosniff no está configurado, permitiendo ataques de MIME sniffing.",
+      detectionMethod: translation.detectionMethod || "Análisis de cabeceras HTTP",
+      impact: translation.impact || "El navegador puede interpretar archivos con tipos MIME incorrectos, facilitando ataques XSS.",
+      technicalDetails: language === 'en' ? `X-Content-Type-Options: ${xContentTypeOptions || 'missing'}` : `X-Content-Type-Options: ${xContentTypeOptions || 'ausente'}`,
+      remediation: translation.remediation || "Añadir el header: X-Content-Type-Options: nosniff",
+      owaspReference: translation.owaspReference || "OWASP A05:2021 - Security Misconfiguration",
       cvssScore: "4.3",
-      evidence: `Header actual: ${xContentTypeOptions || 'no presente'}`,
+      evidence: language === 'en' ? `Current header: ${xContentTypeOptions || 'not present'}` : `Header actual: ${xContentTypeOptions || 'no presente'}`,
     });
   }
 
   const referrerPolicy = headers.get("referrer-policy");
   if (!referrerPolicy) {
+    const translation = getTranslatedVuln("Referrer-Policy no configurado", language);
     vulns.push({
-      name: "Referrer-Policy no configurado",
+      name: translation.name || "Referrer-Policy no configurado",
       category: "Security Headers",
       severity: "low",
-      description: "El header Referrer-Policy no está configurado. Información sensible de la URL puede filtrarse a terceros.",
-      detectionMethod: "Análisis de cabeceras HTTP",
-      impact: "URLs con parámetros sensibles (tokens, IDs) pueden filtrarse a sitios externos.",
-      technicalDetails: "Header Referrer-Policy ausente",
-      remediation: "Añadir: Referrer-Policy: strict-origin-when-cross-origin",
-      owaspReference: "OWASP A05:2021 - Security Misconfiguration",
+      description: translation.description || "El header Referrer-Policy no está configurado. Información sensible de la URL puede filtrarse a terceros.",
+      detectionMethod: translation.detectionMethod || "Análisis de cabeceras HTTP",
+      impact: translation.impact || "URLs con parámetros sensibles (tokens, IDs) pueden filtrarse a sitios externos.",
+      technicalDetails: language === 'en' ? "Referrer-Policy header missing" : "Header Referrer-Policy ausente",
+      remediation: translation.remediation || "Añadir: Referrer-Policy: strict-origin-when-cross-origin",
+      owaspReference: translation.owaspReference || "OWASP A05:2021 - Security Misconfiguration",
       cvssScore: "3.7",
-      evidence: "Header Referrer-Policy no encontrado en la respuesta",
+      evidence: language === 'en' ? "Referrer-Policy header not found in response" : "Header Referrer-Policy no encontrado en la respuesta",
     });
   }
 
   const permissionsPolicy = headers.get("permissions-policy") || headers.get("feature-policy");
   if (!permissionsPolicy) {
+    const translation = getTranslatedVuln("Permissions-Policy no configurado", language);
     vulns.push({
-      name: "Permissions-Policy no configurado",
+      name: translation.name || "Permissions-Policy no configurado",
       category: "Security Headers",
       severity: "low",
-      description: "El header Permissions-Policy no restringe el acceso a APIs del navegador como cámara, micrófono o geolocalización.",
-      detectionMethod: "Análisis de cabeceras HTTP",
-      impact: "Scripts maliciosos podrían acceder a APIs sensibles del navegador sin restricción.",
-      technicalDetails: "Headers Permissions-Policy y Feature-Policy ausentes",
-      remediation: "Añadir: Permissions-Policy: camera=(), microphone=(), geolocation=()",
-      owaspReference: "OWASP A05:2021 - Security Misconfiguration",
+      description: translation.description || "El header Permissions-Policy no restringe el acceso a APIs del navegador como cámara, micrófono o geolocalización.",
+      detectionMethod: translation.detectionMethod || "Análisis de cabeceras HTTP",
+      impact: translation.impact || "Scripts maliciosos podrían acceder a APIs sensibles del navegador sin restricción.",
+      technicalDetails: language === 'en' ? "Permissions-Policy and Feature-Policy headers missing" : "Headers Permissions-Policy y Feature-Policy ausentes",
+      remediation: translation.remediation || "Añadir: Permissions-Policy: camera=(), microphone=(), geolocation=()",
+      owaspReference: translation.owaspReference || "OWASP A05:2021 - Security Misconfiguration",
       cvssScore: "3.5",
-      evidence: "Headers Permissions-Policy/Feature-Policy no encontrados",
+      evidence: language === 'en' ? "Permissions-Policy/Feature-Policy headers not found" : "Headers Permissions-Policy/Feature-Policy no encontrados",
     });
   }
 
   return vulns;
 }
 
-function analyzeHttps(originalUrl: string, finalUrl: string): VulnResult[] {
+function analyzeHttps(originalUrl: string, finalUrl: string, language: 'es' | 'en' = 'es'): VulnResult[] {
   const vulns: VulnResult[] = [];
 
   if (originalUrl.startsWith("http://")) {
@@ -334,7 +351,7 @@ function analyzeHttps(originalUrl: string, finalUrl: string): VulnResult[] {
   return vulns;
 }
 
-function analyzeTechnologies(headers: Headers, body: string, url: string): VulnResult[] {
+function analyzeTechnologies(headers: Headers, body: string, url: string, language: 'es' | 'en' = 'es'): VulnResult[] {
   const vulns: VulnResult[] = [];
   const server = headers.get("server");
   const xPoweredBy = headers.get("x-powered-by");
@@ -391,7 +408,7 @@ function analyzeTechnologies(headers: Headers, body: string, url: string): VulnR
   return vulns;
 }
 
-function analyzeCookies(headers: Headers): VulnResult[] {
+function analyzeCookies(headers: Headers, language: 'es' | 'en' = 'es'): VulnResult[] {
   const vulns: VulnResult[] = [];
   const setCookieHeader = headers.get("set-cookie");
 
@@ -450,7 +467,7 @@ function analyzeCookies(headers: Headers): VulnResult[] {
   return vulns;
 }
 
-function analyzeCSP(headers: Headers): VulnResult[] {
+function analyzeCSP(headers: Headers, language: 'es' | 'en' = 'es'): VulnResult[] {
   const vulns: VulnResult[] = [];
   const csp = headers.get("content-security-policy");
 
@@ -487,7 +504,7 @@ function analyzeCSP(headers: Headers): VulnResult[] {
   return vulns;
 }
 
-function analyzeCORS(headers: Headers): VulnResult[] {
+function analyzeCORS(headers: Headers, language: 'es' | 'en' = 'es'): VulnResult[] {
   const vulns: VulnResult[] = [];
   const acao = headers.get("access-control-allow-origin");
 
@@ -510,7 +527,7 @@ function analyzeCORS(headers: Headers): VulnResult[] {
   return vulns;
 }
 
-async function checkSensitiveFiles(baseUrl: string): Promise<VulnResult[]> {
+async function checkSensitiveFiles(baseUrl: string, language: 'es' | 'en' = 'es'): Promise<VulnResult[]> {
   const vulns: VulnResult[] = [];
   const sensitiveFiles = [
     { path: "/.env", name: "Archivo .env expuesto" },
@@ -552,7 +569,7 @@ async function checkSensitiveFiles(baseUrl: string): Promise<VulnResult[]> {
   return vulns;
 }
 
-function analyzeContent(body: string, headers: Headers): VulnResult[] {
+function analyzeContent(body: string, headers: Headers, language: 'es' | 'en' = 'es'): VulnResult[] {
   const vulns: VulnResult[] = [];
 
   // Check for inline scripts (potential XSS vectors)
@@ -595,7 +612,7 @@ function analyzeContent(body: string, headers: Headers): VulnResult[] {
   return vulns;
 }
 
-function analyzeServer(headers: Headers): VulnResult[] {
+function analyzeServer(headers: Headers, language: 'es' | 'en' = 'es'): VulnResult[] {
   const vulns: VulnResult[] = [];
 
   // Check for directory listing indicators
@@ -621,7 +638,7 @@ function analyzeServer(headers: Headers): VulnResult[] {
 
 // ─── New scanning functions for extended coverage ───────────────────────────
 
-async function detectSubdomains(targetUrl: string): Promise<VulnResult[]> {
+async function detectSubdomains(targetUrl: string, language: 'es' | 'en' = 'es'): Promise<VulnResult[]> {
   const vulns: VulnResult[] = [];
   try {
     const url = new URL(targetUrl);
@@ -673,7 +690,7 @@ async function detectSubdomains(targetUrl: string): Promise<VulnResult[]> {
   return vulns;
 }
 
-async function analyzeTLSCertificate(targetUrl: string): Promise<VulnResult[]> {
+async function analyzeTLSCertificate(targetUrl: string, language: 'es' | 'en' = 'es'): Promise<VulnResult[]> {
   const vulns: VulnResult[] = [];
   try {
     const url = new URL(targetUrl);
@@ -731,7 +748,7 @@ async function analyzeTLSCertificate(targetUrl: string): Promise<VulnResult[]> {
   return vulns;
 }
 
-async function scanOpenPorts(targetUrl: string): Promise<VulnResult[]> {
+async function scanOpenPorts(targetUrl: string, language: 'es' | 'en' = 'es'): Promise<VulnResult[]> {
   const vulns: VulnResult[] = [];
   try {
     const url = new URL(targetUrl);
