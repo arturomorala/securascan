@@ -102,6 +102,7 @@ export const appRouter = router({
           url: input.url,
           status: "pending",
           progress: 0,
+          language: input.language || 'es',
         });
 
         // Log scan creation
