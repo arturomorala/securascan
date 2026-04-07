@@ -227,12 +227,12 @@ export default function ScanPage() {
                   <Shield className="w-9 h-9 text-primary animate-pulse" />
                 </div>
               </div>
-              <h1 className="text-2xl font-black mb-2">Analizando seguridad...</h1>
+              <h1 className="text-2xl font-black mb-2">{t('scan.analyzing_headers')}</h1>
               <p className="text-muted-foreground text-sm">{scanSummary?.url || url}</p>
             </div>
             <div className="bg-card border border-border/50 rounded-2xl p-6 mb-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium">Progreso</span>
+                <span className="text-sm font-medium">{t('common.loading')}</span>
                 <span className="text-sm font-bold text-primary">{scanSummary?.progress ?? 0}%</span>
               </div>
               <div className="w-full h-2 bg-muted rounded-full overflow-hidden mb-3">
@@ -244,7 +244,7 @@ export default function ScanPage() {
               </p>
             </div>
             <div className="bg-card border border-border/50 rounded-2xl p-4">
-              <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">Pasos del análisis</p>
+              <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">{t('scan.generating_results')}</p>
               <div className="space-y-2">
                 {SCAN_STEPS_DISPLAY.map((step, i) => {
                   const stepProgress = (i + 1) * 10;
@@ -272,9 +272,9 @@ export default function ScanPage() {
                 <div className="w-16 h-16 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center mx-auto mb-5">
                   <AlertTriangle className="w-8 h-8 text-red-400" />
                 </div>
-                <h1 className="text-2xl font-black mb-3">Error en el análisis</h1>
-                <p className="text-muted-foreground mb-6">No se pudo completar el análisis. Verifica que la URL sea accesible.</p>
-                <Button onClick={() => { setPhase("form"); setScanId(null); navigate("/scan"); }}>Intentar de nuevo</Button>
+                <h1 className="text-2xl font-black mb-3">{t('common.error')}</h1>
+                <p className="text-muted-foreground mb-6">{t('errors.server_error')}</p>
+                <Button onClick={() => { setPhase("form"); setScanId(null); navigate("/scan"); }}>{t('common.cancel')}</Button>
               </div>
             ) : (
               <div>
@@ -282,14 +282,14 @@ export default function ScanPage() {
                   <div className="w-16 h-16 rounded-2xl bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-5 cyber-glow-green">
                     <CheckCircle className="w-8 h-8 text-green-400" />
                   </div>
-                  <h1 className="text-2xl font-black mb-2">Análisis completado</h1>
+                  <h1 className="text-2xl font-black mb-2">{t('scan.results_title')}</h1>
                   <p className="text-muted-foreground text-sm">{scanSummary.url}</p>
                 </div>
                 <div className="bg-card border border-border/50 rounded-2xl p-6 mb-4">
                   <div className="flex items-center justify-between mb-5">
                     <div>
-                      <h2 className="text-lg font-bold mb-1">Resultado del análisis</h2>
-                      <p className="text-sm text-muted-foreground">Se han encontrado <span className="font-bold text-foreground">{scanSummary.totalVulnerabilities} vulnerabilidades</span>.</p>
+                      <h2 className="text-lg font-bold mb-1">{t('scan.analysis_results')}</h2>
+                      <p className="text-sm text-muted-foreground">{t('scan.vulnerabilities_found_count')} <span className="font-bold text-foreground">{scanSummary.totalVulnerabilities}</span>.</p>
                     </div>
                     {scanSummary.securityScore !== null && scanSummary.securityScore !== undefined && (
                       <ScoreGauge score={scanSummary.securityScore} t={t} />
@@ -297,20 +297,20 @@ export default function ScanPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-muted/20 rounded-xl p-4 text-center">
-                      <p className="text-xs text-muted-foreground mb-1">Nivel de riesgo</p>
+                      <p className="text-xs text-muted-foreground mb-1">{t('scan.risk_level_label')}</p>
                       <span className={`text-xl font-black ${getRiskColor(scanSummary.riskLevel)}`}>{getRiskLabel(scanSummary.riskLevel, t)}</span>
                     </div>
                     <div className="bg-muted/20 rounded-xl p-4 text-center">
-                      <p className="text-xs text-muted-foreground mb-1">Total vulnerabilidades</p>
+                      <p className="text-xs text-muted-foreground mb-1">{t('scan.detected_vulnerabilities')}</p>
                       <span className="text-xl font-black">{scanSummary.totalVulnerabilities}</span>
                     </div>
                   </div>
                   <div className="grid grid-cols-4 gap-2">
                     {[
-                      { label: "Crítico", count: scanSummary.criticalCount, cls: "severity-critical" },
-                      { label: "Alto", count: scanSummary.highCount, cls: "severity-high" },
-                      { label: "Medio", count: scanSummary.mediumCount, cls: "severity-medium" },
-                      { label: "Bajo", count: scanSummary.lowCount, cls: "severity-low" },
+                      { label: t('scan.critical_count'), count: scanSummary.criticalCount, cls: "severity-critical" },
+                      { label: t('scan.high_count'), count: scanSummary.highCount, cls: "severity-high" },
+                      { label: t('scan.medium_count'), count: scanSummary.mediumCount, cls: "severity-medium" },
+                      { label: t('scan.low_count'), count: scanSummary.lowCount, cls: "severity-low" },
                     ].map(item => (
                       <div key={item.label} className={`rounded-lg p-3 text-center ${item.cls}`}>
                         <div className="text-lg font-black">{item.count}</div>
@@ -322,32 +322,32 @@ export default function ScanPage() {
                 {!scanSummary.isPaid ? (
                   <div className="bg-gradient-to-br from-primary/10 to-purple-500/5 border border-primary/30 rounded-2xl p-6 text-center cyber-glow">
                     <Lock className="w-10 h-10 text-primary mx-auto mb-4" />
-                    <h3 className="text-lg font-bold mb-2">Desbloquea el informe completo</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Obtén detalles técnicos, soluciones, explicaciones con IA y el PDF profesional.</p>
+                    <h3 className="text-lg font-bold mb-2">{t('scan.unlock_full_report')}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{t('scan.get_technical_details')}</p>
                     <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
-                      {["Detalles técnicos", "Soluciones", "Explicación IA", "PDF descargable"].map(f => (
+                      {[t('scan.technical_details'), t('scan.solutions'), t('scan.ai_explanation'), t('scan.incomplete_pdf')].map(f => (
                         <span key={f} className="text-xs bg-primary/15 text-primary border border-primary/30 px-2 py-1 rounded-full">{f}</span>
                       ))}
                     </div>
                     <Button className="cyber-glow px-8 h-11 font-semibold" onClick={() => unlockReport.mutate({ scanId: scanId! })} disabled={unlockReport.isPending}>
-                      {unlockReport.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Procesando...</> : <><Shield className="w-4 h-4 mr-2" />Desbloquear informe — Gratis</>}
+                      {unlockReport.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('common.loading')}</> : <><Shield className="w-4 h-4 mr-2" />{t('scan.unlock_report_free')}</>}
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-3">Pago único. Sin suscripción obligatoria.</p>
+                    <p className="text-xs text-muted-foreground mt-3">{t('pricing.billed_monthly')}</p>
                   </div>
                 ) : (
                   <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-6 text-center">
                     <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold mb-2">Informe desbloqueado</h3>
-                    <p className="text-sm text-muted-foreground mb-5">Accede al informe completo con todos los detalles técnicos y el PDF profesional.</p>
+                    <h3 className="text-lg font-bold mb-2">{t('scan.unlock_report')}</h3>
+                    <p className="text-sm text-muted-foreground mb-5">{t('scan.report_locked_desc')}</p>
                     <Link href={`/report/${scanId}`}>
                       <Button className="px-8 h-11 font-semibold bg-green-600 hover:bg-green-700">
-                        <FileText className="w-4 h-4 mr-2" />Ver informe completo<ArrowRight className="w-4 h-4 ml-2" />
+                        <FileText className="w-4 h-4 mr-2" />{t('scan.security_report')}<ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </Link>
                   </div>
                 )}
                 <div className="flex gap-3 mt-4">
-                  <Button variant="outline" className="flex-1" onClick={() => { setPhase("form"); setScanId(null); navigate("/scan"); }}>Nuevo análisis</Button>
+                  <Button variant="outline" className="flex-1" onClick={() => { setPhase("form"); setScanId(null); navigate("/scan"); }}>{t('dashboard.new_analysis')}</Button>
                   <Link href="/dashboard" className="flex-1"><a><Button variant="ghost" className="w-full text-muted-foreground">Ver historial</Button></a></Link>
                 </div>
               </div>

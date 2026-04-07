@@ -6,14 +6,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Shield, ShieldCheck, FileText, Download, ArrowLeft, Brain, ChevronDown, ChevronUp, AlertTriangle, CheckCircle } from "lucide-react";
 import { Streamdown } from "streamdown";
+import { useTranslation } from "react-i18next";
 
-function SeverityBadge({ severity }: { severity: string }) {
+function SeverityBadge({ severity, t }: { severity: string; t: any }) {
   const map: Record<string, string> = { critical: "severity-critical", high: "severity-high", medium: "severity-medium", low: "severity-low" };
-  const labels: Record<string, string> = { critical: "Crítico", high: "Alto", medium: "Medio", low: "Bajo" };
+  const labels: Record<string, string> = { critical: t('scan.critical'), high: t('scan.high'), medium: t('scan.medium'), low: t('scan.low') };
   return <span className={`text-xs px-2 py-0.5 rounded font-medium ${map[severity] || ""}`}>{labels[severity] || severity}</span>;
 }
 
-function VulnerabilityCard({ vuln }: { vuln: any }) {
+function VulnerabilityCard({ vuln, t }: { vuln: any; t: any }) {
   const [expanded, setExpanded] = useState(false);
   const [aiLevel, setAiLevel] = useState<"basic" | "technical" | "expert" | null>(null);
   const [aiContent, setAiContent] = useState<string | null>(null);
@@ -36,7 +37,7 @@ function VulnerabilityCard({ vuln }: { vuln: any }) {
     <div className={`border ${borderColor} ${bgColor} rounded-xl overflow-hidden`}>
       <button className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors" onClick={() => setExpanded(!expanded)}>
         <div className="flex items-center gap-3">
-          <SeverityBadge severity={vuln.severity} />
+          <SeverityBadge severity={vuln.severity} t={t} />
           <span className="font-semibold text-sm">{vuln.name}</span>
           <span className="text-xs text-muted-foreground hidden sm:block">{vuln.category}</span>
         </div>
@@ -49,36 +50,36 @@ function VulnerabilityCard({ vuln }: { vuln: any }) {
       {expanded && (
         <div className="px-4 pb-4 border-t border-white/5 pt-4 space-y-4">
           <div>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Descripción</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('scan.description')}</p>
             <p className="text-sm text-foreground/90">{vuln.description}</p>
           </div>
           {vuln.detectionMethod && (
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Método de detección</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('scan.detection_method')}</p>
               <p className="text-sm text-foreground/90">{vuln.detectionMethod}</p>
             </div>
           )}
           {vuln.impact && (
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Impacto potencial</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('scan.potential_impact')}</p>
               <p className="text-sm text-foreground/90">{vuln.impact}</p>
             </div>
           )}
           {vuln.technicalDetails && (
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Detalles técnicos</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('scan.technical_details')}</p>
               <p className="text-sm font-mono bg-muted/30 rounded-lg p-3 text-foreground/80">{vuln.technicalDetails}</p>
             </div>
           )}
           {vuln.remediation && (
             <div>
-              <p className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-1">Cómo solucionarlo</p>
+              <p className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-1">{t('scan.remediation_steps')}</p>
               <p className="text-sm text-foreground/90">{vuln.remediation}</p>
             </div>
           )}
           {vuln.evidence && (
             <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Evidencia</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('scan.how_it_affects')}</p>
               <p className="text-sm font-mono bg-muted/30 rounded-lg p-3 text-foreground/80">{vuln.evidence}</p>
             </div>
           )}
@@ -89,10 +90,10 @@ function VulnerabilityCard({ vuln }: { vuln: any }) {
           )}
 
           {/* AI Explanation */}
-          <div className="border-t border-white/5 pt-4">
+            <div className="border-t border-white/5 pt-4">
             <div className="flex items-center gap-2 mb-3">
               <Brain className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold">Explicación con IA</span>
+              <span className="text-sm font-semibold">{t('scan.ai_explanation')}</span>
             </div>
             <div className="flex gap-2 mb-3">
               {(["basic", "technical", "expert"] as const).map(level => (
@@ -100,14 +101,14 @@ function VulnerabilityCard({ vuln }: { vuln: any }) {
                   className="text-xs h-7"
                   onClick={() => handleExplain(level)}
                   disabled={explainMutation.isPending && aiLevel === level}>
-                  {level === "basic" ? "Básico" : level === "technical" ? "Técnico" : "Experto"}
+                  {level === "basic" ? t('scan.technical_details') : level === "technical" ? t('scan.solutions') : t('scan.ai_explanation')}
                 </Button>
               ))}
             </div>
             {explainMutation.isPending && aiLevel && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                Generando explicación con IA...
+                {t('common.loading')}
               </div>
             )}
             {aiContent && (
@@ -123,6 +124,7 @@ function VulnerabilityCard({ vuln }: { vuln: any }) {
 }
 
 export default function ReportPage() {
+  const { t } = useTranslation();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const params = useParams<{ id: string }>();
   const scanId = parseInt(params.id);
@@ -151,9 +153,9 @@ export default function ReportPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="bg-card border border-border/50 rounded-2xl p-8 max-w-md w-full text-center">
           <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-3">Acceso requerido</h2>
-          <p className="text-muted-foreground mb-6">Inicia sesión para ver el informe.</p>
-          <a href="/"><Button className="w-full">Ir al inicio</Button></a>
+          <h2 className="text-xl font-bold mb-3">{t('scan.login_required')}</h2>
+          <p className="text-muted-foreground mb-6">{t('scan.login_required_desc')}</p>
+          <a href="/"><Button className="w-full">{t('scan.back_home')}</Button></a>
         </div>
       </div>
     );
@@ -164,8 +166,8 @@ export default function ReportPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
           <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-3">Informe no encontrado</h2>
-          <Link href="/dashboard"><Button>Volver al panel</Button></Link>
+          <h2 className="text-xl font-bold mb-3">{t('errors.not_found')}</h2>
+          <Link href="/dashboard"><Button>{t('dashboard.title')}</Button></Link>
         </div>
       </div>
     );
@@ -185,11 +187,11 @@ export default function ReportPage() {
             <span className="font-bold text-sm"><span className="gradient-text">Secura</span>Scan</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/dashboard"><Button variant="ghost" size="sm" className="text-xs text-muted-foreground"><ArrowLeft className="w-3.5 h-3.5 mr-1" />Panel</Button></Link>
+            <Link href="/dashboard"><Button variant="ghost" size="sm" className="text-xs text-muted-foreground"><ArrowLeft className="w-3.5 h-3.5 mr-1" />{t('dashboard.title')}</Button></Link>
             {scan.isPaid && (
               <Button size="sm" className="text-xs" onClick={() => generatePdf.mutate({ scanId })} disabled={generatePdf.isPending}>
                 {generatePdf.isPending ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Download className="w-3.5 h-3.5 mr-1" />}
-                Descargar PDF
+                {t('scan.download_report')}
               </Button>
             )}
           </div>
@@ -203,7 +205,7 @@ export default function ReportPage() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
                 <FileText className="w-5 h-5 text-primary" />
-                <h1 className="text-xl font-black">Informe de Seguridad</h1>
+                <h1 className="text-xl font-black">{t('scan.security_report')}</h1>
               </div>
               <p className="text-sm text-muted-foreground truncate">{scan.url}</p>
               <p className="text-xs text-muted-foreground mt-1">{new Date(scan.createdAt).toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })}</p>
@@ -220,16 +222,16 @@ export default function ReportPage() {
                   <span className="text-xs text-muted-foreground">/100</span>
                 </div>
               </div>
-              <span className="text-xs text-muted-foreground mt-1">Security Score</span>
+              <span className="text-xs text-muted-foreground mt-1">{t('scan.security_score')}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-4 gap-3 mt-5">
             {[
-              { label: "Crítico", count: scan.criticalCount, cls: "severity-critical" },
-              { label: "Alto", count: scan.highCount, cls: "severity-high" },
-              { label: "Medio", count: scan.mediumCount, cls: "severity-medium" },
-              { label: "Bajo", count: scan.lowCount, cls: "severity-low" },
+              { label: t('scan.critical_count'), count: scan.criticalCount, cls: "severity-critical" },
+              { label: t('scan.high_count'), count: scan.highCount, cls: "severity-high" },
+              { label: t('scan.medium_count'), count: scan.mediumCount, cls: "severity-medium" },
+              { label: t('scan.low_count'), count: scan.lowCount, cls: "severity-low" },
             ].map(item => (
               <div key={item.label} className={`rounded-xl p-3 text-center ${item.cls}`}>
                 <div className="text-xl font-black">{item.count}</div>
@@ -243,9 +245,9 @@ export default function ReportPage() {
         {!scan.isPaid ? (
           <div className="bg-gradient-to-br from-primary/10 to-purple-500/5 border border-primary/30 rounded-2xl p-8 text-center cyber-glow">
             <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-3">Informe bloqueado</h3>
-            <p className="text-muted-foreground mb-6">Desbloquea el informe completo para ver los detalles técnicos de cada vulnerabilidad.</p>
-            <Link href={`/scan/${scanId}`}><Button className="cyber-glow px-8">Desbloquear informe</Button></Link>
+            <h3 className="text-xl font-bold mb-3">{t('scan.report_locked')}</h3>
+            <p className="text-muted-foreground mb-6">{t('scan.report_locked_desc')}</p>
+            <Link href={`/scan/${scanId}`}><Button className="cyber-glow px-8">{t('scan.unlock_report')}</Button></Link>
           </div>
         ) : vulnsLoading ? (
           <div className="flex items-center justify-center py-16">
@@ -254,18 +256,18 @@ export default function ReportPage() {
         ) : vulnerabilities && vulnerabilities.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold">Vulnerabilidades detectadas</h2>
-              <span className="text-sm text-muted-foreground">{vulnerabilities.length} total</span>
+              <h2 className="text-lg font-bold">{t('scan.detected_vulnerabilities')}</h2>
+              <span className="text-sm text-muted-foreground">{vulnerabilities.length} {t('scan.total_vulnerabilities')}</span>
             </div>
             <div className="space-y-3">
-              {vulnerabilities.map(vuln => <VulnerabilityCard key={vuln.id} vuln={vuln} />)}
+              {vulnerabilities.map(vuln => <VulnerabilityCard key={vuln.id} vuln={vuln} t={t} />)}
             </div>
           </div>
         ) : (
           <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-8 text-center">
             <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-3">¡Sin vulnerabilidades detectadas!</h3>
-            <p className="text-muted-foreground">El análisis no encontró vulnerabilidades conocidas en este sitio web. Recuerda realizar análisis periódicos.</p>
+            <h3 className="text-xl font-bold mb-3">{t('scan.no_vulnerabilities')}</h3>
+            <p className="text-muted-foreground">{t('scan.no_vulnerabilities')}</p>
           </div>
         )}
       </div>
