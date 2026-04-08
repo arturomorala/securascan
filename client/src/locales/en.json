@@ -281,6 +281,24 @@
     "description": "Professional automated pentesting platform. Protect your digital presence with cutting-edge security technology.",
     "all_rights_reserved": "All rights reserved."
   },
+  "testimonials": {
+    "badge": "CUSTOMER REVIEWS",
+    "title": "What Our Customers Say",
+    "subtitle": "Discover how SecuraScan helps security professionals and developers protect their web applications",
+    "leave_review": "Share Your Experience",
+    "share_experience": "Share Your Experience with SecuraScan",
+    "rating": "Rating",
+    "title_label": "Review Title",
+    "title_placeholder": "e.g., Excellent security analysis tool",
+    "content_label": "Your Review",
+    "content_placeholder": "Tell us about your experience with SecuraScan...",
+    "submit_button": "Submit Review",
+    "cancel_button": "Cancel",
+    "verified_user": "Verified User",
+    "no_reviews": "No reviews yet. Be the first to share your experience!",
+    "review_submitted": "Thank you for your review!",
+    "error_submitting": "Error submitting review. Please try again."
+  },
   "errors": {
     "invalid_url": "Invalid URL",
     "required_field": "This field is required",
