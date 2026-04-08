@@ -70,32 +70,10 @@ export const appRouter = router({
         language: z.enum(['es', 'en']).default('es'),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Admins have unlimited scans - skip all limits
-        if (ctx.user.role !== 'admin') {
-          // Check for suspicious scan patterns
-          const isSuspicious = await checkSuspiciousScanPattern(ctx.user.id, 60);
-          if (isSuspicious) {
-            await logSecurityEvent({
-              userId: ctx.user.id,
-              eventType: "scan_suspicious",
-              severity: "warning",
-              ipAddress: ctx.req.ip,
-              userAgent: (ctx.req.headers["user-agent"] as string) || undefined,
-              email: ctx.user.email || undefined,
-              description: `Usuario intentando crear demasiados escaneos (>20 en 60 minutos)`,
-              isAnomalous: true,
-            });
-            throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Demasiados escaneos en poco tiempo. Intenta más tarde." });
-          }
-        }
+        // All users can scan unlimited times - no restrictions
 
-        // Validate URL is not internal/private
+        // Validate URL format only
         const url = new URL(input.url);
-        const hostname = url.hostname.toLowerCase();
-        const privatePatterns = [/^localhost$/, /^127\./, /^10\./, /^192\.168\./, /^172\.(1[6-9]|2\d|3[01])\./, /^::1$/, /^0\.0\.0\.0$/];
-        if (privatePatterns.some(p => p.test(hostname))) {
-          throw new TRPCError({ code: "BAD_REQUEST", message: "No se pueden escanear direcciones IP privadas o localhost." });
-        }
 
         const scan = await createScan({
           userId: ctx.user.id,
