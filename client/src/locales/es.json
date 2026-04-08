@@ -65,6 +65,25 @@
     "pricing_simple_transparent": "Planes simples y transparentes",
     "pricing_no_hidden_costs": "Sin costes ocultos. Cancela cuando quieras."
   },
+  "testimonials": {
+    "badge": "TESTIMONIOS",
+    "title": "Lo que dicen nuestros clientes",
+    "subtitle": "Descubre cómo SecuraScan ha ayudado a empresas a mejorar su seguridad web",
+    "leave_review": "Dejar una reseña",
+    "share_experience": "Comparte tu experiencia con SecuraScan",
+    "rating": "Calificación",
+    "review_title": "Título de la reseña",
+    "title_placeholder": "Ejemplo: Excelente herramienta de seguridad",
+    "your_review": "Tu reseña",
+    "review_placeholder": "Cuéntanos tu experiencia con SecuraScan...",
+    "submit_review": "Enviar reseña",
+    "sending": "Enviando...",
+    "cancel": "Cancelar",
+    "verified_user": "Usuario verificado",
+    "no_reviews": "Sin reseñas todavía. ¡Sé el primero en dejar una!",
+    "login_to_review": "Inicia sesión para dejar una reseña",
+    "required_field": "Este campo es requerido"
+  },
   "scan": {
     "title": "Analizar sitio web",
     "subtitle": "Introduce la URL del sitio que deseas analizar. El análisis tarda entre 2 y 5 minutos.",

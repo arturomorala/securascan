@@ -341,6 +341,39 @@ export const appRouter = router({
       }),
   }),
 
+  // ─── Testimonials ────────────────────────────────────────────────────────────
+  testimonials: router({
+    list: publicProcedure
+      .input(z.object({ limit: z.number().min(1).max(50).default(10) }).optional())
+      .query(async ({ input }) => {
+        // Get published testimonials from database
+        const limit = input?.limit ?? 10;
+        // For now, return empty array - will be populated by user reviews
+        return [];
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        rating: z.number().min(1).max(5),
+        title: z.string().min(5).max(255),
+        content: z.string().min(10).max(1000),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Create testimonial in database
+        // For now, return success
+        return {
+          id: Math.random().toString(),
+          userId: ctx.user.id,
+          userName: ctx.user.name || "Usuario",
+          rating: input.rating,
+          title: input.title,
+          content: input.content,
+          isPublished: true,
+          createdAt: new Date(),
+        };
+      }),
+  }),
+
   // ─── Stripe / Payments ────────────────────────────────────────────────────────
   stripe: stripeRouter,
 });

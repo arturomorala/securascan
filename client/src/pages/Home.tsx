@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getLoginUrl } from "@/const";
@@ -8,8 +7,13 @@ import {
   ChevronRight, CheckCircle, Globe, Server, Code, Eye, Key,
   ArrowRight, Star, Users, BarChart3, Clock, Download, Menu, X
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Send } from "lucide-react";
 import { FooterLanguageSwitcher } from "@/components/FooterLanguageSwitcher";
 import { useTranslation } from "react-i18next";
 
@@ -29,6 +33,39 @@ export default function Home() {
   const { user, isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewData, setReviewData] = useState({ rating: 5, title: "", content: "" });
+  const [testimonialsList, setTestimonialsList] = useState<any[]>([]);
+
+  // Fetch testimonials
+  const { data: testimonials } = trpc.testimonials.list.useQuery({ limit: 10 });
+  const createReview = trpc.testimonials.create.useMutation();
+
+  useEffect(() => {
+    if (testimonials) {
+      setTestimonialsList(testimonials);
+    }
+  }, [testimonials]);
+
+  const handleSubmitReview = async () => {
+    if (!reviewData.title || !reviewData.content) {
+      alert(t('testimonials.required_field') || "Este campo es requerido");
+      return;
+    }
+
+    try {
+      await createReview.mutateAsync({
+        rating: reviewData.rating,
+        title: reviewData.title,
+        content: reviewData.content,
+      });
+      
+      setReviewData({ rating: 5, title: "", content: "" });
+      setShowReviewForm(false);
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    }
+  };
 
   // Generate dynamic arrays based on language
   const NAV_LINKS = [
@@ -353,36 +390,130 @@ export default function Home() {
         <div className="container">
           <div className="text-center mb-16">
             <Badge variant="outline" className="mb-4 border-primary/30 text-primary bg-primary/10 text-xs uppercase tracking-wider">
-              Testimonios
+              {t('testimonials.badge')}
             </Badge>
-            <h2 className="text-4xl font-black mb-4">Lo que dicen nuestros clientes</h2>
+            <h2 className="text-4xl font-black mb-4">{t('testimonials.title')}</h2>
+            <p className="text-muted-foreground">{t('testimonials.subtitle')}</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { name: "Carlos Martínez", role: t('home.testimonials_title'), text: t('home.testimonials_title'), rating: 5 },
-              { name: "Laura Sánchez", role: t('home.testimonials_title'), text: t('home.testimonials_title'), rating: 5 },
-              { name: "Miguel Torres", role: t('home.testimonials_title'), text: t('home.testimonials_title'), rating: 5 },
-            ].map(testimonial => (
-              <div key={testimonial.name} className="bg-card border border-border/50 rounded-2xl p-6 card-hover">
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">"{testimonial.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
-                    <span className="text-sm font-bold text-primary">{testimonial.name[0]}</span>
+          {/* Testimonials Grid */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            {testimonialsList.length > 0 ? (
+              testimonialsList.map((testimonial) => (
+                <div key={testimonial.id} className="bg-card border border-border/50 rounded-2xl p-6 card-hover">
+                  <div className="flex gap-0.5 mb-4">
+                    {Array.from({ length: testimonial.rating }).map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    ))}
                   </div>
-                  <div>
-                    <div className="text-sm font-semibold">{testimonial.name}</div>
-                    <div className="text-xs text-muted-foreground">{testimonial.role}</div>
+                  <p className="text-sm font-semibold mb-2">{testimonial.title}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-6">"{testimonial.content}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
+                      <span className="text-sm font-bold text-primary">{testimonial.userName?.[0] || "U"}</span>
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">{testimonial.userName || "Usuario"}</div>
+                      <div className="text-xs text-muted-foreground">{t('testimonials.verified_user')}</div>
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center text-muted-foreground py-8">
+                {t('testimonials.no_reviews')}
               </div>
-            ))}
+            )}
           </div>
+
+          {/* Review Form */}
+          {isAuthenticated ? (
+            <div className="max-w-2xl mx-auto">
+              {!showReviewForm ? (
+                <Button onClick={() => setShowReviewForm(true)} className="w-full" variant="outline">
+                  {t('testimonials.leave_review')}
+                </Button>
+              ) : (
+                <div className="bg-card border border-border/50 rounded-2xl p-8">
+                  <h3 className="text-lg font-bold mb-6">{t('testimonials.share_experience')}</h3>
+                  
+                  <div className="space-y-4">
+                    {/* Rating */}
+                    <div>
+                      <label className="text-sm font-semibold mb-2 block">{t('testimonials.rating')}</label>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => setReviewData({ ...reviewData, rating: star })}
+                            className="transition-transform hover:scale-110"
+                          >
+                            <Star
+                              className={`w-6 h-6 ${
+                                star <= reviewData.rating
+                                  ? 'fill-yellow-400 text-yellow-400'
+                                  : 'text-muted-foreground'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                      <label className="text-sm font-semibold mb-2 block">{t('testimonials.review_title')}</label>
+                      <Input
+                        placeholder={t('testimonials.title_placeholder')}
+                        value={reviewData.title}
+                        onChange={(e) => setReviewData({ ...reviewData, title: e.target.value })}
+                        maxLength={255}
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div>
+                      <label className="text-sm font-semibold mb-2 block">{t('testimonials.your_review')}</label>
+                      <Textarea
+                        placeholder={t('testimonials.review_placeholder')}
+                        value={reviewData.content}
+                        onChange={(e) => setReviewData({ ...reviewData, content: e.target.value })}
+                        maxLength={1000}
+                        rows={4}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">{reviewData.content.length}/1000</p>
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        onClick={handleSubmitReview}
+                        disabled={createReview.isPending}
+                        className="flex-1 gap-2"
+                      >
+                        <Send className="w-4 h-4" />
+                        {createReview.isPending ? t('testimonials.sending') : t('testimonials.submit_review')}
+                      </Button>
+                      <Button
+                        onClick={() => setShowReviewForm(false)}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        {t('testimonials.cancel')}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="max-w-2xl mx-auto text-center py-8">
+              <p className="text-muted-foreground mb-4">{t('testimonials.login_to_review')}</p>
+              <a href={getLoginUrl()}>
+                <Button>{t('home.login_button')}</Button>
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
