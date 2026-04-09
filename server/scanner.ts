@@ -543,7 +543,7 @@ async function checkSensitiveFiles(baseUrl: string, language: 'es' | 'en' = 'es'
 
   for (const file of sensitiveFiles.slice(0, 4)) { // Check only first 4 to avoid too many requests
     try {
-      const res = await fetchWithTimeout(`${base}${file.path}`, 5000);
+      const res = await fetchWithTimeout(`${base}${file.path}`, 3000); // Reduced timeout from 5000 to 3000
       if (res.status === 200) {
         const isEnv = file.path === "/.env";
         const isGit = file.path === "/.git/config";
@@ -657,15 +657,15 @@ async function detectSubdomains(targetUrl: string, language: 'es' | 'en' = 'es')
     const exposedSubdomains: string[] = [];
     
     // Simulate subdomain discovery (in production, use DNS enumeration)
-    for (const subdomain of commonSubdomains.slice(0, 15)) {
+    for (const subdomain of commonSubdomains.slice(0, 10)) { // Reduced from 15 to 10
       try {
         const testUrl = `https://${subdomain}.${domain}`;
-        const response = await fetchWithTimeout(testUrl, 5000);
+        const response = await fetchWithTimeout(testUrl, 3000); // Reduced timeout from 5000 to 3000
         if (response.ok || response.status === 401 || response.status === 403) {
           exposedSubdomains.push(subdomain);
         }
       } catch (e) {
-        // Subdomain not accessible
+        // Subdomain not accessible - continue
       }
     }
 
