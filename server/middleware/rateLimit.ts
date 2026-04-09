@@ -57,43 +57,14 @@ export function createRateLimiter(
 export const loginLimiter = createRateLimiter(5, 5 * 60 * 1000);
 
 /**
- * Rate limiter for scan endpoint (10 scans per hour per user)
- * Admins are exempt from rate limiting
+ * Rate limiter for scan endpoint - DISABLED
+ * All users can scan unlimited times
  */
 export const scanLimiter = (req: Request & { user?: User }, res: Response, next: NextFunction) => {
-  // Admins have unlimited scans
-  if (req.user?.role === 'admin') {
-    res.setHeader('X-RateLimit-Limit', 'unlimited');
-    res.setHeader('X-RateLimit-Remaining', 'unlimited');
-    return next();
-  }
-
-  const userId = req.user?.id?.toString() || req.ip || 'unknown';
-  const key = `scan:${userId}`;
-  const now = Date.now();
-  const windowMs = 60 * 60 * 1000; // 1 hour
-  const maxRequests = 10;
-
-  if (!store[key] || now > store[key].resetTime) {
-    store[key] = {
-      count: 0,
-      resetTime: now + windowMs,
-    };
-  }
-
-  store[key].count++;
-
-  res.setHeader('X-RateLimit-Limit', maxRequests.toString());
-  res.setHeader('X-RateLimit-Remaining', Math.max(0, maxRequests - store[key].count).toString());
-  res.setHeader('X-RateLimit-Reset', store[key].resetTime.toString());
-
-  if (store[key].count > maxRequests) {
-    // Store rate limit info in request for tRPC middleware to handle
-    (req as any).rateLimitExceeded = true;
-    (req as any).rateLimitReset = store[key].resetTime;
-    (req as any).rateLimitRetryAfter = Math.ceil((store[key].resetTime - now) / 1000);
-  }
-
+  // No rate limiting - all users have unlimited scans
+  res.setHeader('X-RateLimit-Limit', 'unlimited');
+  res.setHeader('X-RateLimit-Remaining', 'unlimited');
+  (req as any).rateLimitExceeded = false;
   next();
 };
 

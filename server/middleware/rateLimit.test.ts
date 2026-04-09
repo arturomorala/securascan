@@ -73,18 +73,16 @@ describe('Rate Limiting Middleware', () => {
     expect(nextCalled).toBe(true);
   });
 
-  it('scan limiter should limit by user ID', () => {
+  it('scan limiter should allow unlimited scans', () => {
     const next = () => { nextCalled = true; };
 
-    for (let i = 0; i < 10; i++) {
+    // All users can scan unlimited times
+    for (let i = 0; i < 100; i++) {
       scanLimiter(mockReq, mockRes, next);
       expect(nextCalled).toBe(true);
+      expect(mockReq.rateLimitExceeded).toBe(false);
       nextCalled = false;
     }
-
-    scanLimiter(mockReq, mockRes, next);
-    expect(mockReq.rateLimitExceeded).toBe(true);
-    expect(nextCalled).toBe(true);
   });
 
   it('webhook limiter should limit requests', () => {
