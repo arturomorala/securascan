@@ -252,7 +252,7 @@ export default function ReportPage() {
             </div>
             <div className="space-y-3">
               {vulnerabilities?.map((vuln) => (
-                <VulnerabilityCard key={vuln.id} vuln={vuln} t={t} language={i18n.language} isFree={user?.subscriptionPlan === 'free' && user?.role !== 'admin'} />
+                <VulnerabilityCard key={vuln.id} vuln={vuln} t={t} language={i18n.language} isFree={user?.subscriptionPlan === 'free'} />
               ))}
             </div>
           </div>

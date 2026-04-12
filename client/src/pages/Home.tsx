@@ -141,6 +141,10 @@ export default function Home() {
               <LanguageSwitcher />
               {isAuthenticated ? (
                 <>
+                  <div className="text-sm text-muted-foreground px-3 py-1 rounded-lg bg-muted/30 border border-border/50">
+                    {user?.name || user?.email}
+                    {user?.role === 'admin' && <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">ADMIN</span>}
+                  </div>
                   <Link href="/dashboard">
                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
         {t('home.dashboard_button')}
@@ -185,7 +189,13 @@ export default function Home() {
               ))}
               <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
                 {isAuthenticated ? (
-                  <Link href="/dashboard"><a className="w-full"><Button className="w-full">Panel de control</Button></a></Link>
+                  <>
+                    <div className="text-sm text-muted-foreground px-3 py-2 rounded-lg bg-muted/30 border border-border/50">
+                      {user?.name || user?.email}
+                      {user?.role === 'admin' && <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">ADMIN</span>}
+                    </div>
+                    <Link href="/dashboard"><a className="w-full"><Button className="w-full">Panel de control</Button></a></Link>
+                  </>
                 ) : (
                   <>
                     <a href={getLoginUrl()}><Button variant="outline" className="w-full">Iniciar sesión</Button></a>
