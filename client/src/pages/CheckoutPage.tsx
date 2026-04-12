@@ -97,32 +97,12 @@ export default function CheckoutPage() {
     return null;
   }
 
-  // Admin users don't need to pay - redirect to dashboard
-  if (user?.role === "admin") {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4 pt-24">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="bg-blue-500/10 rounded-full p-4">
-                <Check className="w-8 h-8 text-blue-500" />
-              </div>
-            </div>
-            <CardTitle>Admin Access</CardTitle>
-            <CardDescription>You have unlimited access to all features</CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-sm text-muted-foreground mb-6">
-              As an admin user, you don't need to pay for any plans. You have full access to all features.
-            </p>
-            <Button onClick={() => navigate("/dashboard")} className="w-full">
-              Go to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Admin users don't need to pay - redirect to scan page automatically
+  useEffect(() => {
+    if (user?.role === "admin") {
+      navigate("/scan");
+    }
+  }, [user?.role, navigate]);
 
   // Mostrar estado de pago exitoso
   if (paymentStatus === "success") {
