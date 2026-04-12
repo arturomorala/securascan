@@ -22,6 +22,7 @@ function Router() {
       <Route path="/scan" component={ScanPage} />
       <Route path="/scan/:id" component={ScanPage} />
       <Route path="/report/:id" component={ReportPage} />
+      <Route path="/checkout" component={CheckoutPage} />
       <Route path="/checkout/success" component={CheckoutPage} />
       <Route path="/admin" component={AdminPanel} />
       <Route path="/pricing" component={PricingPage} />

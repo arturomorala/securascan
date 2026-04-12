@@ -467,11 +467,19 @@ export default function Home() {
                     </a>
                   )
                 ) : (
-                  <Link href="/pricing">
-                    <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
-                      {plan.cta}
-                    </Button>
-                  </Link>
+                  isAuthenticated ? (
+                    <Link href="/checkout">
+                      <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
+                        {plan.cta}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <a href={getLoginUrl("/checkout")}>
+                      <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
+                        {plan.cta}
+                      </Button>
+                    </a>
+                  )
                 )}
               </div>
             ))}
