@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { COOKIE_NAME } from "@shared/const";
 import { eq } from "drizzle-orm";
-import { users as usersTable } from "../drizzle/schema";
+import { users as usersTable, scans as scansTable } from "../drizzle/schema";
 import { getDb } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -101,12 +101,17 @@ export const appRouter = router({
         // Validate URL format only
         const url = new URL(input.url);
 
+        // Determine if scan should be marked as paid
+        // One-Time Scan (basic plan) and subscriptions (professional/enterprise) have paid reports
+        const isPaidScan = ['basic', 'professional', 'enterprise'].includes(user.subscriptionPlan);
+
         const scan = await createScan({
           userId: ctx.user.id,
           url: input.url,
           status: "pending",
           progress: 0,
           language: input.language || 'es',
+          isPaid: isPaidScan,
         });
 
         // Log scan creation
@@ -129,6 +134,18 @@ export const appRouter = router({
               .update(usersTable)
               .set({ oneTimeScanUsed: true })
               .where(eq(usersTable.id, ctx.user.id));
+          }
+        }
+
+        // Mark subscription scans as paid
+        if (['professional', 'enterprise'].includes(user.subscriptionPlan)) {
+          const db = await getDb();
+          if (db) {
+            const insertId = (scan as any).insertId as number;
+            await db
+              .update(scansTable)
+              .set({ isPaid: true })
+              .where(eq(scansTable.id, insertId));
           }
         }
 
