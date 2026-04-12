@@ -7,7 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { handleStripeWebhook } from "../webhooks/stripe";
+import { handleStripeWebhook } from "./stripeWebhook";
 import { scanLimiter, webhookLimiter, startRateLimitCleanup } from "../middleware/rateLimit";
 
 function isPortAvailable(port: number): Promise<boolean> {

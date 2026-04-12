@@ -12,20 +12,11 @@ export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "success" | "error">("idle");
 
-  const plansQuery = trpc.stripe.getPlans.useQuery();
-  const checkoutMutation = trpc.stripe.createCheckout.useMutation();
-  const currentSubQuery = trpc.stripe.getCurrentSubscription.useQuery();
-
-  // Parsear session_id desde query params
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const sid = params.get("session_id");
-    if (sid) {
-      setSessionId(sid);
-    }
-  }, []);
+  const oneTimeScanMutation = trpc.stripe.createOneTimeScanCheckout.useMutation();
+  const proCheckoutMutation = trpc.stripe.createProCheckout.useMutation();
+  const businessCheckoutMutation = trpc.stripe.createBusinessCheckout.useMutation();
 
   // Redirigir si no está autenticado
   useEffect(() => {
@@ -34,23 +25,59 @@ export default function CheckoutPage() {
     }
   }, [isAuthenticated, navigate]);
 
-  // Verificar estado del checkout si hay session_id
+  // Verificar parámetros de pago en URL
   useEffect(() => {
-    if (sessionId && currentSubQuery.data) {
-      toast.success("¡Pago completado! Tu suscripción está activa.");
-      setTimeout(() => navigate("/dashboard"), 2000);
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("payment");
+    
+    if (status === "success") {
+      setPaymentStatus("success");
+      toast.success("¡Pago completado exitosamente!");
+      setTimeout(() => navigate("/scan"), 2000);
+    } else if (status === "cancelled") {
+      setPaymentStatus("error");
+      toast.error("El pago fue cancelado");
     }
-  }, [sessionId, currentSubQuery.data, navigate]);
+  }, [navigate]);
 
-  const handleSelectPlan = async (planId: string) => {
+  const handleOneTimeScan = async () => {
     setIsProcessing(true);
     try {
-      const result = await checkoutMutation.mutateAsync({ planId: planId as any });
-      if (result.url) {
-        window.location.href = result.url;
+      const result = await oneTimeScanMutation.mutateAsync();
+      if (result.checkoutUrl) {
+        window.open(result.checkoutUrl, "_blank");
       }
     } catch (error) {
       toast.error("Error al crear sesión de pago");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleProPlan = async () => {
+    setIsProcessing(true);
+    try {
+      const result = await proCheckoutMutation.mutateAsync();
+      if (result.checkoutUrl) {
+        window.open(result.checkoutUrl, "_blank");
+      }
+    } catch (error) {
+      toast.error("Error al crear sesión de pago");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleBusinessPlan = async () => {
+    setIsProcessing(true);
+    try {
+      const result = await businessCheckoutMutation.mutateAsync();
+      if (result.checkoutUrl) {
+        window.open(result.checkoutUrl, "_blank");
+      }
+    } catch (error) {
+      toast.error("Error al crear sesión de pago");
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -59,10 +86,10 @@ export default function CheckoutPage() {
     return null;
   }
 
-  // Mostrar estado de pago procesado
-  if (sessionId && currentSubQuery.data) {
+  // Mostrar estado de pago exitoso
+  if (paymentStatus === "success") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 pt-24">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
@@ -71,14 +98,14 @@ export default function CheckoutPage() {
               </div>
             </div>
             <CardTitle>¡Pago Completado!</CardTitle>
-            <CardDescription>Tu suscripción está activa</CardDescription>
+            <CardDescription>Tu pago ha sido procesado exitosamente</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-sm text-muted-foreground mb-6">
-              Redirigiendo al panel de control...
+              Redirigiendo a tu próximo escaneo...
             </p>
-            <Button onClick={() => navigate("/dashboard")} className="w-full">
-              Ir al Panel
+            <Button onClick={() => navigate("/scan")} className="w-full">
+              Ir a Escanear
             </Button>
           </CardContent>
         </Card>
@@ -87,9 +114,9 @@ export default function CheckoutPage() {
   }
 
   // Mostrar error de pago
-  if (sessionId && !currentSubQuery.data && !currentSubQuery.isLoading) {
+  if (paymentStatus === "error") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 pt-24">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
@@ -97,8 +124,8 @@ export default function CheckoutPage() {
                 <AlertCircle className="w-8 h-8 text-red-500" />
               </div>
             </div>
-            <CardTitle>Pago No Completado</CardTitle>
-            <CardDescription>Intenta de nuevo o contacta soporte</CardDescription>
+            <CardTitle>Pago Cancelado</CardTitle>
+            <CardDescription>Intenta de nuevo o elige otro plan</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <Button onClick={() => navigate("/pricing")} className="w-full">
@@ -110,74 +137,144 @@ export default function CheckoutPage() {
     );
   }
 
-  // Mostrar planes disponibles
+  // Mostrar resumen de pago antes de procesar
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background py-12 px-4 pt-24">
+      <div className="max-w-2xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Planes de Suscripción</h1>
+          <h1 className="text-4xl font-bold mb-4">Resumen de Pago</h1>
           <p className="text-lg text-muted-foreground">
-            Elige el plan que mejor se adapte a tus necesidades
+            Revisa los detalles de tu compra antes de proceder
           </p>
         </div>
 
-        {plansQuery.isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plansQuery.data?.map((plan: any) => (
-              <Card key={plan.planId} className="relative flex flex-col">
-                <CardHeader>
-                  <CardTitle>{plan.name}</CardTitle>
-                  <CardDescription>
-                    <span className="text-3xl font-bold text-foreground">
-                      ${plan.price}
-                    </span>
-                    <span className="text-muted-foreground">/mes</span>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
-                  <div className="mb-6">
-                    <Badge variant="outline" className="mb-4">
-                      {plan.scans} escaneos/mes
-                    </Badge>
-                    <ul className="space-y-3">
-                      {plan.features.map((feature: any, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <Button
-                    onClick={() => handleSelectPlan(plan.planId)}
-                    disabled={isProcessing || checkoutMutation.isPending}
-                    className="w-full mt-auto"
-                  >
-                    {isProcessing || checkoutMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Procesando...
-                      </>
-                    ) : (
-                      "Seleccionar Plan"
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Detalles de la Compra</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center pb-4 border-b">
+              <span className="text-muted-foreground">Usuario:</span>
+              <span className="font-medium">{user?.name || user?.email}</span>
+            </div>
+            <div className="flex justify-between items-center pb-4 border-b">
+              <span className="text-muted-foreground">Email:</span>
+              <span className="font-medium">{user?.email}</span>
+            </div>
+            <div className="flex justify-between items-center pb-4 border-b">
+              <span className="text-muted-foreground">Moneda:</span>
+              <span className="font-medium">EUR (€)</span>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="mt-12 bg-muted/50 rounded-lg p-6 text-center">
-          <h3 className="text-lg font-semibold mb-2">¿Necesitas más información?</h3>
-          <p className="text-muted-foreground mb-4">
-            Contáctanos para planes personalizados o consultas sobre nuestros servicios
-          </p>
-          <Button variant="outline">Contactar Ventas</Button>
+        <div className="space-y-6">
+          {/* One-Time Scan */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">One-Time Scan</CardTitle>
+              <CardDescription>Escaneo único de seguridad</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center text-lg font-semibold">
+                <span>Precio:</span>
+                <span className="text-primary">€4,99</span>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground mb-6">
+                <li>✓ Escaneo único de vulnerabilidades</li>
+                <li>✓ Puntuación de seguridad 0-100</li>
+                <li>✓ Clasificación por severidad</li>
+              </ul>
+              <Button
+                onClick={handleOneTimeScan}
+                disabled={isProcessing || oneTimeScanMutation.isPending}
+                className="w-full"
+              >
+                {isProcessing || oneTimeScanMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Procesando...
+                  </>
+                ) : (
+                  "Pagar €4,99"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Pro Plan */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Plan Pro</CardTitle>
+              <CardDescription>Suscripción mensual</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center text-lg font-semibold">
+                <span>Precio mensual:</span>
+                <span className="text-primary">€29,99</span>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground mb-6">
+                <li>✓ Escaneos ilimitados</li>
+                <li>✓ Detalles técnicos completos</li>
+                <li>✓ Reportes PDF</li>
+                <li>✓ Explicaciones IA</li>
+              </ul>
+              <Button
+                onClick={handleProPlan}
+                disabled={isProcessing || proCheckoutMutation.isPending}
+                className="w-full"
+              >
+                {isProcessing || proCheckoutMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Procesando...
+                  </>
+                ) : (
+                  "Pagar €29,99/mes"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Business Plan */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Plan Business</CardTitle>
+              <CardDescription>Suscripción mensual empresarial</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center text-lg font-semibold">
+                <span>Precio mensual:</span>
+                <span className="text-primary">€79,99</span>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground mb-6">
+                <li>✓ Escaneos ilimitados</li>
+                <li>✓ Todos los features de Pro</li>
+                <li>✓ Monitorización automática</li>
+                <li>✓ Acceso multiusuario</li>
+                <li>✓ Soporte prioritario</li>
+              </ul>
+              <Button
+                onClick={handleBusinessPlan}
+                disabled={isProcessing || businessCheckoutMutation.isPending}
+                className="w-full"
+              >
+                {isProcessing || businessCheckoutMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Procesando...
+                  </>
+                ) : (
+                  "Pagar €79,99/mes"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mt-8 p-4 bg-muted/50 rounded-lg text-center text-sm text-muted-foreground">
+          <p>Serás redirigido a Stripe para completar el pago de forma segura.</p>
+          <p className="mt-2">Para testing, usa tarjeta: 4242 4242 4242 4242</p>
         </div>
       </div>
     </div>
