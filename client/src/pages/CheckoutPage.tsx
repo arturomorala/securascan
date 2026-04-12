@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -7,16 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Check, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+import { useState as useStateReact } from "react";
 
 export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<"idle" | "success" | "error">("idle");
+  const [isProcessing, setIsProcessing] = useStateReact(false);
+  const [paymentStatus, setPaymentStatus] = useStateReact<"idle" | "success" | "error">("idle");
 
   const oneTimeScanMutation = trpc.stripe.createOneTimeScanCheckout.useMutation();
   const proCheckoutMutation = trpc.stripe.createProCheckout.useMutation();
   const businessCheckoutMutation = trpc.stripe.createBusinessCheckout.useMutation();
+  const businessAnnualCheckoutMutation = trpc.stripe.createBusinessAnnualCheckout.useMutation();
 
   // Redirigir si no está autenticado
   useEffect(() => {
@@ -29,6 +31,8 @@ export default function CheckoutPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const status = params.get("payment");
+    const plan = params.get("plan");
+    const billing = params.get("billing");
     
     if (status === "success") {
       setPaymentStatus("success");
@@ -38,48 +42,54 @@ export default function CheckoutPage() {
       setPaymentStatus("error");
       toast.error("El pago fue cancelado");
     }
-  }, [navigate]);
 
-  const handleOneTimeScan = async () => {
+    // Si viene con plan específico, procesar automáticamente
+    if (plan && isAuthenticated) {
+      handlePlanCheckout(plan, billing || "month");
+    }
+  }, [navigate, isAuthenticated]);
+
+  const handlePlanCheckout = async (plan: string, billing: string = "month") => {
     setIsProcessing(true);
     try {
-      const result = await oneTimeScanMutation.mutateAsync();
-      if (result.checkoutUrl) {
+      let result;
+      if (plan === "one_time") {
+        result = await oneTimeScanMutation.mutateAsync();
+      } else if (plan === "pro") {
+        result = await proCheckoutMutation.mutateAsync();
+      } else if (plan === "business") {
+        if (billing === "year") {
+          result = await businessAnnualCheckoutMutation.mutateAsync();
+        } else {
+          result = await businessCheckoutMutation.mutateAsync();
+        }
+      }
+      
+      if (result?.checkoutUrl) {
         window.open(result.checkoutUrl, "_blank");
       }
     } catch (error) {
       toast.error("Error al crear sesión de pago");
+      console.error(error);
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleOneTimeScan = async () => {
+    await handlePlanCheckout("one_time");
   };
 
   const handleProPlan = async () => {
-    setIsProcessing(true);
-    try {
-      const result = await proCheckoutMutation.mutateAsync();
-      if (result.checkoutUrl) {
-        window.open(result.checkoutUrl, "_blank");
-      }
-    } catch (error) {
-      toast.error("Error al crear sesión de pago");
-    } finally {
-      setIsProcessing(false);
-    }
+    await handlePlanCheckout("pro");
   };
 
   const handleBusinessPlan = async () => {
-    setIsProcessing(true);
-    try {
-      const result = await businessCheckoutMutation.mutateAsync();
-      if (result.checkoutUrl) {
-        window.open(result.checkoutUrl, "_blank");
-      }
-    } catch (error) {
-      toast.error("Error al crear sesión de pago");
-    } finally {
-      setIsProcessing(false);
-    }
+    await handlePlanCheckout("business", "month");
+  };
+
+  const handleBusinessAnnual = async () => {
+    await handlePlanCheckout("business", "year");
   };
 
   if (!isAuthenticated) {
@@ -240,34 +250,71 @@ export default function CheckoutPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-xl">Plan Business</CardTitle>
-              <CardDescription>Suscripción mensual empresarial</CardDescription>
+              <CardDescription>Suscripción empresarial</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between items-center text-lg font-semibold">
-                <span>Precio mensual:</span>
-                <span className="text-primary">€79,99</span>
+              <div className="space-y-3">
+                {/* Monthly Option */}
+                <div className="border border-border/50 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      <p className="font-semibold">Mensual</p>
+                      <p className="text-sm text-muted-foreground">Renovación automática cada mes</p>
+                    </div>
+                    <span className="text-lg font-bold text-primary">€79,99</span>
+                  </div>
+                  <Button
+                    onClick={handleBusinessPlan}
+                    disabled={isProcessing || businessCheckoutMutation.isPending}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {isProcessing || businessCheckoutMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Procesando...
+                      </>
+                    ) : (
+                      "Pagar €79,99/mes"
+                    )}
+                  </Button>
+                </div>
+
+                {/* Annual Option */}
+                <div className="border-2 border-primary/50 rounded-lg p-4 relative">
+                  <Badge className="absolute -top-2 -right-2 bg-green-500 text-white">Ahorra 15%</Badge>
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      <p className="font-semibold">Anual</p>
+                      <p className="text-sm text-muted-foreground">Renovación automática cada año</p>
+                    </div>
+                    <span className="text-lg font-bold text-primary">€815,88</span>
+                  </div>
+                  <p className="text-xs text-green-400 mb-3">Ahorras €144,12 comparado con pago mensual</p>
+                  <Button
+                    onClick={handleBusinessAnnual}
+                    disabled={isProcessing || businessAnnualCheckoutMutation.isPending}
+                    className="w-full cyber-glow"
+                  >
+                    {isProcessing || businessAnnualCheckoutMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Procesando...
+                      </>
+                    ) : (
+                      "Pagar €815,88/año"
+                    )}
+                  </Button>
+                </div>
               </div>
-              <ul className="space-y-2 text-sm text-muted-foreground mb-6">
+
+              <ul className="space-y-2 text-sm text-muted-foreground mt-4">
                 <li>✓ Escaneos ilimitados</li>
                 <li>✓ Todos los features de Pro</li>
                 <li>✓ Monitorización automática</li>
                 <li>✓ Acceso multiusuario</li>
                 <li>✓ Soporte prioritario</li>
               </ul>
-              <Button
-                onClick={handleBusinessPlan}
-                disabled={isProcessing || businessCheckoutMutation.isPending}
-                className="w-full"
-              >
-                {isProcessing || businessCheckoutMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Procesando...
-                  </>
-                ) : (
-                  "Pagar €79,99/mes"
-                )}
-              </Button>
             </CardContent>
           </Card>
         </div>
