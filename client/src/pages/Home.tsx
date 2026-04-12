@@ -1,16 +1,24 @@
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
 import {
   Shield, ShieldCheck, Zap, FileText, Brain, Lock, AlertTriangle,
   ChevronRight, CheckCircle, Globe, Server, Code, Eye, Key,
-  ArrowRight, Star, Users, BarChart3, Clock, Download, Menu, X
+  ArrowRight, Star, Users, BarChart3, Clock, Download, Menu, X,
+  LogOut, ChevronDown
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
@@ -112,6 +120,13 @@ export default function Home() {
     }
   };
 
+  const logoutMutation = trpc.auth.logout.useMutation();
+
+  const handleLogout = async () => {
+    await logoutMutation.mutateAsync();
+    window.location.href = "/";
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
@@ -141,15 +156,36 @@ export default function Home() {
               <LanguageSwitcher />
               {isAuthenticated ? (
                 <>
-                  <div className="text-sm text-muted-foreground px-3 py-1 rounded-lg bg-muted/30 border border-border/50">
-                    {user?.name || user?.email}
-                    {user?.role === 'admin' && <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">ADMIN</span>}
-                  </div>
-                  <Link href="/dashboard">
-                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-        {t('home.dashboard_button')}
-                    </Button>
-                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground flex items-center gap-2">
+                        <span>{user?.name || user?.email}</span>
+                        {user?.role === 'admin' && <Badge variant="secondary" className="text-xs">ADMIN</Badge>}
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+                        {user?.email}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard" className="cursor-pointer">
+                          {t('home.dashboard_button')}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/scan" className="cursor-pointer">
+                          {t('home.new_scan_button')}
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">
+                        <LogOut className="w-4 h-4 mr-2" />
+                        {t('dashboard.logout')}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <Link href="/scan">
                     <Button size="sm" className="cyber-glow">
         {t('home.new_scan_button')}
@@ -190,11 +226,15 @@ export default function Home() {
               <div className="pt-2 border-t border-border/50 flex flex-col gap-2">
                 {isAuthenticated ? (
                   <>
-                    <div className="text-sm text-muted-foreground px-3 py-2 rounded-lg bg-muted/30 border border-border/50">
-                      {user?.name || user?.email}
-                      {user?.role === 'admin' && <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">ADMIN</span>}
-                    </div>
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground flex items-center justify-between w-full" onClick={() => setMobileMenuOpen(false)}>
+                      <span>{user?.name || user?.email}</span>
+                      {user?.role === 'admin' && <Badge variant="secondary" className="text-xs">ADMIN</Badge>}
+                    </Button>
                     <Link href="/dashboard"><a className="w-full"><Button className="w-full">Panel de control</Button></a></Link>
+                    <Button variant="outline" className="w-full text-red-500" onClick={handleLogout}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      {t('dashboard.logout')}
+                    </Button>
                   </>
                 ) : (
                   <>
