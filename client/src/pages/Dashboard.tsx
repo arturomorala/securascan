@@ -85,6 +85,8 @@ export default function Dashboard() {
 
   const isSubscribed = user?.subscriptionStatus === "active" && (user?.subscriptionPlan === "professional" || user?.subscriptionPlan === "enterprise");
   const nextRenewalDate = user?.subscriptionExpiresAt ? new Date(user.subscriptionExpiresAt).toLocaleDateString("es-ES") : null;
+  const currentPlan = user?.subscriptionPlan || "free";
+  const subscriptionStatus = user?.subscriptionStatus || "inactive";
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,24 +117,25 @@ export default function Dashboard() {
         </div>
 
         {/* Subscription Card */}
-        {isSubscribed && (
-          <div className="bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30 rounded-2xl p-6 mb-8">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
-                  <CreditCard className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg mb-1">{getPlanLabel(user?.subscriptionPlan || "free", t)}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {nextRenewalDate && `Próxima renovación: ${nextRenewalDate}`}
-                  </p>
-                  <div className="flex gap-2">
-                    <Link href="/pricing">
-                      <Button size="sm" variant="outline" className="text-xs">
-                        Cambiar plan
-                      </Button>
-                    </Link>
+        <div className={`${isSubscribed ? 'bg-gradient-to-r from-primary/20 to-primary/10 border-primary/30' : 'bg-card border-border/50'} border rounded-2xl p-6 mb-8`}>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 rounded-lg ${isSubscribed ? 'bg-primary/20 border-primary/30' : 'bg-muted border-border/50'} border flex items-center justify-center`}>
+                <CreditCard className={`w-6 h-6 ${isSubscribed ? 'text-primary' : 'text-muted-foreground'}`} />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-1">{getPlanLabel(currentPlan, t)}</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {isSubscribed && nextRenewalDate && `Próxima renovación: ${nextRenewalDate}`}
+                  {!isSubscribed && currentPlan === "free" && "Plan gratuito - Límite de 2 escaneos"}
+                </p>
+                <div className="flex gap-2">
+                  <Link href="/pricing">
+                    <Button size="sm" variant="outline" className="text-xs">
+                      {isSubscribed ? "Cambiar plan" : "Mejorar plan"}
+                    </Button>
+                  </Link>
+                  {isSubscribed && (
                     <Button 
                       size="sm" 
                       variant="outline" 
@@ -141,13 +144,15 @@ export default function Dashboard() {
                     >
                       Cancelar suscripción
                     </Button>
-                  </div>
+                  )}
                 </div>
               </div>
-              <Badge className="bg-primary/30 text-primary border-primary/50">Activo</Badge>
             </div>
+            <Badge className={`${isSubscribed ? 'bg-primary/30 text-primary border-primary/50' : 'bg-muted text-muted-foreground border-border/50'} border`}>
+              {isSubscribed ? "Activo" : "Inactivo"}
+            </Badge>
           </div>
-        )}
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
