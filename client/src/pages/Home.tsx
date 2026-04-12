@@ -307,47 +307,47 @@ export default function Home() {
 
           {/* Certification Badges */}
           <div className="mt-16 pt-12 border-t border-border/50">
-            <p className="text-center text-sm text-muted-foreground mb-6">Trusted by security professionals worldwide</p>
+            <p className="text-center text-sm text-muted-foreground mb-6">{t('security.trusted_by')}</p>
             <div className="flex flex-wrap justify-center gap-6 items-center">
               {/* SSL Certificate */}
-              <div className="flex flex-col items-center gap-2">
+              <Link href="/security" className="flex flex-col items-center gap-2 hover:opacity-80 transition">
                 <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
                   <Lock className="w-8 h-8 text-green-400" />
                 </div>
-                <span className="text-xs text-muted-foreground text-center">SSL Secure</span>
-              </div>
+                <span className="text-xs text-muted-foreground text-center">{t('security.ssl_secure')}</span>
+              </Link>
 
               {/* PCI DSS */}
-              <div className="flex flex-col items-center gap-2">
+              <Link href="/security" className="flex flex-col items-center gap-2 hover:opacity-80 transition">
                 <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
                   <ShieldCheck className="w-8 h-8 text-blue-400" />
                 </div>
-                <span className="text-xs text-muted-foreground text-center">PCI DSS</span>
-              </div>
+                <span className="text-xs text-muted-foreground text-center">{t('security.pci_dss')}</span>
+              </Link>
 
               {/* OWASP */}
-              <div className="flex flex-col items-center gap-2">
+              <Link href="/security" className="flex flex-col items-center gap-2 hover:opacity-80 transition">
                 <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
                   <Shield className="w-8 h-8 text-orange-400" />
                 </div>
-                <span className="text-xs text-muted-foreground text-center">OWASP</span>
-              </div>
+                <span className="text-xs text-muted-foreground text-center">{t('security.owasp_badge')}</span>
+              </Link>
 
               {/* Google Safe Browsing */}
-              <div className="flex flex-col items-center gap-2">
+              <Link href="/security" className="flex flex-col items-center gap-2 hover:opacity-80 transition">
                 <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
                   <Globe className="w-8 h-8 text-purple-400" />
                 </div>
-                <span className="text-xs text-muted-foreground text-center">Google Safe</span>
-              </div>
+                <span className="text-xs text-muted-foreground text-center">{t('security.google_safe')}</span>
+              </Link>
 
               {/* GDPR Compliant */}
-              <div className="flex flex-col items-center gap-2">
+              <Link href="/security" className="flex flex-col items-center gap-2 hover:opacity-80 transition">
                 <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
                   <Key className="w-8 h-8 text-indigo-400" />
                 </div>
-                <span className="text-xs text-muted-foreground text-center">GDPR</span>
-              </div>
+                <span className="text-xs text-muted-foreground text-center">{t('security.gdpr_badge')}</span>
+              </Link>
             </div>
           </div>
         </div>

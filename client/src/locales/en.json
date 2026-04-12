@@ -256,6 +256,28 @@
     "business_annual_period": "/year",
     "business_annual_savings": "Save €144.12 per year"
   },
+  "security": {
+    "trusted_by": "Trusted by security professionals worldwide",
+    "ssl_secure": "SSL Secure",
+    "pci_dss": "PCI DSS",
+    "owasp_badge": "OWASP",
+    "google_safe": "Google Safe",
+    "gdpr_badge": "GDPR",
+    "title": "Security & Certifications",
+    "subtitle": "We protect your data with the highest security standards",
+    "ssl_title": "SSL/TLS Certificate",
+    "ssl_desc": "All communication is encrypted with 256-bit SSL/TLS. Your connection is secure and private.",
+    "pci_title": "PCI DSS Compliance",
+    "pci_desc": "We process payments securely through Stripe, which complies with PCI DSS Level 1. We never store credit card details.",
+    "owasp_title": "OWASP Standard",
+    "owasp_desc": "Our scans follow the OWASP Top 10 standard and web security best practices.",
+    "google_title": "Google Safe Browsing",
+    "google_desc": "Verified by Google Safe Browsing. Your site is free from malware and dangerous content.",
+    "gdpr_title": "GDPR Compliance",
+    "gdpr_desc": "We fully comply with GDPR. Your personal data is protected according to European law.",
+    "privacy_link": "Privacy Policy",
+    "terms_link": "Terms of Service"
+  },
   "checkout": {
     "title": "Payment Summary",
     "subtitle": "Review your purchase details before proceeding",

@@ -234,6 +234,28 @@
     "custom_plan": "¿Necesitas un plan personalizado?",
     "custom_plan_desc": "Para empresas con necesidades específicas, ofrecemos planes personalizados con soporte dedicado y características a medida."
   },
+  "security": {
+    "trusted_by": "Confiado por profesionales de seguridad en todo el mundo",
+    "ssl_secure": "SSL Seguro",
+    "pci_dss": "PCI DSS",
+    "owasp_badge": "OWASP",
+    "google_safe": "Google Safe",
+    "gdpr_badge": "GDPR",
+    "title": "Seguridad y Certificaciones",
+    "subtitle": "Protegemos tus datos con los más altos estándares de seguridad",
+    "ssl_title": "Certificado SSL/TLS",
+    "ssl_desc": "Toda la comunicación está encriptada con SSL/TLS de 256 bits. Tu conexión es segura y privada.",
+    "pci_title": "Cumplimiento PCI DSS",
+    "pci_desc": "Procesamos pagos de forma segura a través de Stripe, que cumple con PCI DSS Level 1. Nunca almacenamos datos de tarjetas de crédito.",
+    "owasp_title": "Estándar OWASP",
+    "owasp_desc": "Nuestros escaneos siguen el estándar OWASP Top 10 y las mejores prácticas de seguridad web.",
+    "google_title": "Google Safe Browsing",
+    "google_desc": "Verificado por Google Safe Browsing. Tu sitio está libre de malware y contenido peligroso.",
+    "gdpr_title": "Cumplimiento GDPR",
+    "gdpr_desc": "Cumplimos completamente con GDPR. Tus datos personales están protegidos según la ley europea.",
+    "privacy_link": "Política de Privacidad",
+    "terms_link": "Términos de Servicio"
+  },
   "dashboard": {
     "cancel_subscription_title": "Cancelar suscripción",
     "cancel_subscription_desc": "Tu suscripción se cancelará al final del período de facturación actual.",

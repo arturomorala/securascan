@@ -13,6 +13,7 @@ import PricingPage from "./pages/PricingPage";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CheckoutPage from "./pages/CheckoutPage";
+import SecurityPage from "./pages/SecurityPage";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/pricing" component={PricingPage} />
       <Route path="/terms" component={TermsOfService} />
       <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/security" component={SecurityPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
