@@ -60,6 +60,9 @@ async function startServer() {
     next();
   });
   
+  // Stripe webhook handler with rate limiting (MUST be before express.json)
+  app.post('/api/stripe/webhook', webhookLimiter, express.raw({type: 'application/json'}), handleStripeWebhook);
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -67,11 +70,9 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
-  // Stripe webhook handler with rate limiting (must be before express.json)
-  app.post('/api/stripe/webhook', webhookLimiter, express.raw({type: 'application/json'}), handleStripeWebhook);
-  
   // Apply scan rate limiting to tRPC endpoint
   app.use('/api/trpc', scanLimiter);
+  
 
   // tRPC middleware
   app.use(

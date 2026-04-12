@@ -18,7 +18,13 @@ export async function handleStripeWebhook(req: Request, res: Response) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    // Handle both raw Buffer and parsed JSON object
+    let body = req.body;
+    if (typeof body === 'object' && !(body instanceof Buffer)) {
+      // If body is already parsed as JSON object, convert to string
+      body = JSON.stringify(body);
+    }
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
     console.error("[Webhook] Signature verification failed:", err);
     return res.status(400).json({ error: "Webhook signature verification failed" });
