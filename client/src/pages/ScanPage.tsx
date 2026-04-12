@@ -100,7 +100,7 @@ export default function ScanPage() {
 
   const { data: scanSummary } = trpc.scans.getPublicSummary.useQuery(
     { scanId: scanId! },
-    { enabled: !!scanId, refetchInterval: phase === "scanning" ? 2000 : false }
+    { enabled: !!scanId, refetchInterval: phase === "scanning" ? 2000 : (phase === "result" ? 1000 : false) }
   );
 
   const utils = trpc.useUtils();
@@ -108,14 +108,18 @@ export default function ScanPage() {
   useEffect(() => {
     if (scanSummary?.status === "completed" || scanSummary?.status === "failed") {
       setPhase("result");
+      // Refetch scan summary to get updated isPaid status
+      setTimeout(() => {
+        utils.scans.getPublicSummary.invalidate({ scanId: scanId! });
+      }, 500);
     }
-  }, [scanSummary?.status]);
+  }, [scanSummary?.status, scanId, utils]);
 
   const unlockReport = trpc.scans.unlockReport.useMutation({
     onSuccess: () => {
       toast.success("¡Informe desbloqueado!");
-      setScanId(null);
-      setPhase("form");
+      // Refetch scan summary to get updated isPaid status
+      utils.scans.getPublicSummary.invalidate({ scanId: scanId! });
     },
     onError: (err: any) => toast.error(`Error: ${err.message}`),
   });
