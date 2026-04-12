@@ -323,7 +323,7 @@ export default function ScanPage() {
                     ))}
                   </div>
                 </div>
-                {user?.subscriptionPlan === 'free' ? (
+                {user?.subscriptionPlan === 'free' && user?.role !== 'admin' ? (
                   <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6 text-center">
                     <Shield className="w-10 h-10 text-blue-400 mx-auto mb-4" />
                     <h3 className="text-lg font-bold mb-2">{t('scan.free_plan_results')}</h3>
@@ -339,7 +339,7 @@ export default function ScanPage() {
                       </Button>
                     </Link>
                   </div>
-                ) : !scanSummary.isPaid ? (
+                ) : !scanSummary.isPaid && user?.role !== 'admin' ? (
                   <div className="bg-gradient-to-br from-primary/10 to-purple-500/5 border border-primary/30 rounded-2xl p-6 text-center cyber-glow">
                     <Lock className="w-10 h-10 text-primary mx-auto mb-4" />
                     <h3 className="text-lg font-bold mb-2">{t('scan.unlock_full_report')}</h3>
@@ -368,7 +368,7 @@ export default function ScanPage() {
                 )}
                 <div className="flex gap-3 mt-4">
                   <Button variant="outline" className="flex-1" onClick={() => { setPhase("form"); setScanId(null); navigate("/scan"); }}>{t('dashboard.new_analysis')}</Button>
-                  {user?.subscriptionPlan !== 'free' && (
+                  {user?.subscriptionPlan !== 'free' && user?.role !== 'admin' && (
                     <Link href="/dashboard" className="flex-1"><a><Button variant="ghost" className="w-full text-muted-foreground">Ver historial</Button></a></Link>
                   )}
                 </div>

@@ -74,7 +74,8 @@ export const appRouter = router({
         const user = await getUserById(ctx.user.id);
         if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Usuario no encontrado." });
 
-        if (user.subscriptionPlan === 'free') {
+        // Admin users have unlimited scans
+        if (user.role !== 'admin' && user.subscriptionPlan === 'free') {
           // FREE plan: 2 escaneos de por vida
           const userScans = await getScansByUserId(ctx.user.id, 1000, 0);
           if (userScans.length >= 2) {
