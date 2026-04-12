@@ -126,13 +126,13 @@ export default function Dashboard() {
               <div>
                 <h3 className="font-bold text-lg mb-1">{getPlanLabel(currentPlan, t)}</h3>
                 <p className="text-sm text-muted-foreground mb-3">
-                  {isSubscribed && nextRenewalDate && `Próxima renovación: ${nextRenewalDate}`}
-                  {!isSubscribed && currentPlan === "free" && "Plan gratuito - Límite de 2 escaneos"}
+                  {isSubscribed && nextRenewalDate && `${t('dashboard.next_renewal_label')}: ${nextRenewalDate}`}
+                  {!isSubscribed && currentPlan === "free" && t('dashboard.free_plan_info')}
                 </p>
                 <div className="flex gap-2">
                   <Link href="/pricing">
                     <Button size="sm" variant="outline" className="text-xs">
-                      {isSubscribed ? "Cambiar plan" : "Mejorar plan"}
+                      {isSubscribed ? t('dashboard.change_plan_btn') : t('dashboard.upgrade_plan_btn')}
                     </Button>
                   </Link>
                   {isSubscribed && (
@@ -142,14 +142,14 @@ export default function Dashboard() {
                       className="text-xs text-red-400 hover:text-red-300"
                       onClick={() => setShowCancelModal(true)}
                     >
-                      Cancelar suscripción
+                      {t('dashboard.cancel_subscription_btn')}
                     </Button>
                   )}
                 </div>
               </div>
             </div>
             <Badge className={`${isSubscribed ? 'bg-primary/30 text-primary border-primary/50' : 'bg-muted text-muted-foreground border-border/50'} border`}>
-              {isSubscribed ? "Activo" : "Inactivo"}
+              {isSubscribed ? t('dashboard.active_status') : t('dashboard.inactive_status')}
             </Badge>
           </div>
         </div>

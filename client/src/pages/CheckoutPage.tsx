@@ -8,9 +8,11 @@ import { Loader2, Check, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { useState as useStateReact } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function CheckoutPage() {
   const { user, isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useStateReact(false);
   const [paymentStatus, setPaymentStatus] = useStateReact<"idle" | "success" | "error">("idle");
@@ -36,11 +38,11 @@ export default function CheckoutPage() {
     
     if (status === "success") {
       setPaymentStatus("success");
-      toast.success("¡Pago completado exitosamente!");
+      toast.success(t("checkout.payment_successful"));
       setTimeout(() => navigate("/scan"), 2000);
     } else if (status === "cancelled") {
       setPaymentStatus("error");
-      toast.error("El pago fue cancelado");
+      toast.error(t("checkout.payment_cancelled"));
     }
 
     // Si viene con plan específico, procesar automáticamente
@@ -107,15 +109,15 @@ export default function CheckoutPage() {
                 <Check className="w-8 h-8 text-green-500" />
               </div>
             </div>
-            <CardTitle>¡Pago Completado!</CardTitle>
-            <CardDescription>Tu pago ha sido procesado exitosamente</CardDescription>
+            <CardTitle>{t("checkout.payment_completed")}</CardTitle>
+            <CardDescription>{t("checkout.payment_successful")}</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-sm text-muted-foreground mb-6">
-              Redirigiendo a tu próximo escaneo...
+              {t("checkout.redirecting")}
             </p>
             <Button onClick={() => navigate("/scan")} className="w-full">
-              Ir a Escanear
+              {t("checkout.go_to_scan")}
             </Button>
           </CardContent>
         </Card>
@@ -134,12 +136,12 @@ export default function CheckoutPage() {
                 <AlertCircle className="w-8 h-8 text-red-500" />
               </div>
             </div>
-            <CardTitle>Pago Cancelado</CardTitle>
-            <CardDescription>Intenta de nuevo o elige otro plan</CardDescription>
+            <CardTitle>{t("checkout.payment_cancelled")}</CardTitle>
+            <CardDescription>{t("checkout.try_again")}</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <Button onClick={() => navigate("/pricing")} className="w-full">
-              Volver a Planes
+              {t("checkout.back_to_plans")}
             </Button>
           </CardContent>
         </Card>
@@ -152,27 +154,27 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-background py-12 px-4 pt-24">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Resumen de Pago</h1>
+          <h1 className="text-4xl font-bold mb-4">{t("checkout.title")}</h1>
           <p className="text-lg text-muted-foreground">
-            Revisa los detalles de tu compra antes de proceder
+            {t("checkout.subtitle")}
           </p>
         </div>
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Detalles de la Compra</CardTitle>
+            <CardTitle>{t("checkout.purchase_details")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center pb-4 border-b">
-              <span className="text-muted-foreground">Usuario:</span>
+              <span className="text-muted-foreground">{t("checkout.user_label")}:</span>
               <span className="font-medium">{user?.name || user?.email}</span>
             </div>
             <div className="flex justify-between items-center pb-4 border-b">
-              <span className="text-muted-foreground">Email:</span>
+              <span className="text-muted-foreground">{t("checkout.email_label")}:</span>
               <span className="font-medium">{user?.email}</span>
             </div>
             <div className="flex justify-between items-center pb-4 border-b">
-              <span className="text-muted-foreground">Moneda:</span>
+              <span className="text-muted-foreground">{t("checkout.currency_label")}:</span>
               <span className="font-medium">EUR (€)</span>
             </div>
           </CardContent>
@@ -182,18 +184,18 @@ export default function CheckoutPage() {
           {/* One-Time Scan */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">One-Time Scan</CardTitle>
-              <CardDescription>Escaneo único de seguridad</CardDescription>
+              <CardTitle className="text-xl">{t("checkout.one_time_scan_title")}</CardTitle>
+              <CardDescription>{t("checkout.one_time_scan_desc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center text-lg font-semibold">
-                <span>Precio:</span>
-                <span className="text-primary">€4,99</span>
+                <span>{t("checkout.price_label")}:</span>
+                <span className="text-primary">€4.99</span>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground mb-6">
-                <li>✓ Escaneo único de vulnerabilidades</li>
-                <li>✓ Puntuación de seguridad 0-100</li>
-                <li>✓ Clasificación por severidad</li>
+                <li>{t("checkout.single_scan_feature_1")}</li>
+                <li>{t("checkout.single_scan_feature_2")}</li>
+                <li>{t("checkout.single_scan_feature_3")}</li>
               </ul>
               <Button
                 onClick={handleOneTimeScan}
@@ -206,7 +208,7 @@ export default function CheckoutPage() {
                     Procesando...
                   </>
                 ) : (
-                  "Pagar €4,99"
+                  t("checkout.pay_button")
                 )}
               </Button>
             </CardContent>
@@ -215,19 +217,19 @@ export default function CheckoutPage() {
           {/* Pro Plan */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Plan Pro</CardTitle>
-              <CardDescription>Suscripción mensual</CardDescription>
+              <CardTitle className="text-xl">{t("checkout.pro_plan_title")}</CardTitle>
+              <CardDescription>{t("checkout.pro_plan_desc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center text-lg font-semibold">
-                <span>Precio mensual:</span>
-                <span className="text-primary">€29,99</span>
+                <span>{t("checkout.monthly_price_label")}:</span>
+                <span className="text-primary">€29.99</span>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground mb-6">
-                <li>✓ Escaneos ilimitados</li>
-                <li>✓ Detalles técnicos completos</li>
-                <li>✓ Reportes PDF</li>
-                <li>✓ Explicaciones IA</li>
+                <li>{t("checkout.pro_features_1")}</li>
+                <li>{t("checkout.pro_features_2")}</li>
+                <li>{t("checkout.pro_features_3")}</li>
+                <li>{t("checkout.pro_features_4")}</li>
               </ul>
               <Button
                 onClick={handleProPlan}
@@ -240,7 +242,7 @@ export default function CheckoutPage() {
                     Procesando...
                   </>
                 ) : (
-                  "Pagar €29,99/mes"
+                  t("checkout.pro_pay_button")
                 )}
               </Button>
             </CardContent>
@@ -249,8 +251,8 @@ export default function CheckoutPage() {
           {/* Business Plan */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Plan Business</CardTitle>
-              <CardDescription>Suscripción empresarial</CardDescription>
+              <CardTitle className="text-xl">{t("checkout.business_plan_title")}</CardTitle>
+              <CardDescription>{t("checkout.business_plan_desc")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
@@ -258,10 +260,10 @@ export default function CheckoutPage() {
                 <div className="border border-border/50 rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
                     <div>
-                      <p className="font-semibold">Mensual</p>
-                      <p className="text-sm text-muted-foreground">Renovación automática cada mes</p>
+                      <p className="font-semibold">{t("checkout.business_monthly_label")}</p>
+                      <p className="text-sm text-muted-foreground">{t("checkout.business_monthly_desc")}</p>
                     </div>
-                    <span className="text-lg font-bold text-primary">€79,99</span>
+                    <span className="text-lg font-bold text-primary">€79.99</span>
                   </div>
                   <Button
                     onClick={handleBusinessPlan}
@@ -275,22 +277,22 @@ export default function CheckoutPage() {
                         Procesando...
                       </>
                     ) : (
-                      "Pagar €79,99/mes"
+                      t("checkout.business_monthly_pay")
                     )}
                   </Button>
                 </div>
 
                 {/* Annual Option */}
                 <div className="border-2 border-primary/50 rounded-lg p-4 relative">
-                  <Badge className="absolute -top-2 -right-2 bg-green-500 text-white">Ahorra 15%</Badge>
+                  <Badge className="absolute -top-2 -right-2 bg-green-500 text-white">{t("checkout.business_save_label")}</Badge>
                   <div className="flex justify-between items-center mb-3">
                     <div>
-                      <p className="font-semibold">Anual</p>
-                      <p className="text-sm text-muted-foreground">Renovación automática cada año</p>
+                      <p className="font-semibold">{t("checkout.business_annual_label")}</p>
+                      <p className="text-sm text-muted-foreground">{t("checkout.business_annual_desc")}</p>
                     </div>
-                    <span className="text-lg font-bold text-primary">€815,88</span>
+                    <span className="text-lg font-bold text-primary">€815.88</span>
                   </div>
-                  <p className="text-xs text-green-400 mb-3">Ahorras €144,12 comparado con pago mensual</p>
+                  <p className="text-xs text-green-400 mb-3">{t("checkout.business_annual_savings")}</p>
                   <Button
                     onClick={handleBusinessAnnual}
                     disabled={isProcessing || businessAnnualCheckoutMutation.isPending}
@@ -302,26 +304,26 @@ export default function CheckoutPage() {
                         Procesando...
                       </>
                     ) : (
-                      "Pagar €815,88/año"
+                      t("checkout.business_annual_pay")
                     )}
                   </Button>
                 </div>
               </div>
 
               <ul className="space-y-2 text-sm text-muted-foreground mt-4">
-                <li>✓ Escaneos ilimitados</li>
-                <li>✓ Todos los features de Pro</li>
-                <li>✓ Monitorización automática</li>
-                <li>✓ Acceso multiusuario</li>
-                <li>✓ Soporte prioritario</li>
+                <li>{t("checkout.business_features_1")}</li>
+                <li>{t("checkout.business_features_2")}</li>
+                <li>{t("checkout.business_features_3")}</li>
+                <li>{t("checkout.business_features_4")}</li>
+                <li>{t("checkout.business_features_5")}</li>
               </ul>
             </CardContent>
           </Card>
         </div>
 
         <div className="mt-8 p-4 bg-muted/50 rounded-lg text-center text-sm text-muted-foreground">
-          <p>Serás redirigido a Stripe para completar el pago de forma segura.</p>
-          <p className="mt-2">Para testing, usa tarjeta: 4242 4242 4242 4242</p>
+          <p>{t("checkout.secure_redirect")}</p>
+          <p className="mt-2">{t("checkout.test_card_info")}</p>
         </div>
       </div>
     </div>
