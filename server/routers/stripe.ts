@@ -7,6 +7,14 @@ export const stripeRouter = router({
   // Create checkout session for one-time scan
   createOneTimeScanCheckout: protectedProcedure
     .mutation(async ({ ctx }) => {
+      // Admin users don't pay
+      if (ctx.user.role === "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Admin users do not need to pay for scans",
+        });
+      }
+
       if (!ctx.user.email || !ctx.user.name) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -47,6 +55,14 @@ export const stripeRouter = router({
   // Create checkout session for Pro plan subscription
   createProCheckout: protectedProcedure
     .mutation(async ({ ctx }) => {
+      // Admin users don't pay
+      if (ctx.user.role === "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Admin users do not need to pay for scans",
+        });
+      }
+
       if (!ctx.user.email || !ctx.user.name) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -88,6 +104,14 @@ export const stripeRouter = router({
   // Create checkout session for Business plan subscription (monthly)
   createBusinessCheckout: protectedProcedure
     .mutation(async ({ ctx }) => {
+      // Admin users don't pay
+      if (ctx.user.role === "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Admin users do not need to pay for scans",
+        });
+      }
+
       if (!ctx.user.email || !ctx.user.name) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -130,6 +154,14 @@ export const stripeRouter = router({
   // Create checkout session for Business plan subscription (annual with 15% discount)
   createBusinessAnnualCheckout: protectedProcedure
     .mutation(async ({ ctx }) => {
+      // Admin users don't pay
+      if (ctx.user.role === "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Admin users do not need to pay for scans",
+        });
+      }
+
       if (!ctx.user.email || !ctx.user.name) {
         throw new TRPCError({
           code: "BAD_REQUEST",
