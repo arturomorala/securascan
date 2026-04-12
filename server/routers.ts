@@ -102,8 +102,9 @@ export const appRouter = router({
         const url = new URL(input.url);
 
         // Determine if scan should be marked as paid
+        // Admin users always have paid reports
         // One-Time Scan (basic plan) and subscriptions (professional/enterprise) have paid reports
-        const isPaidScan = ['basic', 'professional', 'enterprise'].includes(user.subscriptionPlan);
+        const isPaidScan = ctx.user.role === 'admin' || ['basic', 'professional', 'enterprise'].includes(user.subscriptionPlan);
 
         const scan = await createScan({
           userId: ctx.user.id,
