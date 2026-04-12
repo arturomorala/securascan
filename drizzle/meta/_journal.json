@@ -43,6 +43,13 @@
       "when": 1775573999830,
       "tag": "0005_flowery_toxin",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1776015146788,
+      "tag": "0006_peaceful_stellaris",
+      "breakpoints": true
     }
   ]
 }

@@ -264,6 +264,16 @@
     "cancel_subscription_success": "Suscripción cancelada exitosamente",
     "cancel_subscription_error": "Error al cancelar la suscripción"
   },
+  "one_time_scan": {
+    "title": "One-Time Scan",
+    "description": "Un único escaneo de seguridad completo",
+    "price": "€4.99",
+    "limit_reached": "Ya usaste tu escaneo de One-Time Scan. Compra otro para continuar.",
+    "purchase_another": "Comprar otro escaneo",
+    "single_scan": "Un escaneo único",
+    "full_report": "Informe completo incluido",
+    "valid_7_days": "Válido por 7 días"
+  },
   "admin": {
     "access_denied": "Acceso denegado",
     "no_permissions": "No tienes permisos para acceder al panel de administración.",

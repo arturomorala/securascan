@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { COOKIE_NAME } from "@shared/const";
+import { eq } from "drizzle-orm";
+import { users as usersTable } from "../drizzle/schema";
+import { getDb } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router, rateLimitedProcedure } from "./_core/trpc";
@@ -70,18 +73,27 @@ export const appRouter = router({
         language: z.enum(['es', 'en']).default('es'),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Check scan limit for FREE plan
+        // Check scan limit for FREE plan and One-Time Scan
         const user = await getUserById(ctx.user.id);
         if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Usuario no encontrado." });
 
         // Admin users have unlimited scans
-        if (user.role !== 'admin' && user.subscriptionPlan === 'free') {
+        if (user.role !== 'admin') {
           // FREE plan: 2 escaneos de por vida
-          const userScans = await getScansByUserId(ctx.user.id, 1000, 0);
-          if (userScans.length >= 2) {
+          if (user.subscriptionPlan === 'free') {
+            const userScans = await getScansByUserId(ctx.user.id, 1000, 0);
+            if (userScans.length >= 2) {
+              throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "Has alcanzado el límite de 2 escaneos en el plan FREE. Actualiza tu plan para escanear más sitios."
+              });
+            }
+          }
+          // One-Time Scan (basic plan): solo 1 escaneo por pago
+          else if (user.subscriptionPlan === 'basic' && user.oneTimeScanUsed) {
             throw new TRPCError({
               code: "FORBIDDEN",
-              message: "Has alcanzado el límite de 2 escaneos en el plan FREE. Actualiza tu plan para escanear más sitios."
+              message: "Ya usaste tu escaneo de One-Time Scan. Compra otro para continuar."
             });
           }
         }
@@ -108,6 +120,17 @@ export const appRouter = router({
           description: `Nuevo escaneo creado para: ${input.url}`,
           metadata: { url: input.url },
         });
+
+        // Mark One-Time Scan as used if user is on basic plan
+        if (user.subscriptionPlan === 'basic' && !user.oneTimeScanUsed) {
+          const db = await getDb();
+          if (db) {
+            await db
+              .update(usersTable)
+              .set({ oneTimeScanUsed: true })
+              .where(eq(usersTable.id, ctx.user.id));
+          }
+        }
 
         // Start scan asynchronously
         const insertId = (scan as any).insertId as number;

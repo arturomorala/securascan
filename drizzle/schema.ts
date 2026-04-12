@@ -24,6 +24,8 @@ export const users = mysqlTable("users", {
   subscriptionExpiresAt: timestamp("subscriptionExpiresAt"),
   scansUsed: int("scansUsed").default(0).notNull(),
   scansLimit: int("scansLimit").default(1).notNull(),
+  oneTimeScanUsed: boolean("oneTimeScanUsed").default(false).notNull(),
+  oneTimeScanPurchasedAt: timestamp("oneTimeScanPurchasedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

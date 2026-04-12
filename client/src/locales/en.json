@@ -347,6 +347,16 @@
     "cancel_subscription_success": "Subscription cancelled successfully",
     "cancel_subscription_error": "Failed to cancel subscription"
   },
+  "one_time_scan": {
+    "title": "One-Time Scan",
+    "description": "A single complete security scan",
+    "price": "€4.99",
+    "limit_reached": "You've already used your One-Time Scan. Purchase another one to continue.",
+    "purchase_another": "Buy Another Scan",
+    "single_scan": "One single scan",
+    "full_report": "Complete report included",
+    "valid_7_days": "Valid for 7 days"
+  },
   "testimonials": {
     "required_field": "This field is required"
   }

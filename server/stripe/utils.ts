@@ -177,9 +177,17 @@ export async function handlePaymentSuccess(
     .set({ status: "succeeded" })
     .where(eq(payments.stripeSessionId, sessionId));
 
-  // For one-time scans, just mark as paid
+  // For one-time scans, mark user as having purchased one-time scan
   if (metadata.plan_type === "one_time_scan") {
-    // Payment is recorded, user can now access the scan
+    // Update user to basic plan with one-time scan purchased
+    await db
+      .update(users)
+      .set({
+        subscriptionPlan: "basic",
+        oneTimeScanUsed: false, // Not used yet, just purchased
+        oneTimeScanPurchasedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
     return;
   }
 
