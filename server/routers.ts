@@ -70,7 +70,20 @@ export const appRouter = router({
         language: z.enum(['es', 'en']).default('es'),
       }))
       .mutation(async ({ ctx, input }) => {
-        // All users can scan unlimited times - no restrictions
+        // Check scan limit for FREE plan
+        const user = await getUserById(ctx.user.id);
+        if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Usuario no encontrado." });
+
+        if (user.subscriptionPlan === 'free') {
+          // FREE plan: 2 escaneos de por vida
+          const userScans = await getScansByUserId(ctx.user.id, 1000, 0);
+          if (userScans.length >= 2) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Has alcanzado el límite de 2 escaneos en el plan FREE. Actualiza tu plan para escanear más sitios."
+            });
+          }
+        }
 
         // Validate URL format only
         const url = new URL(input.url);

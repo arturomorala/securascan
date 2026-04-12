@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { Link, useParams } from "wouter";
@@ -7,6 +6,7 @@ import { toast } from "sonner";
 import { Loader2, Shield, ShieldCheck, FileText, Download, ArrowLeft, Brain, ChevronDown, ChevronUp, AlertTriangle, CheckCircle } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 function SeverityBadge({ severity, t }: { severity: string; t: any }) {
   const map: Record<string, string> = { critical: "severity-critical", high: "severity-high", medium: "severity-medium", low: "severity-low" };
@@ -14,7 +14,7 @@ function SeverityBadge({ severity, t }: { severity: string; t: any }) {
   return <span className={`text-xs px-2 py-0.5 rounded font-medium ${map[severity] || ""}`}>{labels[severity] || severity}</span>;
 }
 
-function VulnerabilityCard({ vuln, t, language }: { vuln: any; t: any; language: string }) {
+function VulnerabilityCard({ vuln, t, language, isFree }: { vuln: any; t: any; language: string; isFree: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const [aiLevel, setAiLevel] = useState<"basic" | "technical" | "expert" | null>(null);
   const [aiContent, setAiContent] = useState<string | null>(null);
@@ -65,31 +65,32 @@ function VulnerabilityCard({ vuln, t, language }: { vuln: any; t: any; language:
               <p className="text-sm text-foreground/90">{vuln.impact}</p>
             </div>
           )}
-          {vuln.technicalDetails && (
+          {!isFree && vuln.technicalDetails && (
             <div>
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('scan.technical_details')}</p>
               <p className="text-sm font-mono bg-muted/30 rounded-lg p-3 text-foreground/80">{vuln.technicalDetails}</p>
             </div>
           )}
-          {vuln.remediation && (
+          {!isFree && vuln.remediation && (
             <div>
               <p className="text-xs font-semibold text-green-400 uppercase tracking-wider mb-1">{t('scan.remediation_steps')}</p>
               <p className="text-sm text-foreground/90">{vuln.remediation}</p>
             </div>
           )}
-          {vuln.evidence && (
+          {!isFree && vuln.evidence && (
             <div>
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('scan.how_it_affects')}</p>
               <p className="text-sm font-mono bg-muted/30 rounded-lg p-3 text-foreground/80">{vuln.evidence}</p>
             </div>
           )}
-          {vuln.owaspReference && (
+          {!isFree && vuln.owaspReference && (
             <div className="flex items-center gap-2">
               <span className="text-xs bg-primary/15 text-primary border border-primary/30 px-2 py-1 rounded">{vuln.owaspReference}</span>
             </div>
           )}
 
           {/* AI Explanation */}
+          {!isFree && (
           <div className="border-t border-white/5 pt-4">
             <div className="flex items-center gap-2 mb-3">
               <Brain className="w-4 h-4 text-primary" />
@@ -117,6 +118,7 @@ function VulnerabilityCard({ vuln, t, language }: { vuln: any; t: any; language:
               </div>
             )}
           </div>
+          )}
         </div>
       )}
     </div>
@@ -250,7 +252,7 @@ export default function ReportPage() {
             </div>
             <div className="space-y-3">
               {vulnerabilities?.map((vuln) => (
-                <VulnerabilityCard key={vuln.id} vuln={vuln} t={t} language={i18n.language} />
+                <VulnerabilityCard key={vuln.id} vuln={vuln} t={t} language={i18n.language} isFree={user?.subscriptionPlan === 'free'} />
               ))}
             </div>
           </div>

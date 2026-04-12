@@ -1,4 +1,3 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +7,7 @@ import { getLoginUrl } from "@/const";
 import { Link, useParams, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 import {
   Shield, ShieldCheck, AlertTriangle, CheckCircle, Loader2,
@@ -323,7 +323,23 @@ export default function ScanPage() {
                     ))}
                   </div>
                 </div>
-                {!scanSummary.isPaid ? (
+                {user?.subscriptionPlan === 'free' ? (
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6 text-center">
+                    <Shield className="w-10 h-10 text-blue-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold mb-2">{t('scan.free_plan_results')}</h3>
+                    <p className="text-sm text-muted-foreground mb-5">{t('scan.free_plan_desc')}</p>
+                    <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
+                      {[t('scan.security_score'), t('scan.total_vulnerabilities'), t('scan.severity_classification')].map(f => (
+                        <span key={f} className="text-xs bg-blue-500/15 text-blue-300 border border-blue-500/30 px-2 py-1 rounded-full">{f}</span>
+                      ))}
+                    </div>
+                    <Link href="/pricing">
+                      <Button className="cyber-glow px-8 h-11 font-semibold">
+                        <Zap className="w-4 h-4 mr-2" />{t('scan.upgrade_plan')}
+                      </Button>
+                    </Link>
+                  </div>
+                ) : !scanSummary.isPaid ? (
                   <div className="bg-gradient-to-br from-primary/10 to-purple-500/5 border border-primary/30 rounded-2xl p-6 text-center cyber-glow">
                     <Lock className="w-10 h-10 text-primary mx-auto mb-4" />
                     <h3 className="text-lg font-bold mb-2">{t('scan.unlock_full_report')}</h3>
@@ -352,7 +368,9 @@ export default function ScanPage() {
                 )}
                 <div className="flex gap-3 mt-4">
                   <Button variant="outline" className="flex-1" onClick={() => { setPhase("form"); setScanId(null); navigate("/scan"); }}>{t('dashboard.new_analysis')}</Button>
-                  <Link href="/dashboard" className="flex-1"><a><Button variant="ghost" className="w-full text-muted-foreground">Ver historial</Button></a></Link>
+                  {user?.subscriptionPlan !== 'free' && (
+                    <Link href="/dashboard" className="flex-1"><a><Button variant="ghost" className="w-full text-muted-foreground">Ver historial</Button></a></Link>
+                  )}
                 </div>
               </div>
             )}
