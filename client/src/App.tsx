@@ -10,8 +10,8 @@ import ScanPage from "./pages/ScanPage";
 import ReportPage from "./pages/ReportPage";
 import AdminPanel from "./pages/AdminPanel";
 import PricingPage from "./pages/PricingPage";
-import TermsPage from "./pages/TermsPage";
-import PrivacyPage from "./pages/PrivacyPage";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import CheckoutPage from "./pages/CheckoutPage";
 
 function Router() {
@@ -26,8 +26,8 @@ function Router() {
       <Route path="/checkout/success" component={CheckoutPage} />
       <Route path="/admin" component={AdminPanel} />
       <Route path="/pricing" component={PricingPage} />
-      <Route path="/terms" component={TermsPage} />
-      <Route path="/privacy" component={PrivacyPage} />
+      <Route path="/terms" component={TermsOfService} />
+      <Route path="/privacy" component={PrivacyPolicy} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

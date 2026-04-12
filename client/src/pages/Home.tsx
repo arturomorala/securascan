@@ -304,6 +304,52 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          {/* Certification Badges */}
+          <div className="mt-16 pt-12 border-t border-border/50">
+            <p className="text-center text-sm text-muted-foreground mb-6">Trusted by security professionals worldwide</p>
+            <div className="flex flex-wrap justify-center gap-6 items-center">
+              {/* SSL Certificate */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
+                  <Lock className="w-8 h-8 text-green-400" />
+                </div>
+                <span className="text-xs text-muted-foreground text-center">SSL Secure</span>
+              </div>
+
+              {/* PCI DSS */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
+                  <ShieldCheck className="w-8 h-8 text-blue-400" />
+                </div>
+                <span className="text-xs text-muted-foreground text-center">PCI DSS</span>
+              </div>
+
+              {/* OWASP */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
+                  <Shield className="w-8 h-8 text-orange-400" />
+                </div>
+                <span className="text-xs text-muted-foreground text-center">OWASP</span>
+              </div>
+
+              {/* Google Safe Browsing */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
+                  <Globe className="w-8 h-8 text-purple-400" />
+                </div>
+                <span className="text-xs text-muted-foreground text-center">Google Safe</span>
+              </div>
+
+              {/* GDPR Compliant */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 rounded-lg bg-card border border-border/50 flex items-center justify-center hover:border-primary/50 transition">
+                  <Key className="w-8 h-8 text-indigo-400" />
+                </div>
+                <span className="text-xs text-muted-foreground text-center">GDPR</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
