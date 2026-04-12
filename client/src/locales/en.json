@@ -135,7 +135,19 @@
     "score_good": "Good",
     "score_moderate": "Moderate",
     "score_poor": "Poor",
-    "score_critical": "Critical"
+    "score_critical": "Critical",
+    "free_plan_results": "FREE Plan Results",
+    "free_plan_desc": "Your FREE plan includes security score, total number of vulnerabilities and severity classification.",
+    "security_score": "Security Score",
+    "total_vulnerabilities": "Total Vulnerabilities",
+    "severity_classification": "Severity Classification",
+    "upgrade_plan": "Upgrade Plan",
+    "unlock_full_report": "Unlock the complete report",
+    "get_technical_details": "Get technical details, solutions and AI explanations",
+    "unlock_report_free": "Unlock Report",
+    "security_report": "Security Report",
+    "remediation_steps": "Remediation Steps",
+    "how_it_affects": "How It Affects"
   },
   "dashboard": {
     "completed": "Completed",
