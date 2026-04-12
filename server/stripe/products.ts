@@ -27,6 +27,14 @@ export const STRIPE_PRODUCTS = {
     type: "recurring",
     interval: "month",
   },
+  BUSINESS_ANNUAL: {
+    name: "Business Plan Annual",
+    description: "Enterprise security monitoring with advanced features (Annual - 15% discount)",
+    priceInCents: 81588, // 815.88 EUR (79.99 * 12 * 0.85)
+    currency: "eur",
+    type: "recurring",
+    interval: "year",
+  },
 };
 
 export const PLAN_MAPPING = {

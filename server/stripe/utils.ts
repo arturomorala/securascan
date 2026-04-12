@@ -103,16 +103,24 @@ export async function createSubscriptionCheckout(
   name: string,
   plan: "pro" | "business",
   successUrl: string,
-  cancelUrl: string
+  cancelUrl: string,
+  billingPeriod: "month" | "year" = "month"
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
   const customerId = await getOrCreateStripeCustomer(userId, email, name);
 
-  const priceData = plan === "pro" 
-    ? { amount: 2999, name: "Pro Plan", description: "Professional security monitoring" }
-    : { amount: 7999, name: "Business Plan", description: "Enterprise security monitoring" };
+  let priceData;
+  if (plan === "pro") {
+    priceData = { amount: 2999, name: "Pro Plan", description: "Professional security monitoring" };
+  } else {
+    if (billingPeriod === "year") {
+      priceData = { amount: 81588, name: "Business Plan Annual", description: "Enterprise security monitoring (15% discount)" };
+    } else {
+      priceData = { amount: 7999, name: "Business Plan", description: "Enterprise security monitoring" };
+    }
+  }
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -127,7 +135,7 @@ export async function createSubscriptionCheckout(
           },
           unit_amount: priceData.amount,
           recurring: {
-            interval: "month",
+            interval: billingPeriod,
           },
         },
         quantity: 1,
@@ -142,6 +150,7 @@ export async function createSubscriptionCheckout(
       customer_email: email,
       customer_name: name,
       plan_type: plan,
+      billing_period: billingPeriod,
     },
     allow_promotion_codes: true,
   });

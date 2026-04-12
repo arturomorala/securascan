@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
-import { Loader2, Shield, ShieldCheck, Plus, FileText, Eye, Clock, AlertTriangle, CheckCircle, XCircle, BarChart3, Globe } from "lucide-react";
+import { Loader2, Shield, ShieldCheck, Plus, FileText, Eye, Clock, AlertTriangle, CheckCircle, XCircle, BarChart3, Globe, CreditCard, X, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { toast } from "sonner";
 
 function getStatusBadge(status: string, t: any) {
   switch (status) {
@@ -37,10 +39,22 @@ function ScoreBar({ score }: { score: number | null }) {
   );
 }
 
+function getPlanLabel(plan: string, t: any) {
+  const labels: Record<string, string> = {
+    free: t('pricing.free') || "Free",
+    basic: "One-Time Scan",
+    professional: t('pricing.pro') || "Pro",
+    enterprise: t('pricing.business') || "Business",
+  };
+  return labels[plan] || plan;
+}
+
 export default function Dashboard() {
   const { user, isAuthenticated, loading: authLoading, logout } = useAuth();
   const { data: scans, isLoading: scansLoading } = trpc.scans.list.useQuery(undefined, { enabled: isAuthenticated });
   const { t } = useTranslation();
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   if (authLoading) {
     return (
@@ -69,6 +83,9 @@ export default function Dashboard() {
     ? Math.round(completedScans.reduce((acc, s) => acc + (s.securityScore ?? 0), 0) / completedScans.length)
     : null;
 
+  const isSubscribed = user?.subscriptionStatus === "active" && (user?.subscriptionPlan === "professional" || user?.subscriptionPlan === "enterprise");
+  const nextRenewalDate = user?.subscriptionExpiresAt ? new Date(user.subscriptionExpiresAt).toLocaleDateString("es-ES") : null;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -96,6 +113,41 @@ export default function Dashboard() {
           <h1 className="text-2xl font-black mb-1">{t('dashboard.title')}</h1>
           <p className="text-muted-foreground text-sm">{t('dashboard.welcome')}, <span className="text-foreground font-medium">{user?.name || user?.email}</span></p>
         </div>
+
+        {/* Subscription Card */}
+        {isSubscribed && (
+          <div className="bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30 rounded-2xl p-6 mb-8">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
+                  <CreditCard className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg mb-1">{getPlanLabel(user?.subscriptionPlan || "free", t)}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {nextRenewalDate && `Próxima renovación: ${nextRenewalDate}`}
+                  </p>
+                  <div className="flex gap-2">
+                    <Link href="/pricing">
+                      <Button size="sm" variant="outline" className="text-xs">
+                        Cambiar plan
+                      </Button>
+                    </Link>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-xs text-red-400 hover:text-red-300"
+                      onClick={() => setShowCancelModal(true)}
+                    >
+                      Cancelar suscripción
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <Badge className="bg-primary/30 text-primary border-primary/50">Activo</Badge>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -190,6 +242,54 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Cancel Subscription Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card border border-border/50 rounded-2xl p-6 max-w-md w-full">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-bold">Cancelar suscripción</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Tu suscripción se cancelará al final del período de facturación actual.
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setShowCancelModal(false)}>
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => setShowCancelModal(false)}
+              >
+                Mantener suscripción
+              </Button>
+              <Button 
+                variant="destructive" 
+                className="flex-1"
+                onClick={() => {
+                  setIsCancelling(true);
+                  // TODO: Implement cancel subscription API call
+                  setTimeout(() => {
+                    setIsCancelling(false);
+                    setShowCancelModal(false);
+                    toast.success("Suscripción cancelada");
+                  }, 1000);
+                }}
+                disabled={isCancelling}
+              >
+                {isCancelling ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

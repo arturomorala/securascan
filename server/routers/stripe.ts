@@ -85,7 +85,7 @@ export const stripeRouter = router({
       }
     }),
 
-  // Create checkout session for Business plan subscription
+  // Create checkout session for Business plan subscription (monthly)
   createBusinessCheckout: protectedProcedure
     .mutation(async ({ ctx }) => {
       if (!ctx.user.email || !ctx.user.name) {
@@ -106,7 +106,8 @@ export const stripeRouter = router({
           ctx.user.name,
           "business",
           successUrl,
-          cancelUrl
+          cancelUrl,
+          "month"
         );
 
         if (!checkoutUrl) {
@@ -119,6 +120,48 @@ export const stripeRouter = router({
         return { checkoutUrl };
       } catch (error) {
         console.error("[Stripe] Error creating Business checkout:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create checkout session",
+        });
+      }
+    }),
+
+  // Create checkout session for Business plan subscription (annual with 15% discount)
+  createBusinessAnnualCheckout: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      if (!ctx.user.email || !ctx.user.name) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Email and name are required",
+        });
+      }
+
+      const origin = ctx.req.headers.origin || "https://securascan.manus.space";
+      const successUrl = `${origin}/dashboard?subscription=success`;
+      const cancelUrl = `${origin}/pricing?subscription=cancelled`;
+
+      try {
+        const checkoutUrl = await createSubscriptionCheckout(
+          ctx.user.id,
+          ctx.user.email,
+          ctx.user.name,
+          "business",
+          successUrl,
+          cancelUrl,
+          "year"
+        );
+
+        if (!checkoutUrl) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create checkout session",
+          });
+        }
+
+        return { checkoutUrl };
+      } catch (error) {
+        console.error("[Stripe] Error creating Business Annual checkout:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create checkout session",
