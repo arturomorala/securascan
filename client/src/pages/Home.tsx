@@ -438,11 +438,41 @@ export default function Home() {
                 {plan.note && (
                   <p className="text-xs text-muted-foreground mb-4 italic">{plan.note}</p>
                 )}
-                <Link href="/pricing">
-                  <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
-                    {plan.cta}
-                  </Button>
-                </Link>
+                {plan.name === t('pricing.one_time') ? (
+                  isAuthenticated ? (
+                    <Link href="/checkout">
+                      <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
+                        {plan.cta}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <a href={getLoginUrl("/checkout")}>
+                      <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
+                        {plan.cta}
+                      </Button>
+                    </a>
+                  )
+                ) : plan.name === t('pricing.free') ? (
+                  isAuthenticated ? (
+                    <Link href="/scan">
+                      <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
+                        {plan.cta}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <a href={getLoginUrl("/scan")}>
+                      <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
+                        {plan.cta}
+                      </Button>
+                    </a>
+                  )
+                ) : (
+                  <Link href="/pricing">
+                    <Button className={`w-full ${plan.popular ? 'cyber-glow' : ''}`} variant={plan.popular ? "default" : "outline"}>
+                      {plan.cta}
+                    </Button>
+                  </Link>
+                )}
               </div>
             ))}
           </div>
