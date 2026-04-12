@@ -55,6 +55,7 @@ export default function Dashboard() {
   const { t } = useTranslation();
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const cancelSubscriptionMutation = trpc.stripe.cancelSubscription.useMutation();
 
   if (authLoading) {
     return (
@@ -256,9 +257,9 @@ export default function Dashboard() {
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-bold">Cancelar suscripción</h3>
+                  <h3 className="font-bold">{t('dashboard.cancel_subscription_title')}</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Tu suscripción se cancelará al final del período de facturación actual.
+                    {t('dashboard.cancel_subscription_desc')}
                   </p>
                 </div>
               </div>
@@ -272,24 +273,24 @@ export default function Dashboard() {
                 className="flex-1"
                 onClick={() => setShowCancelModal(false)}
               >
-                Mantener suscripción
+                {t('dashboard.keep_subscription_btn')}
               </Button>
               <Button 
                 variant="destructive" 
                 className="flex-1"
-                onClick={() => {
-                  setIsCancelling(true);
-                  // TODO: Implement cancel subscription API call
-                  setTimeout(() => {
-                    setIsCancelling(false);
+                onClick={async () => {
+                  try {
+                    await cancelSubscriptionMutation.mutateAsync();
                     setShowCancelModal(false);
-                    toast.success("Suscripción cancelada");
-                  }, 1000);
+                    toast.success(t('dashboard.cancel_subscription_success'));
+                  } catch (error) {
+                    toast.error(t('dashboard.cancel_subscription_error'));
+                  }
                 }}
-                disabled={isCancelling}
+                disabled={cancelSubscriptionMutation.isPending}
               >
-                {isCancelling ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Cancelar
+                {cancelSubscriptionMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                {t('dashboard.confirm_cancel_btn')}
               </Button>
             </div>
           </div>

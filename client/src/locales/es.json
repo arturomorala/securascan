@@ -234,6 +234,14 @@
     "custom_plan": "¿Necesitas un plan personalizado?",
     "custom_plan_desc": "Para empresas con necesidades específicas, ofrecemos planes personalizados con soporte dedicado y características a medida."
   },
+  "dashboard": {
+    "cancel_subscription_title": "Cancelar suscripción",
+    "cancel_subscription_desc": "Tu suscripción se cancelará al final del período de facturación actual.",
+    "keep_subscription_btn": "Mantener suscripción",
+    "confirm_cancel_btn": "Cancelar",
+    "cancel_subscription_success": "Suscripción cancelada exitosamente",
+    "cancel_subscription_error": "Error al cancelar la suscripción"
+  },
   "admin": {
     "access_denied": "Acceso denegado",
     "no_permissions": "No tienes permisos para acceder al panel de administración.",

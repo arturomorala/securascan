@@ -168,4 +168,63 @@ export const stripeRouter = router({
         });
       }
     }),
+
+  // Cancel subscription at end of period
+  cancelSubscription: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      try {
+        const { getDb } = await import("../db");
+        const { users } = await import("../../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const Stripe = await import("stripe");
+
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const stripe = new Stripe.default(process.env.STRIPE_SECRET_KEY || "");
+
+        // Get user's subscription ID from database
+        const user = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, ctx.user.id))
+          .limit(1)
+          .then((rows) => rows[0]);
+
+        if (!user?.stripeSubscriptionId) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "No active subscription found",
+          });
+        }
+
+        // Cancel subscription at end of period
+        const updatedSubscription = await stripe.subscriptions.update(
+          user.stripeSubscriptionId,
+          {
+            cancel_at_period_end: true,
+          }
+        );
+
+        // Update user in database to mark subscription as cancelled
+        await db
+          .update(users)
+          .set({
+            subscriptionStatus: "cancelled",
+          })
+          .where(eq(users.id, ctx.user.id));
+
+        return {
+          success: true,
+          message: "Subscription cancelled at end of period",
+          cancelDate: (updatedSubscription as any).current_period_end,
+        };
+      } catch (error) {
+        console.error("[Stripe] Error cancelling subscription:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to cancel subscription",
+        });
+      }
+    }),
 });

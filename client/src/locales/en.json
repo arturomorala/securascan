@@ -317,6 +317,14 @@
     "active_subscriptions": "Active Subscriptions",
     "revenue": "Revenue"
   },
+  "dashboard": {
+    "cancel_subscription_title": "Cancel Subscription",
+    "cancel_subscription_desc": "Your subscription will be cancelled at the end of the current billing period.",
+    "keep_subscription_btn": "Keep Subscription",
+    "confirm_cancel_btn": "Cancel",
+    "cancel_subscription_success": "Subscription cancelled successfully",
+    "cancel_subscription_error": "Failed to cancel subscription"
+  },
   "testimonials": {
     "required_field": "This field is required"
   }
