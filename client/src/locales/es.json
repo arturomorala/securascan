@@ -271,14 +271,6 @@
     "privacy_link": "Política de Privacidad",
     "terms_link": "Términos de Servicio"
   },
-  "dashboard": {
-    "cancel_subscription_title": "Cancelar suscripción",
-    "cancel_subscription_desc": "Tu suscripción se cancelará al final del período de facturación actual.",
-    "keep_subscription_btn": "Mantener suscripción",
-    "confirm_cancel_btn": "Cancelar",
-    "cancel_subscription_success": "Suscripción cancelada exitosamente",
-    "cancel_subscription_error": "Error al cancelar la suscripción"
-  },
   "one_time_scan": {
     "title": "One-Time Scan",
     "description": "Un único escaneo de seguridad completo",

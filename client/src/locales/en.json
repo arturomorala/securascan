@@ -378,14 +378,6 @@
     "terms": "Terms",
     "vulnerabilities": "Vulnerabilities"
   },
-  "dashboard": {
-    "cancel_subscription_title": "Cancel Subscription",
-    "cancel_subscription_desc": "Your subscription will be cancelled at the end of the current billing period.",
-    "keep_subscription_btn": "Keep Subscription",
-    "confirm_cancel_btn": "Cancel",
-    "cancel_subscription_success": "Subscription cancelled successfully",
-    "cancel_subscription_error": "Failed to cancel subscription"
-  },
   "one_time_scan": {
     "title": "One-Time Scan",
     "description": "A single complete security scan",
