@@ -164,7 +164,7 @@ export async function sendOneTimeScanConfirmation(
     to: [{ email: userEmail, name: userName }],
     subject: '✅ Pago Confirmado - Tu Escaneo Está Listo',
     htmlContent,
-    sender: { email: 'noreply@securascan.com', name: 'SecuraScan' },
+    sender: { email: 'arturomorala@gmail.com', name: 'SecuraScan' },
     replyTo: { email: 'support@securascan.com', name: 'SecuraScan Support' },
   });
 }
@@ -309,7 +309,7 @@ export async function sendProSubscriptionConfirmation(
     to: [{ email: userEmail, name: userName }],
     subject: '🎉 Bienvenido a SecuraScan Pro - Acceso Ilimitado',
     htmlContent,
-    sender: { email: 'noreply@securascan.com', name: 'SecuraScan' },
+    sender: { email: 'arturomorala@gmail.com', name: 'SecuraScan' },
     replyTo: { email: 'support@securascan.com', name: 'SecuraScan Support' },
   });
 }
@@ -437,7 +437,7 @@ export async function sendBusinessSubscriptionConfirmation(
     to: [{ email: userEmail, name: userName }],
     subject: '🎉 Bienvenido a SecuraScan Business - Solución Empresarial',
     htmlContent,
-    sender: { email: 'noreply@securascan.com', name: 'SecuraScan' },
+    sender: { email: 'arturomorala@gmail.com', name: 'SecuraScan' },
     replyTo: { email: 'support@securascan.com', name: 'SecuraScan Support' },
   });
 }

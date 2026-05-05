@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { getDb } from "../db";
 import { payments, subscriptions, users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { sendOneTimeScanConfirmation, sendProSubscriptionConfirmation, sendBusinessSubscriptionConfirmation } from "../email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2026-02-25.clover",
@@ -207,7 +208,6 @@ export async function handlePaymentSuccess(
 
     // Send confirmation email
     try {
-      const { sendOneTimeScanConfirmation } = await import("../email");
       if (user.email) {
         await sendOneTimeScanConfirmation(
           user.email,
@@ -219,7 +219,7 @@ export async function handlePaymentSuccess(
         console.log("[Stripe] One-Time Scan confirmation email sent to", user.email);
       }
     } catch (error) {
-      console.warn("[Stripe] Failed to send One-Time Scan confirmation email", error);
+      console.error("[Stripe] Failed to send One-Time Scan confirmation email:", error);
     }
     return;
   }
@@ -251,7 +251,6 @@ export async function handlePaymentSuccess(
   try {
     if (user.email) {
       if (plan === "professional") {
-        const { sendProSubscriptionConfirmation } = await import("../email");
         await sendProSubscriptionConfirmation(
           user.email,
           user.name || "User",
@@ -260,7 +259,6 @@ export async function handlePaymentSuccess(
           dashboard
         );
       } else if (plan === "enterprise") {
-        const { sendBusinessSubscriptionConfirmation } = await import("../email");
         await sendBusinessSubscriptionConfirmation(
           user.email,
           user.name || "User",
@@ -272,7 +270,7 @@ export async function handlePaymentSuccess(
       console.log(`[Stripe] ${plan} subscription confirmation email sent to`, user.email);
     }
   } catch (error) {
-    console.warn(`[Stripe] Failed to send ${plan} subscription confirmation email`, error);
+    console.error(`[Stripe] Failed to send ${plan} subscription confirmation email:`, error);
   }
 }
 
