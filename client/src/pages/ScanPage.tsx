@@ -91,6 +91,8 @@ export default function ScanPage() {
   const [shouldPoll, setShouldPoll] = useState(!!params.id);
   const resultFetchedRef = useRef(false);
 
+  const utils = trpc.useUtils();
+
   const createScan = trpc.scans.create.useMutation({
     onSuccess: (data) => {
       setScanId(data.id);
@@ -106,8 +108,6 @@ export default function ScanPage() {
     { scanId: scanId! },
     { enabled: !!scanId && shouldPoll }
   );
-
-  const utils = trpc.useUtils();
 
   // Control polling and phase transitions separately
   useEffect(() => {
@@ -139,11 +139,15 @@ export default function ScanPage() {
     onError: (err: any) => toast.error(`Error: ${err.message}`),
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) { toast.error("Introduce una URL válida"); return; }
     if (!ownerConfirmation) { toast.error("Debes confirmar que eres propietario o tienes permiso"); return; }
     if (!termsAccepted) { toast.error("Debes aceptar los términos de uso"); return; }
+    
+    // Refetch user data to ensure we have latest subscription status
+    await utils.auth.me.refetch();
+    
     createScan.mutate({ url: url.trim(), ownerConfirmation, termsAccepted, language: i18n.language as 'es' | 'en' });
   };
 
