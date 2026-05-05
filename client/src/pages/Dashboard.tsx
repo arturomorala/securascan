@@ -102,9 +102,9 @@ export default function Dashboard() {
           </Link>
           <div className="flex items-center gap-3">
             {user?.role === "admin" && (
-              <Link href="/admin"><Button variant="ghost" size="sm" className="text-xs text-orange-400 hover:text-orange-300">{t('dashboard.admin')}</Button></Link>
+              <Link href="/admin"><a><Button variant="ghost" size="sm" className="text-xs text-orange-400 hover:text-orange-300">{t('dashboard.admin')}</Button></a></Link>
             )}
-            <Link href="/scan"><Button size="sm" className="cyber-glow text-xs"><Plus className="w-3.5 h-3.5 mr-1" />{t('dashboard.new_scan')}</Button></Link>
+            <Link href="/scan"><a><Button size="sm" className="cyber-glow text-xs"><Plus className="w-3.5 h-3.5 mr-1" />{t('dashboard.new_scan')}</Button></a></Link>
             <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={logout}>{t('dashboard.logout')}</Button>
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function Dashboard() {
               <Shield className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
               <h3 className="font-semibold mb-2">{t('dashboard.no_scans')}</h3>
               <p className="text-sm text-muted-foreground mb-6">{t('dashboard.no_scans_desc')}</p>
-              <Link href="/scan"><Button className="cyber-glow"><Plus className="w-4 h-4 mr-2" />{t('dashboard.start_first_scan')}</Button></Link>
+              <Link href="/scan"><a><Button className="cyber-glow"><Plus className="w-4 h-4 mr-2" />{t('dashboard.start_first_scan')}</Button></a></Link>
             </div>
           ) : (
             <div className="divide-y divide-border/30">
