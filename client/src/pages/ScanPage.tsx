@@ -100,7 +100,7 @@ export default function ScanPage() {
 
   const { data: scanSummary } = trpc.scans.getPublicSummary.useQuery(
     { scanId: scanId! },
-    { enabled: !!scanId, refetchInterval: phase === "scanning" ? 2000 : (phase === "result" ? 1000 : false) }
+    { enabled: !!scanId, refetchInterval: phase === "scanning" ? 2000 : false }
   );
 
   const utils = trpc.useUtils();
@@ -108,10 +108,8 @@ export default function ScanPage() {
   useEffect(() => {
     if (scanSummary?.status === "completed" || scanSummary?.status === "failed") {
       setPhase("result");
-      // Refetch scan summary to get updated isPaid status
-      setTimeout(() => {
-        utils.scans.getPublicSummary.invalidate({ scanId: scanId! });
-      }, 500);
+      // Invalidate and refetch scan summary to get updated isPaid status
+      utils.scans.getPublicSummary.invalidate({ scanId: scanId! });
     }
   }, [scanSummary?.status, scanId, utils]);
 
@@ -174,7 +172,7 @@ export default function ScanPage() {
       </nav>
 
       <div className="container py-10 max-w-2xl mx-auto">
-        {/* FORM */}
+        {/* FORM PHASE */}
         {phase === "form" && (
           <div>
             <div className="text-center mb-10">
@@ -226,7 +224,7 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* SCANNING */}
+        {/* SCANNING PHASE */}
         {phase === "scanning" && (
           <div>
             <div className="text-center mb-8">
@@ -272,7 +270,7 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* RESULT */}
+        {/* RESULT PHASE */}
         {phase === "result" && scanSummary && (
           <div>
             {scanSummary.status === "failed" ? (
@@ -373,7 +371,7 @@ export default function ScanPage() {
                 <div className="flex gap-3 mt-4">
                   <Button variant="outline" className="flex-1" onClick={() => { setPhase("form"); setScanId(null); navigate("/scan"); }}>{t('dashboard.new_analysis')}</Button>
                   {user?.subscriptionPlan !== 'free' && (
-                    <Link href="/dashboard" className="flex-1"><a><Button variant="ghost" className="w-full text-muted-foreground">Ver historial</Button></a></Link>
+                    <Link href="/dashboard" className="flex-1"><Button variant="ghost" className="w-full text-muted-foreground">Ver historial</Button></Link>
                   )}
                 </div>
               </div>

@@ -16,7 +16,6 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useStateReact(false);
   const [paymentStatus, setPaymentStatus] = useStateReact<"idle" | "success" | "error">("idle");
 
-  const utils = trpc.useUtils();
   const oneTimeScanMutation = trpc.stripe.createOneTimeScanCheckout.useMutation();
   const proCheckoutMutation = trpc.stripe.createProCheckout.useMutation();
   const businessCheckoutMutation = trpc.stripe.createBusinessCheckout.useMutation();
@@ -39,9 +38,7 @@ export default function CheckoutPage() {
     if (status === "success") {
       setPaymentStatus("success");
       toast.success(t("checkout.payment_successful"));
-      // Refetch user data to ensure updated subscription plan
-      utils.auth.me.refetch();
-      setTimeout(() => navigate("/scan"), 3000);
+      setTimeout(() => navigate("/scan"), 2000);
     } else if (status === "cancelled") {
       setPaymentStatus("error");
       toast.error(t("checkout.payment_cancelled"));

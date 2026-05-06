@@ -209,14 +209,14 @@ export async function handlePaymentSuccess(
     // Send confirmation email
     try {
       if (user.email) {
-        // TEMPORARILY DISABLED: await sendOneTimeScanConfirmation(
-        //   user.email,
-        //   user.name || "User",
-        //   499,
-        //   sessionId,
-        //   dashboard
-        // );
-        console.log("[Stripe] One-Time Scan confirmation email DISABLED for testing");
+        await sendOneTimeScanConfirmation(
+          user.email,
+          user.name || "User",
+          499,
+          sessionId,
+          dashboard
+        );
+        console.log("[Stripe] One-Time Scan confirmation email sent to", user.email);
       }
     } catch (error) {
       console.error("[Stripe] Failed to send One-Time Scan confirmation email:", error);
