@@ -6,7 +6,7 @@ import { users as usersTable, scans as scansTable } from "../drizzle/schema";
 import { getDb } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router, rateLimitedProcedure } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router, rateLimitedProcedure, checkRateLimitMiddleware } from "./_core/trpc";
 import { logSecurityEvent, checkBruteForcePattern, checkSuspiciousScanPattern, getSecurityStats, getRecentSecurityEvents } from "./lib/security-logger";
 import {
   getUserById, getScansByUserId, getScanById, createScan, updateScan,
@@ -61,7 +61,8 @@ export const appRouter = router({
         return scan;
       }),
 
-    create: rateLimitedProcedure
+    create: protectedProcedure
+      .use(checkRateLimitMiddleware)
       .use(({ ctx, next }) => {
         if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED", message: "Debes estar autenticado." });
         return next({ ctx: { ...ctx, user: ctx.user } });
