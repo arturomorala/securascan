@@ -43,13 +43,10 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         console.log("[Webhook] Checkout session completed:", session.id);
 
         if (session.metadata) {
-          // Get dashboard URL from success_url or use default
-          const dashboardUrl = session.success_url?.split('?')[0] || "https://securascan.com/dashboard";
           await handlePaymentSuccess(
             session.id,
             session.customer as string,
-            session.metadata,
-            dashboardUrl
+            session.metadata
           );
         }
         break;

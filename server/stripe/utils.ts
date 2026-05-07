@@ -2,7 +2,6 @@ import Stripe from "stripe";
 import { getDb } from "../db";
 import { payments, subscriptions, users } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
-import { sendOneTimeScanConfirmation, sendProSubscriptionConfirmation, sendBusinessSubscriptionConfirmation } from "../email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2026-02-25.clover",
@@ -165,28 +164,12 @@ export async function createSubscriptionCheckout(
 export async function handlePaymentSuccess(
   sessionId: string,
   customerId: string,
-  metadata: Record<string, string>,
-  dashboardUrl?: string
+  metadata: Record<string, string>
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
   const userId = parseInt(metadata.user_id);
-
-  // Get user info for email
-  const user = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1)
-    .then((rows) => rows[0]);
-
-  if (!user) {
-    console.error("[Stripe] User not found for payment success", userId);
-    return;
-  }
-
-  const dashboard = dashboardUrl || "https://securascan.com/dashboard";
 
   // Update payment record
   await db
@@ -201,26 +184,10 @@ export async function handlePaymentSuccess(
       .update(users)
       .set({
         subscriptionPlan: "basic",
-        oneTimeScanUsed: false,
+        oneTimeScanUsed: false, // Not used yet, just purchased
         oneTimeScanPurchasedAt: new Date(),
       })
       .where(eq(users.id, userId));
-
-    // Send confirmation email
-    try {
-      if (user.email) {
-        await sendOneTimeScanConfirmation(
-          user.email,
-          user.name || "User",
-          499,
-          sessionId,
-          dashboard
-        );
-        console.log("[Stripe] One-Time Scan confirmation email sent to", user.email);
-      }
-    } catch (error) {
-      console.error("[Stripe] Failed to send One-Time Scan confirmation email:", error);
-    }
     return;
   }
 
@@ -244,34 +211,6 @@ export async function handlePaymentSuccess(
       subscriptionStatus: "active",
     })
     .where(eq(users.id, userId));
-
-  // Send confirmation email based on plan
-  const amount = metadata.plan_type === "pro" ? 2999 : 7999;
-
-  try {
-    if (user.email) {
-      if (plan === "professional") {
-        await sendProSubscriptionConfirmation(
-          user.email,
-          user.name || "User",
-          amount,
-          sessionId,
-          dashboard
-        );
-      } else if (plan === "enterprise") {
-        await sendBusinessSubscriptionConfirmation(
-          user.email,
-          user.name || "User",
-          amount,
-          sessionId,
-          dashboard
-        );
-      }
-      console.log(`[Stripe] ${plan} subscription confirmation email sent to`, user.email);
-    }
-  } catch (error) {
-    console.error(`[Stripe] Failed to send ${plan} subscription confirmation email:`, error);
-  }
 }
 
 /**
