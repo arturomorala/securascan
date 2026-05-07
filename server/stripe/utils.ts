@@ -177,6 +177,28 @@ export async function handlePaymentSuccess(
     .set({ status: "succeeded" })
     .where(eq(payments.stripeSessionId, sessionId));
 
+  // Get user data for email
+  const user = await db.select().from(users).where(eq(users.id, userId)).limit(1).then(rows => rows[0]);
+  
+  // Send email via n8n webhook
+  const n8nWebhookUrl = "https://armorala1.app.n8n.cloud/webhook/securascan-emails";
+  const emailPayload = {
+    email: metadata.customer_email || user?.email,
+    name: metadata.customer_name || user?.name || "Cliente",
+    plan: metadata.plan_type === "one_time_scan" ? "one_time" : metadata.plan_type,
+  };
+
+  try {
+    await fetch(n8nWebhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(emailPayload),
+    });
+  } catch (error) {
+    console.error("Error sending email via n8n:", error);
+    // Don't throw - email failure shouldn't block payment success
+  }
+
   // For one-time scans, mark user as having purchased one-time scan
   if (metadata.plan_type === "one_time_scan") {
     // Update user to basic plan with one-time scan purchased
