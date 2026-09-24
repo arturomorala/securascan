@@ -18,7 +18,8 @@ EXPECTED = {
     "GRAPHQL_INTROSPECTION_ENABLED",
     "JWT_ALG_NONE",
     "JWT_NO_EXP",
-    "SENSITIVE_RESPONSE_PUBLIC_CACHE",
+    "AUTH_RESPONSE_CACHEABLE",
+    "JSON_SQL_ERROR_SIGNAL",
     "HTTP_TRACE_ENABLED",
     "OPENAPI_SCHEMA_EXPOSED",
     "PACKAGE_JSON_EXPOSED",
@@ -27,6 +28,7 @@ EXPECTED = {
     "BACKUP_FILE_EXPOSED",
     "DIRECTORY_LISTING",
     "INSECURE_FORM_ACTION",
+    "TECHNOLOGY_VERSION_DISCLOSURE",
 }
 
 def main():
@@ -52,7 +54,8 @@ def main():
         try:
             scan=db.get(Scan,scan_id)
             if scan and scan.status in TERMINAL:
-                checks=db.scalar(select(func.count(ScanCheck.id)).where(ScanCheck.scan_id==scan.id)) or 0
+                check_rows=db.scalars(select(ScanCheck).where(ScanCheck.scan_id==scan.id).order_by(ScanCheck.id)).all()
+                checks=len(check_rows)
                 occs=db.scalars(select(FindingOccurrence).where(FindingOccurrence.scan_id==scan.id)).all()
                 ids={o.finding_id for o in occs}
                 findings=db.scalars(select(Finding).where(Finding.id.in_(ids))).all() if ids else []
@@ -62,8 +65,13 @@ def main():
                 print(f"E2E_RESULT status={scan.status} score={scan.score} risk={scan.risk_level} checks={checks} findings={len(occs)} report={'yes' if report else 'no'}",flush=True)
                 for f in sorted(findings,key=lambda x:(x.severity,x.type)):
                     print(f"E2E_FINDING severity={f.severity} type={f.type} title={f.title}",flush=True)
+                check_keys={x.check_key for x in check_rows}
+                required_checks={"graphql_v063","api_docs_v063","technology_v063"}
+                missing_checks=sorted(required_checks-check_keys)
+                print(f"E2E_CHECK_KEYS {sorted(check_keys)}",flush=True)
                 print(f"E2E_EXPECTED_MISSING {missing}",flush=True)
-                if scan.status not in {"COMPLETED","PARTIAL"} or missing:
+                print(f"E2E_CHECKS_MISSING {missing_checks}",flush=True)
+                if scan.status not in {"COMPLETED","PARTIAL"} or missing or missing_checks:
                     return 2
                 return 0
         finally:
