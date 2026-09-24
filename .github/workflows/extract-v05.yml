@@ -1,0 +1,22 @@
+name: Extract v0.5 scanner source
+on:
+  push:
+    branches: [chatgpt-extract-v05]
+permissions:
+  contents: read
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct scanner overlay
+        run: |
+          mkdir -p extracted
+          cat scanner_v05_chunks/chunk*.txt | base64 -d > /tmp/scanner.zip
+          unzip -q /tmp/scanner.zip -d extracted
+          find extracted -type f -maxdepth 5 -print
+      - name: Upload extracted source
+        uses: actions/upload-artifact@v4
+        with:
+          name: v05-scanner-source
+          path: extracted/securascan/app/scanner/
