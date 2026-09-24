@@ -48,6 +48,13 @@ RUN cat \
     && cp -a /tmp/v04overlay/securascan/. /app/ \
     && rm -rf /tmp/payload_v04 /tmp/v04overlay /tmp/v04overlay.zip
 
+# Apply v0.4.3 marketing landing without altering scanner/runtime behavior.
+COPY marketing_v043 /tmp/marketing_v043
+RUN cp /tmp/marketing_v043/landing.html /app/app/templates/landing.html \
+    && cat /tmp/marketing_v043/marketing.css >> /app/app/static/app.css \
+    && python /tmp/marketing_v043/patch.py \
+    && rm -rf /tmp/marketing_v043
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["sh", "scripts/start-web.sh"]
