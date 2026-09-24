@@ -55,6 +55,13 @@ RUN cp /tmp/marketing_v043/landing.html /app/app/templates/landing.html \
     && python /tmp/marketing_v043/patch.py \
     && rm -rf /tmp/marketing_v043
 
+# Apply SecuraScan v0.5 scanner engine overlay.
+COPY scanner_v05_overlay.b64 /tmp/scanner_v05_overlay.b64
+RUN base64 -d /tmp/scanner_v05_overlay.b64 > /tmp/scanner_v05_overlay.zip \
+    && unzip /tmp/scanner_v05_overlay.zip -d /tmp/scanner_v05_overlay \
+    && cp -a /tmp/scanner_v05_overlay/securascan/. /app/ \
+    && rm -rf /tmp/scanner_v05_overlay /tmp/scanner_v05_overlay.zip /tmp/scanner_v05_overlay.b64
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["sh", "scripts/start-web.sh"]
