@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VulnLab - Web deliberadamente insegura</title>
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+  <script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .card { border: 1px solid #ccc; border-radius: 12px; padding: 20px; margin: 18px 0; }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    code { background: #eee; padding: 2px 6px; }
+  </style>
+</head>
+<body>
+  <h1>VulnLab</h1>
+  <p>Aplicación de laboratorio creada a propósito con malas configuraciones de seguridad.</p>
+  <div class="card">
+    <h2>Formulario HTTP inseguro</h2>
+    <p>El formulario envía credenciales a una URL <code>http://</code>.</p>
+    <form action="http://example.com/login" method="post">
+      <input name="username" placeholder="Usuario" value="demo">
+      <input name="password" type="password" placeholder="Contraseña" value="password123">
+      <button type="submit">Entrar de forma insegura</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Mixed content</h2>
+    <p>Esta imagen se solicita mediante HTTP y debería ser detectada si la página principal está bajo HTTPS.</p>
+    <img src="http://httpbin.org/image/png" alt="Recurso HTTP" width="180">
+  </div>
+  <div class="card">
+    <h2>API con CORS inseguro</h2>
+    <p>Endpoint de prueba: <code>/api/profile</code>.</p>
+    <button onclick="loadProfile()">Leer perfil</button>
+    <pre id="result">Sin consultar</pre>
+  </div>
+  <div class="card">
+    <h2>Headers deliberadamente ausentes</h2>
+    <ul>
+      <li>Content-Security-Policy</li>
+      <li>Strict-Transport-Security</li>
+      <li>X-Frame-Options</li>
+      <li>X-Content-Type-Options</li>
+      <li>Referrer-Policy</li>
+      <li>Permissions-Policy</li>
+    </ul>
+  </div>
+  <script>
+    async function loadProfile() {
+      const r = await fetch('/api/profile', { credentials: 'include' });
+      document.getElementById('result').textContent = JSON.stringify(await r.json(), null, 2);
+    }
+  </script>
+</body>
+</html>
