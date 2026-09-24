@@ -10,7 +10,7 @@ RUN apt-get update \
 
 WORKDIR /app
 COPY payload /tmp/payload
-RUN cat /tmp/payload/part*.txt | base64 -d > /tmp/securascan.zip \
+RUN cat /tmp/payload/v02-part*.txt | base64 -d > /tmp/securascan.zip \
     && unzip /tmp/securascan.zip -d /tmp/securascan \
     && cp -a /tmp/securascan/securascan/. /app/ \
     && rm -rf /tmp/payload /tmp/securascan /tmp/securascan.zip
