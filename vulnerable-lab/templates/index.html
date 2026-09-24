@@ -3,9 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="WordPress 6.6">
   <title>VulnLab - Web deliberadamente insegura</title>
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
   <script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="/wp-content/plugins/demo/jquery.js"></script>
   <!-- TODO: API_KEY=demo-not-a-real-key -->
   <style>
     body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
@@ -15,8 +17,13 @@
   </style>
 </head>
 <body>
-  <h1>VulnLab</h1>
+  <h1>VulnLab v0.6</h1>
   <p>Aplicación de laboratorio creada a propósito con malas configuraciones y endpoints vulnerables para regresión de SecuraScan.</p>
+
+  <div class="card">
+    <h2>Crawling profundo</h2>
+    <a href="/level1">Empieza el árbol de navegación de tres niveles</a>
+  </div>
 
   <div class="card">
     <h2>Formulario HTTP inseguro</h2>
@@ -33,6 +40,14 @@
       <input name="id" value="1">
       <input name="password" type="password" value="demo">
       <button type="submit">Buscar</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>POST activo controlado</h2>
+    <form action="/search-post" method="post">
+      <input name="id" value="1">
+      <button type="submit">Buscar por POST</button>
     </form>
   </div>
 
@@ -60,11 +75,22 @@
   <div class="card">
     <h2>Pruebas activas controladas</h2>
     <ul>
-      <li><a href="/search?id=1">SQLi fixture</a></li>
-      <li><a href="/reflect?q=hello">HTML reflection fixture</a></li>
+      <li><a href="/search?id=1">SQLi GET fixture</a></li>
+      <li><a href="/reflect?q=hello">HTML reflection / SSTI fixture</a></li>
       <li><a href="/redirect?next=/">Open redirect fixture</a></li>
       <li><a href="/files/">Directory listing fixture</a></li>
+      <li><a href="/api/profile">JSON API fixture</a></li>
+      <li><a href="/api/token">JWT fixture</a></li>
+      <li><a href="/api/private">Sensitive cache fixture</a></li>
+      <li><a href="/graphql">GraphQL fixture</a></li>
+      <li><a href="/openapi.json">OpenAPI fixture</a></li>
     </ul>
+  </div>
+
+  <div class="card">
+    <h2>API JSON vulnerable</h2>
+    <button onclick="runJsonSearch()">POST /api/search</button>
+    <pre id="json-result">Sin consultar</pre>
   </div>
 
   <div class="card">
@@ -90,6 +116,16 @@
       const r = await fetch('/api/profile', { credentials: 'include' });
       document.getElementById('result').textContent = JSON.stringify(await r.json(), null, 2);
     }
+    async function runJsonSearch() {
+      const r = await fetch('/api/search', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: '1', q: 'demo'})
+      });
+      document.getElementById('json-result').textContent = JSON.stringify(await r.json(), null, 2);
+    }
+    fetch('/api/token');
+    fetch('/api/private');
     function intentionallyRiskyDemo(value) {
       document.getElementById('result').innerHTML = value;
     }
