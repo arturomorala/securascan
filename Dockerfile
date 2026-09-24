@@ -74,6 +74,7 @@ RUN cat /tmp/scanner_v06_chunks/chunk*.txt | base64 -d > /tmp/scanner_v06_overla
 RUN sed -i 's/SecuraScan worker v0.5 started/SecuraScan worker v0.6 started/' /app/app/worker.py
 
 COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
+COPY e2e_v06_vulnlab.py /app/e2e_v06_vulnlab.py
 
 RUN pip install --no-cache-dir -r requirements.txt \
     && python -m compileall -q /app/app
