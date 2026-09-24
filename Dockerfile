@@ -61,6 +61,7 @@ RUN base64 -d /tmp/scanner_v05_overlay.b64 > /tmp/scanner_v05_overlay.zip \
     && unzip /tmp/scanner_v05_overlay.zip -d /tmp/scanner_v05_overlay \
     && cp -a /tmp/scanner_v05_overlay/securascan/. /app/ \
     && rm -rf /tmp/scanner_v05_overlay /tmp/scanner_v05_overlay.zip /tmp/scanner_v05_overlay.b64
+RUN sed -i 's/SecuraScan worker v0.4 started/SecuraScan worker v0.5 started/' /app/app/worker.py
 
 COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
 
