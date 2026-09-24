@@ -24,6 +24,13 @@ RUN cat /tmp/prod_overlay_v03/v03s*.txt | base64 -d > /tmp/v03overlay.zip \
     && cp -a /tmp/v03overlay/securascan/. /app/ \
     && rm -rf /tmp/prod_overlay_v03 /tmp/v03overlay /tmp/v03overlay.zip
 
+# Apply the tested v0.4 commercial/email/hardening overlay.
+COPY payload_v04 /tmp/payload_v04
+RUN cat /tmp/payload_v04/v04-part*.txt | base64 -d > /tmp/v04overlay.zip \
+    && unzip /tmp/v04overlay.zip -d /tmp/v04overlay \
+    && cp -a /tmp/v04overlay/securascan/. /app/ \
+    && rm -rf /tmp/payload_v04 /tmp/v04overlay /tmp/v04overlay.zip
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["sh", "scripts/start-web.sh"]
