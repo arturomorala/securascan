@@ -9,10 +9,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY securascan_v0.1.2_railway.zip /tmp/securascan.zip
-RUN unzip /tmp/securascan.zip -d /tmp/securascan \
+COPY payload /tmp/payload
+RUN cat /tmp/payload/part*.txt | base64 -d > /tmp/securascan.zip \
+    && unzip /tmp/securascan.zip -d /tmp/securascan \
     && cp -a /tmp/securascan/securascan/. /app/ \
-    && rm -rf /tmp/securascan /tmp/securascan.zip
+    && rm -rf /tmp/payload /tmp/securascan /tmp/securascan.zip
 
 RUN pip install --no-cache-dir -r requirements.txt
 
