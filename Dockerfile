@@ -57,7 +57,7 @@ RUN cp /tmp/marketing_v043/landing.html /app/app/templates/landing.html \
 
 # Apply SecuraScan v0.5 scanner engine overlay.
 COPY scanner_v05_chunks /tmp/scanner_v05_chunks
-RUN cat /tmp/scanner_v05_chunks/chunk*.txt | base64 -d > /tmp/scanner_v05_overlay.zip \
+RUN cat /tmp/scanner_v05_chunks/chunk00.txt /tmp/scanner_v05_chunks/chunk01.txt /tmp/scanner_v05_chunks/chunk02.txt /tmp/scanner_v05_chunks/chunk03a.txt /tmp/scanner_v05_chunks/chunk03b.txt | base64 -d > /tmp/scanner_v05_overlay.zip \
     && unzip /tmp/scanner_v05_overlay.zip -d /tmp/scanner_v05_overlay \
     && cp -a /tmp/scanner_v05_overlay/securascan/. /app/ \
     && rm -rf /tmp/scanner_v05_chunks /tmp/scanner_v05_overlay /tmp/scanner_v05_overlay.zip
