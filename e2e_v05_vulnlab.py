@@ -41,7 +41,8 @@ def main():
                 print(f"E2E_STATUS scan_id={scan.id} status={scan.status} score={scan.score} risk={scan.risk_level}", flush=True)
                 last = scan.status
             if scan.status in TERMINAL:
-                checks = db.scalar(select(func.count(ScanCheck.id)).where(ScanCheck.scan_id == scan.id)) or 0
+                check_rows = db.scalars(select(ScanCheck).where(ScanCheck.scan_id == scan.id).order_by(ScanCheck.id)).all()
+                checks = len(check_rows)
                 occs = db.scalar(select(func.count(FindingOccurrence.id)).where(FindingOccurrence.scan_id == scan.id)) or 0
                 stages = db.scalars(select(ScanStage).where(ScanStage.scan_id == scan.id).order_by(ScanStage.id)).all()
                 finding_ids = db.scalars(select(FindingOccurrence.finding_id).where(FindingOccurrence.scan_id == scan.id)).all()
@@ -53,6 +54,15 @@ def main():
                       f"error_code={scan.error_code!r} error={scan.error_message_safe!r}", flush=True)
                 for s in stages:
                     print(f"E2E_STAGE stage={s.stage} status={s.status}", flush=True)
+                for ch in check_rows:
+                    data = ch.result_json or {}
+                    summary = {}
+                    if isinstance(data, dict):
+                        for k in ("pages_scanned","max_depth","discovered","probes","tokens","technologies","observations","endpoints","surface"):
+                            if k in data:
+                                v = data[k]
+                                summary[k] = len(v) if isinstance(v, list) else v
+                    print(f"E2E_CHECK key={ch.check_key} status={ch.status} summary={summary}", flush=True)
                 for f in findings:
                     print(f"E2E_FINDING severity={f.severity} type={f.type} title={f.title}", flush=True)
                 return
