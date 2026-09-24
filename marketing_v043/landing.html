@@ -103,7 +103,7 @@
       {% for p in plans %}
       <article class="landing-price-card {% if p.code=='PRO' %}is-featured{% endif %}">
         {% if p.code=='PRO' %}<div class="price-ribbon">MÁS POPULAR</div>{% endif %}
-        <div class="price-card-head"><span class="plan-code">{{p.code.replace('_',' ')}}</span><h3>{{p.name}}</h3><div class="landing-amount">{% if p.price_cents is none %}<strong>A medida</strong>{% elif p.price_cents == 0 %}<strong>0 €</strong>{% else %}<strong>{{'%.0f'|format(p.price_cents/100)}} €</strong>{% endif %}{% if p.interval %}<small>/ {{'mes' if p.interval=='month' else p.interval}}</small>{% elif p.billing_type=='ONE_TIME' %}<small>/ análisis</small>{% endif %}</div></div>
+        <div class="price-card-head"><span class="plan-code">{{p.code.replace('_',' ')}}</span><h3>{{p.name}}</h3><div class="landing-amount">{% if p.price_cents is none %}<strong>A medida</strong>{% elif p.price_cents == 0 %}<strong>0 €</strong>{% else %}<strong>{{'%.2f'|format(p.price_cents/100)}} €</strong>{% endif %}{% if p.interval %}<small>/ {{'mes' if p.interval=='month' else p.interval}}</small>{% elif p.billing_type=='ONE_TIME' %}<small>/ análisis</small>{% endif %}</div></div>
         <ul>{% for f in p.features_json %}<li><span>✓</span>{{f}}</li>{% endfor %}</ul>
         <a class="btn {% if p.code=='PRO' %}marketing-primary{% else %}secondary{% endif %} full" href="{% if p.code=='ENTERPRISE' %}/pricing{% else %}/register{% endif %}">{% if p.code=='FREE' %}Empezar gratis{% elif p.code=='ONE_TIME' %}Analizar una web{% elif p.code=='ENTERPRISE' %}Ver opción Enterprise{% else %}Probar {{p.name}}{% endif %}</a>
       </article>
