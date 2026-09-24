@@ -56,11 +56,11 @@ RUN cp /tmp/marketing_v043/landing.html /app/app/templates/landing.html \
     && rm -rf /tmp/marketing_v043
 
 # Apply SecuraScan v0.5 scanner engine overlay.
-COPY scanner_v05_overlay.b64 /tmp/scanner_v05_overlay.b64
-RUN base64 -d /tmp/scanner_v05_overlay.b64 > /tmp/scanner_v05_overlay.zip \
+COPY scanner_v05_chunks /tmp/scanner_v05_chunks
+RUN cat /tmp/scanner_v05_chunks/chunk*.txt | base64 -d > /tmp/scanner_v05_overlay.zip \
     && unzip /tmp/scanner_v05_overlay.zip -d /tmp/scanner_v05_overlay \
     && cp -a /tmp/scanner_v05_overlay/securascan/. /app/ \
-    && rm -rf /tmp/scanner_v05_overlay /tmp/scanner_v05_overlay.zip /tmp/scanner_v05_overlay.b64
+    && rm -rf /tmp/scanner_v05_chunks /tmp/scanner_v05_overlay /tmp/scanner_v05_overlay.zip
 RUN sed -i 's/SecuraScan worker v0.4 started/SecuraScan worker v0.5 started/' /app/app/worker.py
 
 COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
