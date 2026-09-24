@@ -24,17 +24,13 @@ RUN cat /tmp/prod_overlay_v03/v03s*.txt | base64 -d > /tmp/v03overlay.zip \
     && cp -a /tmp/v03overlay/securascan/. /app/ \
     && rm -rf /tmp/prod_overlay_v03 /tmp/v03overlay /tmp/v03overlay.zip
 
-# Apply the tested v0.4 commercial/email/hardening overlay.
-# Explicit order avoids the superseded malformed v04-part01b.txt.
+# Apply the v0.4 overlay. Use an explicit ordered file list so temporary upload
+# fragments in payload_v04 can never corrupt the base64 stream.
 COPY payload_v04 /tmp/payload_v04
 RUN cat \
       /tmp/payload_v04/v04-part00.txt \
       /tmp/payload_v04/v04-part01a.txt \
-      /tmp/payload_v04/v04-part01b0.txt \
-      /tmp/payload_v04/v04-part01b1.txt \
-      /tmp/payload_v04/v04-part01b2.txt \
-      /tmp/payload_v04/v04-part01b3.txt \
-      /tmp/payload_v04/v04-part01b4.txt \
+      /tmp/payload_v04/v04-part01b.txt \
       /tmp/payload_v04/v04-part01c.txt \
       /tmp/payload_v04/v04-part01d.txt \
       /tmp/payload_v04/v04-part02a.txt \
@@ -43,7 +39,8 @@ RUN cat \
       /tmp/payload_v04/v04-part02d.txt \
       /tmp/payload_v04/v04-part03.txt \
       /tmp/payload_v04/v04-part04.txt \
-    | base64 -d > /tmp/v04overlay.zip \
+      | base64 -d > /tmp/v04overlay.zip \
+    && unzip -t /tmp/v04overlay.zip \
     && unzip /tmp/v04overlay.zip -d /tmp/v04overlay \
     && cp -a /tmp/v04overlay/securascan/. /app/ \
     && rm -rf /tmp/payload_v04 /tmp/v04overlay /tmp/v04overlay.zip
