@@ -30,7 +30,11 @@ COPY payload_v04 /tmp/payload_v04
 RUN cat \
       /tmp/payload_v04/v04-part00.txt \
       /tmp/payload_v04/v04-part01a.txt \
-      /tmp/payload_v04/v04-part01b.txt \
+      /tmp/payload_v04/v04-part01b0.txt \
+      /tmp/payload_v04/v04-part01b1.txt \
+      /tmp/payload_v04/v04-part01b2.txt \
+      /tmp/payload_v04/v04-part01b3.txt \
+      /tmp/payload_v04/v04-part01b4.txt \
       /tmp/payload_v04/v04-part01c.txt \
       /tmp/payload_v04/v04-part01d.txt \
       /tmp/payload_v04/v04-part02a.txt \
