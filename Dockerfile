@@ -48,6 +48,11 @@ RUN cat \
     && cp -a /tmp/v04overlay/securascan/. /app/ \
     && rm -rf /tmp/payload_v04 /tmp/v04overlay /tmp/v04overlay.zip
 
+# Apply the v0.4.3 marketing-only landing page override.
+COPY marketing_v043 /tmp/marketing_v043
+RUN cp -a /tmp/marketing_v043/. /app/ \
+    && rm -rf /tmp/marketing_v043
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["sh", "scripts/start-web.sh"]
