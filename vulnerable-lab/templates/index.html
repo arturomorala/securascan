@@ -3,11 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="generator" content="WordPress 6.6">
+  <meta name="generator" content="VulnLab CMS 0.6">
   <title>VulnLab - Web deliberadamente insegura</title>
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
   <script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="/wp-content/plugins/demo/jquery.js"></script>
   <!-- TODO: API_KEY=demo-not-a-real-key -->
   <style>
     body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
@@ -17,50 +16,42 @@
   </style>
 </head>
 <body>
-  <h1>VulnLab v0.6</h1>
-  <p>Aplicación de laboratorio creada a propósito con malas configuraciones y endpoints vulnerables para regresión de SecuraScan.</p>
-
-  <div class="card">
-    <h2>Crawling profundo</h2>
-    <a href="/level1">Empieza el árbol de navegación de tres niveles</a>
-  </div>
+  <h1>VulnLab 0.6</h1>
+  <p>Aplicación controlada deliberadamente insegura para regresión de SecuraScan.</p>
 
   <div class="card">
     <h2>Formulario HTTP inseguro</h2>
     <form action="http://example.com/login" method="post">
-      <input name="username" placeholder="Usuario" value="demo">
-      <input name="password" type="password" placeholder="Contraseña" value="password123">
-      <button type="submit">Entrar de forma insegura</button>
+      <input name="username" value="demo">
+      <input name="password" type="password" value="password123">
+      <button type="submit">Entrar</button>
     </form>
   </div>
 
   <div class="card">
-    <h2>Password por GET</h2>
+    <h2>SQLi GET + password GET</h2>
     <form action="/search" method="get">
       <input name="id" value="1">
       <input name="password" type="password" value="demo">
-      <button type="submit">Buscar</button>
+      <button type="submit">Buscar GET</button>
     </form>
   </div>
 
   <div class="card">
-    <h2>POST activo controlado</h2>
-    <form action="/search-post" method="post">
+    <h2>SQLi POST controlada</h2>
+    <form action="/search" method="post">
       <input name="id" value="1">
-      <button type="submit">Buscar por POST</button>
+      <input name="q" value="demo">
+      <button type="submit">Buscar POST</button>
     </form>
   </div>
 
   <div class="card">
-    <h2>POST sin CSRF</h2>
+    <h2>POST sin CSRF y upload</h2>
     <form action="/profile/update" method="post">
       <input name="display_name" value="demo">
-      <button type="submit">Actualizar perfil</button>
+      <button type="submit">Actualizar</button>
     </form>
-  </div>
-
-  <div class="card">
-    <h2>Upload surface</h2>
     <form action="/profile/update" method="post" enctype="multipart/form-data">
       <input name="avatar" type="file">
       <button type="submit">Subir</button>
@@ -73,59 +64,31 @@
   </div>
 
   <div class="card">
-    <h2>Pruebas activas controladas</h2>
+    <h2>Superficie API</h2>
     <ul>
-      <li><a href="/search?id=1">SQLi GET fixture</a></li>
-      <li><a href="/reflect?q=hello">HTML reflection / SSTI fixture</a></li>
+      <li><a href="/api/profile">API profile con caché pública</a></li>
+      <li><a href="/graphql">GraphQL con introspección</a></li>
+      <li><a href="/openapi.json">OpenAPI público</a></li>
+      <li><a href="/package.json">package.json expuesto</a></li>
+      <li><a href="/search?id=1">SQLi fixture</a></li>
+      <li><a href="/reflect?q=hello">Reflection fixture</a></li>
       <li><a href="/redirect?next=/">Open redirect fixture</a></li>
       <li><a href="/files/">Directory listing fixture</a></li>
-      <li><a href="/api/profile">JSON API fixture</a></li>
-      <li><a href="/api/token">JWT fixture</a></li>
-      <li><a href="/api/private">Sensitive cache fixture</a></li>
-      <li><a href="/graphql">GraphQL fixture</a></li>
-      <li><a href="/openapi.json">OpenAPI fixture</a></li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h2>API JSON vulnerable</h2>
-    <button onclick="runJsonSearch()">POST /api/search</button>
-    <pre id="json-result">Sin consultar</pre>
-  </div>
-
-  <div class="card">
-    <h2>API con CORS inseguro</h2>
-    <button onclick="loadProfile()">Leer perfil</button>
-    <pre id="result">Sin consultar</pre>
-  </div>
-
-  <div class="card">
-    <h2>Headers deliberadamente ausentes</h2>
-    <ul>
-      <li>Content-Security-Policy</li>
-      <li>Strict-Transport-Security</li>
-      <li>X-Frame-Options</li>
-      <li>X-Content-Type-Options</li>
-      <li>Referrer-Policy</li>
-      <li>Permissions-Policy</li>
     </ul>
   </div>
 
   <script>
     async function loadProfile() {
       const r = await fetch('/api/profile', { credentials: 'include' });
-      document.getElementById('result').textContent = JSON.stringify(await r.json(), null, 2);
+      return await r.json();
     }
-    async function runJsonSearch() {
-      const r = await fetch('/api/search', {
+    async function queryApi() {
+      return fetch('/api/query', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({id: '1', q: 'demo'})
       });
-      document.getElementById('json-result').textContent = JSON.stringify(await r.json(), null, 2);
     }
-    fetch('/api/token');
-    fetch('/api/private');
     function intentionallyRiskyDemo(value) {
       document.getElementById('result').innerHTML = value;
     }
