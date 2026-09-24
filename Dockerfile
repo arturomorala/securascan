@@ -62,6 +62,6 @@ RUN base64 -d /tmp/scanner_v05_overlay.b64 > /tmp/scanner_v05_overlay.zip \
     && cp -a /tmp/scanner_v05_overlay/securascan/. /app/ \
     && rm -rf /tmp/scanner_v05_overlay /tmp/scanner_v05_overlay.zip /tmp/scanner_v05_overlay.b64
 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py\n\nRUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["sh", "scripts/start-web.sh"]
