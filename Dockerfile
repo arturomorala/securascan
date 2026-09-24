@@ -63,6 +63,15 @@ RUN cat /tmp/scanner_v05_chunks/chunk00.txt /tmp/scanner_v05_chunks/chunk01.txt 
     && rm -rf /tmp/scanner_v05_chunks /tmp/scanner_v05_overlay /tmp/scanner_v05_overlay.zip
 RUN sed -i 's/SecuraScan worker v0.4 started/SecuraScan worker v0.5 started/' /app/app/worker.py
 
+# Layer SecuraScan v0.6 on top of the validated v0.5 engine while keeping the
+# previous implementation available for regression-safe reuse.
+RUN mv /app/app/scanner/engine.py /app/app/scanner/engine_v05.py \
+    && mv /app/app/scanner/rules.py /app/app/scanner/rules_v05.py
+COPY scanner_v06/engine.py /app/app/scanner/engine.py
+COPY scanner_v06/rules.py /app/app/scanner/rules.py
+RUN python -m py_compile /app/app/scanner/engine.py /app/app/scanner/rules.py \
+    && sed -i 's/SecuraScan worker v0.5 started/SecuraScan worker v0.6 started/' /app/app/worker.py
+
 COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
 
 RUN pip install --no-cache-dir -r requirements.txt
