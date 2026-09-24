@@ -7,7 +7,7 @@ from app.models import User, Organization, OrganizationMember, Scan, ScanCheck, 
 from app.services.sites import create_site
 from app.services.scans import create_scan
 
-TARGET = "https://securascan-web-production.up.railway.app/health"
+TARGET = "https://securascan-v04-web-production.up.railway.app/"
 TERMINAL = {"COMPLETED", "PARTIAL", "FAILED"}
 
 def main():
@@ -22,7 +22,7 @@ def main():
         db.flush()
         db.add(OrganizationMember(organization_id=org.id, user_id=user.id, role="OWNER"))
         db.commit()
-        site = create_site(db, org.id, user.id, TARGET, "SecuraScan Production Health E2E")
+        site = create_site(db, org.id, user.id, TARGET, "VulnLab Deliberately Vulnerable E2E")
         scan = create_scan(db, site, user.id, trigger="MANUAL")
         scan_id = scan.id
         print(f"E2E_CREATED user_id={user.id} org_id={org.id} site_id={site.id} scan_id={scan.id} target={TARGET}", flush=True)
