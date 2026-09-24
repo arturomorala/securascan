@@ -55,6 +55,8 @@ RUN cp /tmp/marketing_v043/landing.html /app/app/templates/landing.html \
     && python /tmp/marketing_v043/patch.py \
     && rm -rf /tmp/marketing_v043
 
+COPY e2e_prod_scan_test.py /app/e2e_prod_scan_test.py
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["sh", "scripts/start-web.sh"]
