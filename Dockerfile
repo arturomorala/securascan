@@ -74,6 +74,21 @@ RUN python -m py_compile /app/app/scanner/engine.py /app/app/scanner/rules.py \
 
 COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Preserve the validated v0.5 scanner so v0.6 can extend it without regressions.
+RUN cp /app/app/scanner/engine.py /app/app/scanner/engine_v05.py \
+    && cp /app/app/scanner/rules.py /app/app/scanner/rules_v05.py
+
+# Apply SecuraScan v0.6 scanner layer.
+COPY scanner_v06/engine.py /app/app/scanner/engine.py
+COPY scanner_v06/rules.py /app/app/scanner/rules.py
+COPY scanner_v06/selftest.py /app/scanner_v06_selftest.py
+COPY e2e_v06_vulnlab.py /app/e2e_v06_vulnlab.py
+RUN sed -i 's/SecuraScan worker v0.5 started/SecuraScan worker v0.6 started/' /app/app/worker.py \
+    && sed -i 's/scanner_version="0.4.0"/scanner_version="0.6.0"/g' /app/app/services/scans.py \
+    && sed -i 's/ruleset_version="0.4.0"/ruleset_version="0.6.0"/g' /app/app/services/scans.py
+
+RUN pip install --no-cache-dir -r requirements.txt \
+    && python -m compileall -q /app/app \
+    && python /app/scanner_v06_selftest.py
 
 CMD ["sh", "scripts/start-web.sh"]
