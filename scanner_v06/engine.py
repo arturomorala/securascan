@@ -6,6 +6,8 @@ import json
 import re
 import time
 import uuid
+import socket
+import ipaddress
 from collections import deque
 from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 
@@ -38,9 +40,61 @@ def _crawl_key(url: str) -> str:
     return urlunsplit((p.scheme, p.netloc.lower(), p.path or "/", urlencode(shape), ""))
 
 
+def _public_destination(url: str) -> bool:
+    p = urlsplit(url)
+    if p.scheme not in {"http", "https"} or not p.hostname:
+        return False
+    port = p.port or (443 if p.scheme == "https" else 80)
+    if port not in {80, 443, 8080, 8443}:
+        return False
+    try:
+        infos = socket.getaddrinfo(p.hostname, port, type=socket.SOCK_STREAM)
+    except socket.gaierror:
+        return False
+    if not infos:
+        return False
+    for info in infos:
+        raw = info[4][0].split("%")[0]
+        try:
+            ip = ipaddress.ip_address(raw)
+        except ValueError:
+            return False
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_reserved or ip.is_unspecified:
+            return False
+    return True
+
+
+def _body_request(client: httpx.Client, method: str, url: str, *, data=None, json_data=None, headers=None, max_bytes=MAX_API_BODY):
+    if not _public_destination(url):
+        raise ValueError("Unsafe destination")
+    kwargs = {"follow_redirects": False}
+    if data is not None:
+        kwargs["data"] = data
+    if json_data is not None:
+        kwargs["json"] = json_data
+    if headers:
+        kwargs["headers"] = headers
+    started = time.perf_counter()
+    resp = client.request(method, url, **kwargs)
+    body = resp.content[:max_bytes]
+    text = body.decode(resp.encoding or "utf-8", errors="replace")
+    return {
+        "status_code": resp.status_code,
+        "headers": {k.lower(): v for k, v in resp.headers.items()},
+        "header_items": list(resp.headers.multi_items()),
+        "body": body,
+        "text": text,
+        "elapsed_ms": int((time.perf_counter() - started) * 1000),
+    }
+
+
 def _stable_pair(client: httpx.Client, method: str, url: str, *, data=None, json_data=None):
-    a = v05._bounded_request(client, method, url, data=data, json_data=json_data, max_bytes=MAX_API_BODY)
-    b = v05._bounded_request(client, method, url, data=data, json_data=json_data, max_bytes=MAX_API_BODY)
+    if data is None and json_data is None:
+        a = v05._bounded_request(client, method, url, max_bytes=MAX_API_BODY)
+        b = v05._bounded_request(client, method, url, max_bytes=MAX_API_BODY)
+    else:
+        a = _body_request(client, method, url, data=data, json_data=json_data, max_bytes=MAX_API_BODY)
+        b = _body_request(client, method, url, data=data, json_data=json_data, max_bytes=MAX_API_BODY)
     return a, b, a["status_code"] == b["status_code"] and v05._similarity(a["text"], b["text"]) >= 0.88
 
 
@@ -150,14 +204,14 @@ def _post_probes(client: httpx.Client, candidates: list[dict]):
             base1, base2, stable = _stable_pair(client, "POST", url, data=data)
             quote_data = dict(data)
             quote_data[param] = value + "'"
-            quote = v05._bounded_request(client, "POST", url, data=quote_data, max_bytes=MAX_API_BODY)
+            quote = _body_request(client, "POST", url, data=quote_data, max_bytes=MAX_API_BODY)
             base_error = bool(v05.SQL_ERROR_RE.search(base1["text"][:200_000]))
             quote_error = bool(v05.SQL_ERROR_RE.search(quote["text"][:200_000]))
 
             marker = f"<secscan-post-{uuid.uuid4().hex[:8]}>"
             marker_data = dict(data)
             marker_data[param] = marker
-            reflected = v05._bounded_request(client, "POST", url, data=marker_data, max_bytes=MAX_API_BODY)
+            reflected = _body_request(client, "POST", url, data=marker_data, max_bytes=MAX_API_BODY)
             html_reflection = marker in reflected["text"] and "html" in reflected["headers"].get("content-type", "").lower()
 
             boolean_signal, evidence = False, None
@@ -168,8 +222,8 @@ def _post_probes(client: httpx.Client, candidates: list[dict]):
                     tdata[param], fdata[param] = value + " AND 1=1", value + " AND 1=2"
                 else:
                     tdata[param], fdata[param] = value + "' AND '1'='1", value + "' AND '1'='2"
-                tr = v05._bounded_request(client, "POST", url, data=tdata, max_bytes=MAX_API_BODY)
-                fl = v05._bounded_request(client, "POST", url, data=fdata, max_bytes=MAX_API_BODY)
+                tr = _body_request(client, "POST", url, data=tdata, max_bytes=MAX_API_BODY)
+                fl = _body_request(client, "POST", url, data=fdata, max_bytes=MAX_API_BODY)
                 sim_true, sim_false = v05._similarity(base1["text"], tr["text"]), v05._similarity(base1["text"], fl["text"])
                 if sim_true >= 0.90 and sim_false <= 0.72 and abs(len(tr["text"]) - len(fl["text"])) >= 30:
                     boolean_signal = True
@@ -179,7 +233,7 @@ def _post_probes(client: httpx.Client, candidates: list[dict]):
             expected = ssti_payload.split("{{", 1)[0] + "49"
             sdata = dict(data)
             sdata[param] = ssti_payload
-            sr = v05._bounded_request(client, "POST", url, data=sdata, max_bytes=MAX_API_BODY)
+            sr = _body_request(client, "POST", url, data=sdata, max_bytes=MAX_API_BODY)
 
             results.append({
                 "method": "POST",
@@ -440,10 +494,10 @@ def _json_probes(client: httpx.Client, api_candidates: list[dict]):
         try:
             b1,b2,stable=_stable_pair(client,"POST",u,json_data=payload)
             q=dict(payload); q["id"]="1'"
-            qr=v05._bounded_request(client,"POST",u,json_data=q,max_bytes=MAX_API_BODY)
+            qr=_body_request(client,"POST",u,json_data=q,max_bytes=MAX_API_BODY)
             marker=f"<secscan-json-{uuid.uuid4().hex[:8]}>"
             mp=dict(payload); mp["q"]=marker
-            mr=v05._bounded_request(client,"POST",u,json_data=mp,max_bytes=MAX_API_BODY)
+            mr=_body_request(client,"POST",u,json_data=mp,max_bytes=MAX_API_BODY)
             out.append({
                 "method":"POST_JSON","url_path":path,"param":"id/q","baseline_stable":stable,
                 "sql_error_signal":stable and not v05.SQL_ERROR_RE.search(b1["text"][:200_000]) and bool(v05.SQL_ERROR_RE.search(qr["text"][:200_000])),
