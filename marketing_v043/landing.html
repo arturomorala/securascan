@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}SecuraScan — Detecta riesgos reales antes de que se conviertan en problemas{% endblock %}
+{% block content %}
+<div class="marketing-page">
+  <section class="marketing-hero">
+    <div class="hero-glow hero-glow-one"></div>
+    <div class="hero-glow hero-glow-two"></div>
+    <div class="marketing-hero-copy">
+      <div class="eyebrow marketing-eyebrow"><span class="live-dot"></span> ESCÁNER DE SEGURIDAD WEB NO DESTRUCTIVO</div>
+      <h1>Tu web puede parecer segura.<br><span>SecuraScan te enseña lo que se te escapa.</span></h1>
+      <p class="marketing-lead">Analiza una web autorizada y obtén una visión clara de su postura de seguridad: puntuación 0–100, vulnerabilidades priorizadas, evidencia técnica y recomendaciones concretas para corregirlas.</p>
+      <form class="marketing-scanbar" method="get" action="/register">
+        <div class="url-prefix">https://</div>
+        <input name="url" placeholder="tuempresa.com" aria-label="URL de tu web">
+        <button class="btn marketing-primary">Analizar mi web <span aria-hidden="true">→</span></button>
+      </form>
+      <div class="hero-actions-secondary">
+        <a href="#vulnerabilidades">Ver qué detectamos</a>
+        <span>•</span>
+        <a href="#precios">Ver precios</a>
+      </div>
+      <div class="marketing-trust-row">
+        <span><b>✓</b> Sin exploits</span>
+        <span><b>✓</b> Scanner real</span>
+        <span><b>✓</b> Resultados trazables</span>
+        <span><b>✓</b> Protección SSRF</span>
+      </div>
+    </div>
+
+    <div class="security-preview-wrap" aria-label="Ejemplo visual de resultados">
+      <div class="preview-float preview-float-a">TLS 1.3 <span>✓</span></div>
+      <div class="preview-float preview-float-b">CSP <span class="warn-dot">!</span></div>
+      <div class="security-preview-card">
+        <div class="preview-topbar">
+          <div class="preview-site"><span class="site-dot"></span><div><strong>tuempresa.com</strong><small>Análisis completado</small></div></div>
+          <span class="preview-time">hace 2 min</span>
+        </div>
+        <div class="preview-score-block">
+          <div class="preview-score-ring"><div><strong>86</strong><span>/100</span></div></div>
+          <div class="preview-score-copy"><span>SECURITY SCORE</span><h3>Buena postura</h3><p>Hay mejoras recomendadas antes de darla por cerrada.</p></div>
+        </div>
+        <div class="preview-findings">
+          <div class="preview-finding"><span class="severity-pill high">HIGH</span><div><strong>HTTP sin redirección segura</strong><small>Transporte · confianza media</small></div><b>1</b></div>
+          <div class="preview-finding"><span class="severity-pill medium">MEDIUM</span><div><strong>Content-Security-Policy ausente</strong><small>Headers · confianza alta</small></div><b>2</b></div>
+          <div class="preview-finding"><span class="severity-pill low">LOW</span><div><strong>Cookies mejorables</strong><small>Sesión · confianza media</small></div><b>3</b></div>
+        </div>
+        <div class="preview-footer"><span>Ejemplo de interfaz</span><strong>Ver informe →</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof-strip" aria-label="Capacidades principales">
+    <div><strong>0–100</strong><span>Score determinista</span></div>
+    <div><strong>13+</strong><span>Clases de riesgo observables</span></div>
+    <div><strong>5 niveles</strong><span>Critical → Info</span></div>
+    <div><strong>PDF + JSON</strong><span>Informes y exportación</span></div>
+  </section>
+
+  <section class="marketing-section" id="vulnerabilidades">
+    <div class="section-heading split-heading">
+      <div><div class="eyebrow">COBERTURA REAL</div><h2>¿Qué vulnerabilidades y malas configuraciones detecta?</h2></div>
+      <p>SecuraScan inspecciona señales que una web expone de forma no destructiva. No intenta explotar el objetivo: observa, valida y convierte los resultados en hallazgos accionables.</p>
+    </div>
+
+    <div class="coverage-grid">
+      <article class="coverage-card"><div class="coverage-icon">TLS</div><div><h3>HTTPS y TLS</h3><p>HTTP sin HTTPS, redirección HTTP→HTTPS ausente, certificados caducados o próximos a caducar y protocolos TLS obsoletos.</p><div class="mini-tags"><span>TLS 1.0/1.1</span><span>Certificados</span><span>Redirecciones</span></div></div></article>
+      <article class="coverage-card"><div class="coverage-icon">HDR</div><div><h3>Headers de seguridad</h3><p>HSTS, CSP, X-Content-Type-Options, protección anti-clickjacking, Referrer-Policy y Permissions-Policy.</p><div class="mini-tags"><span>HSTS</span><span>CSP</span><span>Clickjacking</span></div></div></article>
+      <article class="coverage-card"><div class="coverage-icon">CK</div><div><h3>Cookies y sesión</h3><p>Cookies observadas sin atributos Secure, HttpOnly o SameSite, con evidencia sin almacenar su valor sensible.</p><div class="mini-tags"><span>Secure</span><span>HttpOnly</span><span>SameSite</span></div></div></article>
+      <article class="coverage-card"><div class="coverage-icon">WEB</div><div><h3>Contenido mixto</h3><p>Scripts, iframes, CSS, imágenes y otros recursos cargados por HTTP dentro de páginas servidas por HTTPS.</p><div class="mini-tags"><span>Mixed active</span><span>Mixed passive</span></div></div></article>
+      <article class="coverage-card"><div class="coverage-icon">FORM</div><div><h3>Formularios inseguros</h3><p>Formularios que envían datos por HTTP, elevando la severidad cuando se observa un campo de contraseña.</p><div class="mini-tags"><span>HTTP actions</span><span>Password forms</span></div></div></article>
+      <article class="coverage-card"><div class="coverage-icon">CORS</div><div><h3>CORS peligroso</h3><p>Configuraciones observables que combinan credenciales con un origen comodín, una combinación que requiere revisión inmediata.</p><div class="mini-tags"><span>Wildcard</span><span>Credentials</span></div></div></article>
+      <article class="coverage-card"><div class="coverage-icon">SRI</div><div><h3>Scripts de terceros</h3><p>Recursos JavaScript de otros dominios sin Subresource Integrity cuando la página los expone de forma observable.</p><div class="mini-tags"><span>Third-party</span><span>Integrity</span></div></div></article>
+      <article class="coverage-card coverage-card-accent"><div class="coverage-icon">AI</div><div><h3>Del hallazgo a la acción</h3><p>El score y las severidades salen de reglas deterministas. La capa de IA, cuando está habilitada, se utiliza para explicar y priorizar, no para inventar vulnerabilidades.</p><div class="mini-tags"><span>Evidence-first</span><span>Determinista</span></div></div></article>
+    </div>
+  </section>
+
+  <section class="marketing-section product-section">
+    <div class="section-heading center-heading"><div class="eyebrow">NO ES SOLO UN SCORE</div><h2>Un flujo de seguridad pensado para que puedas actuar</h2><p>Desde el primer análisis hasta la monitorización continua, SecuraScan conserva contexto, evidencia e histórico para que el resultado no se quede en una captura de pantalla.</p></div>
+    <div class="product-grid">
+      <article><span class="product-number">01</span><h3>Hallazgos priorizados</h3><p>Critical, High, Medium, Low e Info con una explicación clara de qué se observó y por qué importa.</p></article>
+      <article><span class="product-number">02</span><h3>Evidencia técnica</h3><p>Cabeceras, metadatos y observaciones trazables para que el equipo técnico pueda verificar cada hallazgo.</p></article>
+      <article><span class="product-number">03</span><h3>Histórico y comparación</h3><p>Compara análisis y distingue hallazgos abiertos, corregidos o reabiertos a lo largo del tiempo.</p></article>
+      <article><span class="product-number">04</span><h3>Monitorización y alertas</h3><p>Programa revisiones periódicas y recibe avisos cuando aparezcan cambios relevantes en la postura de seguridad.</p></article>
+      <article><span class="product-number">05</span><h3>PDF y exportaciones</h3><p>Genera informes profesionales y exporta datos para compartirlos con clientes, responsables o sistemas internos.</p></article>
+      <article><span class="product-number">06</span><h3>API, webhooks y equipos</h3><p>Los planes avanzados añaden automatización, integración con otros sistemas, organizaciones y control por roles.</p></article>
+    </div>
+  </section>
+
+  <section class="marketing-section how-section">
+    <div class="how-card">
+      <div class="how-copy"><div class="eyebrow">CÓMO FUNCIONA</div><h2>De una URL a un plan de acción.</h2><p>No necesitas interpretar un volcado técnico. SecuraScan estructura el análisis para que negocio y desarrollo puedan hablar del mismo problema.</p><a class="btn secondary" href="/register">Crear cuenta gratis</a></div>
+      <div class="how-steps">
+        <div class="how-step"><span>1</span><div><strong>Añade una web autorizada</strong><p>Validamos el destino y bloqueamos rangos internos o destinos no permitidos.</p></div></div>
+        <div class="how-step"><span>2</span><div><strong>Ejecutamos comprobaciones reales</strong><p>El worker inspecciona transporte, TLS, headers, cookies, contenido, formularios y señales relacionadas.</p></div></div>
+        <div class="how-step"><span>3</span><div><strong>Recibes resultados accionables</strong><p>Score, hallazgos, evidencia, recomendaciones, histórico y reportes según tu plan.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="marketing-section" id="precios">
+    <div class="section-heading center-heading"><div class="eyebrow">PRECIOS</div><h2>Empieza gratis. Paga cuando SecuraScan ya te aporta valor.</h2><p>Planes para una revisión puntual, monitorización continua o equipos que necesitan automatizar seguridad web.</p></div>
+    <div class="landing-pricing">
+      {% for p in plans %}
+      <article class="landing-price-card {% if p.code=='PRO' %}is-featured{% endif %}">
+        {% if p.code=='PRO' %}<div class="price-ribbon">MÁS POPULAR</div>{% endif %}
+        <div class="price-card-head"><span class="plan-code">{{p.code.replace('_',' ')}}</span><h3>{{p.name}}</h3><div class="landing-amount">{% if p.price_cents is none %}<strong>A medida</strong>{% elif p.price_cents == 0 %}<strong>0 €</strong>{% else %}<strong>{{'%.0f'|format(p.price_cents/100)}} €</strong>{% endif %}{% if p.interval %}<small>/ {{'mes' if p.interval=='month' else p.interval}}</small>{% elif p.billing_type=='ONE_TIME' %}<small>/ análisis</small>{% endif %}</div></div>
+        <ul>{% for f in p.features_json %}<li><span>✓</span>{{f}}</li>{% endfor %}</ul>
+        <a class="btn {% if p.code=='PRO' %}marketing-primary{% else %}secondary{% endif %} full" href="{% if p.code=='ENTERPRISE' %}/pricing{% else %}/register{% endif %}">{% if p.code=='FREE' %}Empezar gratis{% elif p.code=='ONE_TIME' %}Analizar una web{% elif p.code=='ENTERPRISE' %}Ver opción Enterprise{% else %}Probar {{p.name}}{% endif %}</a>
+      </article>
+      {% endfor %}
+    </div>
+    <div class="pricing-note">Los importes mostrados se leen del catálogo activo de SecuraScan. Las funciones que dependen de proveedores externos requieren que su integración esté configurada.</div>
+  </section>
+
+  <section class="marketing-section audiences-section">
+    <div class="section-heading split-heading"><div><div class="eyebrow">PARA QUIÉN</div><h2>Seguridad web entendible sin perder profundidad técnica.</h2></div><p>La misma información sirve para tomar decisiones distintas: corregir una web propia, preparar un entregable para un cliente o monitorizar varias propiedades digitales.</p></div>
+    <div class="audience-grid">
+      <article><span>01</span><h3>Freelancers y agencias</h3><p>Añade una revisión de seguridad objetiva a tus entregas y comparte un informe más profesional con el cliente.</p></article>
+      <article><span>02</span><h3>SaaS, ecommerce y pymes</h3><p>Detecta regresiones de configuración y mantén una visión histórica sin montar una plataforma interna desde cero.</p></article>
+      <article><span>03</span><h3>Equipos técnicos</h3><p>Integra resultados mediante API, webhooks y exportaciones cuando necesitas incorporar la revisión a otros flujos.</p></article>
+    </div>
+  </section>
+
+  <section class="marketing-section faq-section">
+    <div class="section-heading center-heading"><div class="eyebrow">PREGUNTAS FRECUENTES</div><h2>Lo importante antes de empezar</h2></div>
+    <div class="faq-list">
+      <details><summary>¿SecuraScan intenta hackear mi web?</summary><p>No. El scanner actual está diseñado para realizar comprobaciones no destructivas y observacionales. No ejecuta exploits, fuerza bruta ni acciones destructivas.</p></details>
+      <details><summary>¿El score lo decide una IA?</summary><p>No. El score 0–100 y las severidades se calculan mediante reglas deterministas sobre observaciones del scanner. La IA puede ayudar a explicar o priorizar cuando el proveedor está habilitado.</p></details>
+      <details><summary>¿Puedo analizar cualquier URL?</summary><p>Debes analizar únicamente sitios sobre los que tengas autorización. Además, SecuraScan bloquea destinos internos, locales o no permitidos para reducir riesgos SSRF.</p></details>
+      <details><summary>¿Qué diferencia hay entre Free y Pro?</summary><p>Free permite empezar y obtener un score y resumen básico. Pro añade histórico, comparación, monitorización, alertas, PDF, IA cuando esté disponible y exportaciones.</p></details>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="final-cta-glow"></div>
+    <div><div class="eyebrow">TU SIGUIENTE SCAN PUEDE SER EL QUE EVITE EL SIGUIENTE PROBLEMA</div><h2>Comprueba tu web antes de que alguien encuentre el fallo por ti.</h2><p>Empieza con una cuenta gratuita y convierte señales técnicas dispersas en un plan de corrección claro.</p></div>
+    <div class="final-cta-actions"><a class="btn marketing-primary" href="/register">Empezar gratis →</a><a class="btn secondary" href="/pricing">Comparar planes</a></div>
+  </section>
+</div>
+{% endblock %}
