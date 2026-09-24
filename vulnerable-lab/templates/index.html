@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="VulnLab CMS 0.6">
+  <title>VulnLab - Web deliberadamente insegura</title>
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+  <script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- TODO: API_KEY=demo-not-a-real-key -->
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .card { border: 1px solid #ccc; border-radius: 12px; padding: 20px; margin: 18px 0; }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    code { background: #eee; padding: 2px 6px; }
+  </style>
+</head>
+<body>
+  <h1>VulnLab 0.6</h1>
+  <p>Aplicación controlada deliberadamente insegura para regresión de SecuraScan.</p>
+
+  <div class="card">
+    <h2>Formulario HTTP inseguro</h2>
+    <form action="http://example.com/login" method="post">
+      <input name="username" value="demo">
+      <input name="password" type="password" value="password123">
+      <button type="submit">Entrar</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>SQLi GET + password GET</h2>
+    <form action="/search" method="get">
+      <input name="id" value="1">
+      <input name="password" type="password" value="demo">
+      <button type="submit">Buscar GET</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>SQLi POST controlada</h2>
+    <form action="/search" method="post">
+      <input name="id" value="1">
+      <input name="q" value="demo">
+      <button type="submit">Buscar POST</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>POST sin CSRF y upload</h2>
+    <form action="/profile/update" method="post">
+      <input name="display_name" value="demo">
+      <button type="submit">Actualizar</button>
+    </form>
+    <form action="/profile/update" method="post" enctype="multipart/form-data">
+      <input name="avatar" type="file">
+      <button type="submit">Subir</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Mixed content</h2>
+    <img src="http://httpbin.org/image/png" alt="Recurso HTTP" width="180">
+  </div>
+
+  <div class="card">
+    <h2>Superficie API</h2>
+    <ul>
+      <li><a href="/api/profile">API profile con caché pública</a></li>
+      <li><a href="/graphql">GraphQL con introspección</a></li>
+      <li><a href="/openapi.json">OpenAPI público</a></li>
+      <li><a href="/package.json">package.json expuesto</a></li>
+      <li><a href="/search?id=1">SQLi fixture</a></li>
+      <li><a href="/reflect?q=hello">Reflection fixture</a></li>
+      <li><a href="/redirect?next=/">Open redirect fixture</a></li>
+      <li><a href="/files/">Directory listing fixture</a></li>
+    </ul>
+  </div>
+
+  <script>
+    async function loadProfile() {
+      const r = await fetch('/api/profile', { credentials: 'include' });
+      return await r.json();
+    }
+    async function queryApi() {
+      return fetch('/api/query', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: '1', q: 'demo'})
+      });
+    }
+    function intentionallyRiskyDemo(value) {
+      document.getElementById('result').innerHTML = value;
+    }
+  </script>
+</body>
+</html>
