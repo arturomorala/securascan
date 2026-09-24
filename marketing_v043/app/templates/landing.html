@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SecuraScan · Seguridad web clara, real y accionable</title>
+  <meta name="description" content="Analiza la seguridad de tu web con comprobaciones reales, puntuación 0–100, hallazgos priorizados y recomendaciones claras.">
+  <style>
+    :root{
+      --bg:#07110f;--bg2:#0b1715;--panel:#0f211d;--panel2:#122a25;--text:#f4fbf8;--muted:#9fb9b1;
+      --brand:#55e6b1;--brand2:#7ef2c6;--blue:#6fa8ff;--danger:#ff6b7a;--warn:#ffc970;
+      --line:rgba(255,255,255,.09);--shadow:0 24px 80px rgba(0,0,0,.34);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:
+      radial-gradient(circle at 18% 0%,rgba(85,230,177,.10),transparent 28%),
+      radial-gradient(circle at 86% 8%,rgba(111,168,255,.08),transparent 30%),
+      var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+    .nav{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(7,17,15,.80);backdrop-filter:blur(14px);z-index:10}
+    .brand{font-weight:900;letter-spacing:-.03em;font-size:23px}.brand b{color:var(--brand)}
+    .navlinks{display:flex;gap:24px;align-items:center;color:#c8ddd7;font-size:14px}.navlinks a:hover{color:white}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:13px 18px;font-weight:800;border:1px solid var(--line);transition:.2s}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--brand);color:#052019;border-color:transparent;box-shadow:0 12px 34px rgba(85,230,177,.20)}
+    .btn-secondary{background:rgba(255,255,255,.035);color:#fff}
+    .hero{padding:88px 0 64px;display:grid;grid-template-columns:1.1fr .9fr;gap:54px;align-items:center}
+    .eyebrow{display:inline-flex;gap:9px;align-items:center;border:1px solid rgba(85,230,177,.25);background:rgba(85,230,177,.07);color:#aef5d8;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    h1{font-size:clamp(46px,7vw,80px);line-height:.97;letter-spacing:-.065em;margin:20px 0 24px}
+    .hero p{font-size:20px;line-height:1.6;color:var(--muted);max-width:720px}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+    .micro{display:flex;flex-wrap:wrap;gap:18px;margin-top:22px;color:#86a39a;font-size:13px}
+    .micro span:before{content:"✓";color:var(--brand);margin-right:7px;font-weight:900}
+    .scan-card{background:linear-gradient(180deg,rgba(18,42,37,.98),rgba(10,24,21,.98));border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}
+    .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.dot{width:9px;height:9px;border-radius:50%;background:var(--brand);box-shadow:0 0 18px var(--brand)}
+    .scorebox{display:grid;grid-template-columns:142px 1fr;gap:18px;align-items:center;padding:18px;border-radius:16px;background:rgba(255,255,255,.025);border:1px solid var(--line)}
+    .score{width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--brand) 0 84%,rgba(255,255,255,.07) 84%);position:relative}
+    .score:after{content:"";position:absolute;inset:10px;background:var(--panel);border-radius:50%}
+    .score strong{z-index:1;font-size:35px}.score small{z-index:1;position:absolute;margin-top:48px;color:var(--muted)}
+    .finding{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px}.finding:last-child{border-bottom:0}
+    .sev{font-size:11px;font-weight:900;border-radius:999px;padding:5px 8px}.high{background:rgba(255,107,122,.12);color:#ff8995}.med{background:rgba(255,201,112,.12);color:#ffd48c}.low{background:rgba(111,168,255,.12);color:#91baff}
+    .trust{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:8px 0 70px}.trust div{padding:20px;background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:15px}.trust strong{font-size:27px;display:block;margin-bottom:4px}.trust span{color:var(--muted);font-size:13px}
+    section{padding:72px 0}.section-head{max-width:760px;margin-bottom:34px}.kicker{color:var(--brand);font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.section-head h2{font-size:clamp(34px,5vw,54px);letter-spacing:-.045em;line-height:1.03;margin:10px 0 14px}.section-head p{color:var(--muted);font-size:18px;line-height:1.6}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.feature{padding:24px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015))}.icon{font-size:24px;margin-bottom:15px}.feature h3{margin:0 0 9px;font-size:18px}.feature p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+    .checks{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.check{display:flex;gap:13px;align-items:flex-start;padding:17px;border:1px solid var(--line);background:rgba(255,255,255,.024);border-radius:14px}.check i{font-style:normal;color:var(--brand);font-weight:900}.check b{display:block;margin-bottom:4px}.check span{color:var(--muted);font-size:13px;line-height:1.45}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.step{padding:26px;border:1px solid var(--line);border-radius:17px;background:var(--panel)}.num{font-size:12px;color:var(--brand);font-weight:900;letter-spacing:.12em}.step h3{font-size:21px;margin:10px 0}.step p{color:var(--muted);line-height:1.55}
+    .pricing-wrap{background:linear-gradient(180deg,rgba(85,230,177,.045),rgba(255,255,255,.012));border:1px solid var(--line);border-radius:24px;padding:28px}
+    .pricing{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.plan{padding:20px;border-radius:16px;background:rgba(7,17,15,.72);border:1px solid var(--line);min-height:280px;display:flex;flex-direction:column}.plan.pop{border-color:rgba(85,230,177,.55);box-shadow:0 18px 50px rgba(85,230,177,.08);position:relative}.popular{position:absolute;right:12px;top:12px;font-size:10px;font-weight:900;background:var(--brand);color:#062018;padding:5px 8px;border-radius:999px}.plan h3{margin:4px 0 8px}.price{font-size:28px;font-weight:900;letter-spacing:-.04em}.sub{font-size:12px;color:var(--muted);min-height:32px}.plan ul{padding-left:17px;color:#c9ddd7;font-size:13px;line-height:1.7;flex:1}.plan .btn{padding:10px 11px;font-size:13px}
+    .band{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;padding:34px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(120deg,rgba(85,230,177,.07),rgba(111,168,255,.055))}
+    .band h2{font-size:38px;letter-spacing:-.04em;margin:0 0 14px}.band p{color:var(--muted);line-height:1.6}
+    footer{padding:34px 0 48px;color:#78958c;font-size:13px;border-top:1px solid var(--line);margin-top:72px}.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    @media(max-width:980px){.hero{grid-template-columns:1fr}.trust{grid-template-columns:repeat(2,1fr)}.grid,.steps{grid-template-columns:1fr 1fr}.pricing{grid-template-columns:repeat(2,1fr)}.band{grid-template-columns:1fr}}
+    @media(max-width:640px){.navlinks a:not(.btn){display:none}.hero{padding-top:54px}.trust,.grid,.steps,.checks,.pricing{grid-template-columns:1fr}.scorebox{grid-template-columns:1fr}.score{margin:auto}.wrap{padding:0 18px}}
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap" style="width:100%;display:flex;align-items:center;justify-content:space-between">
+      <a class="brand" href="/">Secura<b>Scan</b></a>
+      <nav class="navlinks">
+        <a href="#deteccion">Qué detecta</a>
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#precios">Precios</a>
+        <a href="/login">Entrar</a>
+        <a class="btn btn-primary" href="/register">Analizar mi web</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <span class="eyebrow">● Seguridad web sin ruido</span>
+          <h1>Descubre qué está poniendo en riesgo tu web.</h1>
+          <p>SecuraScan analiza tu sitio con comprobaciones técnicas reales y convierte los resultados en una puntuación clara, vulnerabilidades priorizadas y recomendaciones que sí puedes entender y aplicar.</p>
+          <div class="cta">
+            <a class="btn btn-primary" href="/register">Analizar mi web ahora →</a>
+            <a class="btn btn-secondary" href="#deteccion">Ver qué detectamos</a>
+          </div>
+          <div class="micro">
+            <span>Análisis no destructivo</span><span>Resultados trazables</span><span>Histórico de escaneos</span><span>Protección SSRF</span>
+          </div>
+        </div>
+        <div class="scan-card">
+          <div class="card-head"><strong>Resultado del análisis</strong><span style="color:var(--muted);font-size:12px"><span class="dot" style="display:inline-block;margin-right:7px"></span>Completado</span></div>
+          <div class="scorebox">
+            <div class="score"><strong>84</strong><small>/100</small></div>
+            <div><div style="font-weight:900;font-size:19px">Buen nivel de seguridad</div><p style="margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.5">3 hallazgos requieren atención. SecuraScan te explica el impacto y qué hacer primero.</p></div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="finding"><span>Content Security Policy ausente</span><span class="sev med">MEDIUM</span></div>
+            <div class="finding"><span>Cookie sin atributo SameSite</span><span class="sev low">LOW</span></div>
+            <div class="finding"><span>Script externo sin SRI</span><span class="sev low">INFO</span></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="trust">
+        <div><strong>0–100</strong><span>Puntuación de seguridad determinista</span></div>
+        <div><strong>15+</strong><span>Comprobaciones técnicas sobre TLS, headers, cookies y más</span></div>
+        <div><strong>24/7</strong><span>Base preparada para monitorización continua</span></div>
+        <div><strong>MySQL</strong><span>Histórico persistente de análisis y hallazgos</span></div>
+      </div>
+
+      <section>
+        <div class="section-head">
+          <div class="kicker">Mucho más que un “scanner”</div>
+          <h2>Seguridad explicada para tomar decisiones.</h2>
+          <p>No necesitas leer una lista interminable de cabeceras HTTP. SecuraScan organiza lo importante, separa el ruido y te muestra qué merece tu atención primero.</p>
+        </div>
+        <div class="grid">
+          <article class="feature"><div class="icon">◎</div><h3>Puntuación objetiva</h3><p>Score de 0 a 100 basado en reglas y severidades definidas. La IA no inventa la nota.</p></article>
+          <article class="feature"><div class="icon">⚑</div><h3>Hallazgos priorizados</h3><p>Critical, High, Medium, Low e Info para distinguir un problema serio de una simple mejora.</p></article>
+          <article class="feature"><div class="icon">↗</div><h3>Recomendaciones claras</h3><p>Cada resultado está pensado para ayudarte a entender el riesgo y orientar la corrección.</p></article>
+          <article class="feature"><div class="icon">◌</div><h3>Histórico y evolución</h3><p>Compara análisis y comprueba si la seguridad mejora o empeora con el tiempo.</p></article>
+          <article class="feature"><div class="icon">⌁</div><h3>Escaneo asíncrono</h3><p>El worker procesa los análisis sin bloquear la aplicación y deja trazabilidad del estado.</p></article>
+          <article class="feature"><div class="icon">▣</div><h3>Preparado para equipos</h3><p>Organizaciones, roles, API, auditoría y capacidades Business integradas en la arquitectura.</p></article>
+        </div>
+      </section>
+
+      <section id="deteccion">
+        <div class="section-head">
+          <div class="kicker">Qué vulnerabilidades y malas configuraciones detectamos</div>
+          <h2>Revisamos los puntos que más suelen fallar.</h2>
+          <p>SecuraScan realiza comprobaciones no destructivas sobre la configuración real del sitio y clasifica cada hallazgo según severidad y confianza.</p>
+        </div>
+        <div class="checks">
+          <div class="check"><i>✓</i><div><b>HTTPS y redirecciones</b><span>Detecta webs servidas sin HTTPS y ausencia de redirección de HTTP a HTTPS.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Certificados TLS</b><span>Certificados caducados o próximos a caducar y uso de protocolos TLS antiguos.</span></div></div>
+          <div class="check"><i>✓</i><div><b>HSTS</b><span>Comprueba si Strict-Transport-Security está ausente.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Content Security Policy</b><span>Detecta CSP ausente o políticas debilitadas por wildcards y directivas unsafe-*.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Protección contra clickjacking</b><span>Revisa mecanismos como X-Frame-Options o políticas equivalentes.</span></div></div>
+          <div class="check"><i>✓</i><div><b>X-Content-Type-Options</b><span>Identifica la ausencia de protección frente a MIME sniffing.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Referrer-Policy</b><span>Detecta configuraciones que pueden exponer más información de navegación de la necesaria.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Permissions-Policy</b><span>Comprueba si faltan restricciones para capacidades sensibles del navegador.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Cookies inseguras</b><span>Revisa flags Secure, HttpOnly y SameSite sin almacenar el valor sensible de las cookies.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Mixed Content</b><span>Localiza recursos activos y pasivos cargados mediante HTTP dentro de páginas HTTPS.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Formularios inseguros</b><span>Detecta formularios que envían datos hacia destinos HTTP no cifrados.</span></div></div>
+          <div class="check"><i>✓</i><div><b>CORS peligroso</b><span>Señala combinaciones de origen comodín y credenciales que pueden ser arriesgadas.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Scripts externos sin SRI</b><span>Identifica dependencias de terceros sin Subresource Integrity.</span></div></div>
+          <div class="check"><i>✓</i><div><b>Cabeceras de seguridad</b><span>Agrupa ausencias y debilidades relevantes en la respuesta HTTP del sitio.</span></div></div>
+        </div>
+      </section>
+
+      <section id="como-funciona">
+        <div class="section-head">
+          <div class="kicker">Cómo funciona</div>
+          <h2>De una URL a un plan de acción.</h2>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="num">01 · ANALIZA</div><h3>Añade tu sitio</h3><p>SecuraScan valida el destino y realiza comprobaciones técnicas limitadas, controladas y no destructivas.</p></div>
+          <div class="step"><div class="num">02 · PRIORIZA</div><h3>Entiende el riesgo</h3><p>Las observaciones pasan por reglas deterministas y se convierten en hallazgos con severidad y puntuación.</p></div>
+          <div class="step"><div class="num">03 · CORRIGE</div><h3>Actúa con contexto</h3><p>Consulta la evidencia, las recomendaciones y el histórico para corregir y volver a medir.</p></div>
+        </div>
+      </section>
+
+      <section id="precios">
+        <div class="section-head">
+          <div class="kicker">Planes para cada etapa</div>
+          <h2>Empieza gratis. Escala cuando lo necesites.</h2>
+          <p>Desde 0 €. Elige análisis puntuales, monitorización continua o capacidades para equipos. Los importes y límites vigentes se muestran siempre en la página de precios antes de contratar.</p>
+        </div>
+        <div class="pricing-wrap">
+          <div class="pricing">
+            <article class="plan"><h3>Free</h3><div class="price">0 €</div><div class="sub">Para probar SecuraScan</div><ul><li>Primeros análisis</li><li>Puntuación 0–100</li><li>Hallazgos priorizados</li><li>Histórico básico</li></ul><a class="btn btn-secondary" href="/register">Empezar gratis</a></article>
+            <article class="plan"><h3>One-Time</h3><div class="price">Pago único</div><div class="sub">Un análisis cuando lo necesitas</div><ul><li>Crédito de análisis</li><li>Resultado completo</li><li>Ideal para auditorías puntuales</li><li>Sin suscripción</li></ul><a class="btn btn-secondary" href="/pricing">Ver precio</a></article>
+            <article class="plan pop"><span class="popular">MÁS POPULAR</span><h3>Pro</h3><div class="price">Mensual</div><div class="sub">Para webs que evolucionan</div><ul><li>Más capacidad de análisis</li><li>Monitorización</li><li>Alertas</li><li>Informes y seguimiento</li></ul><a class="btn btn-primary" href="/pricing">Ver precio Pro</a></article>
+            <article class="plan"><h3>Business</h3><div class="price">Mensual</div><div class="sub">Para equipos y operaciones</div><ul><li>Organizaciones y roles</li><li>API</li><li>Webhooks</li><li>Auditoría</li></ul><a class="btn btn-secondary" href="/pricing">Ver precio Business</a></article>
+            <article class="plan"><h3>Enterprise</h3><div class="price">A medida</div><div class="sub">Para necesidades avanzadas</div><ul><li>Escala y soporte</li><li>Necesidades personalizadas</li><li>Controles avanzados</li><li>Contacto comercial</li></ul><a class="btn btn-secondary" href="/pricing">Contactar</a></article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="band">
+          <div><div class="kicker">Menos incertidumbre, más control</div><h2>Tu web cambia. Su seguridad también.</h2><p>Una configuración correcta hoy puede dejar de serlo mañana. SecuraScan te da una referencia medible para detectar cambios, volver a analizar y mantener el riesgo visible.</p></div>
+          <div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap"><a class="btn btn-primary" href="/register">Crear cuenta gratis</a><a class="btn btn-secondary" href="/pricing">Comparar planes</a></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot"><span>© 2026 SecuraScan · Seguridad web clara y accionable.</span><span>Escaneos no destructivos · Puntuación determinista · Resultados trazables</span></div>
+  </footer>
+</body>
+</html>
