@@ -63,26 +63,15 @@ RUN cat /tmp/scanner_v05_chunks/chunk00.txt /tmp/scanner_v05_chunks/chunk01.txt 
     && rm -rf /tmp/scanner_v05_chunks /tmp/scanner_v05_overlay /tmp/scanner_v05_overlay.zip
 RUN sed -i 's/SecuraScan worker v0.4 started/SecuraScan worker v0.5 started/' /app/app/worker.py
 
-# Layer SecuraScan v0.6 on top of the validated v0.5 engine while keeping the
-# previous implementation available for regression-safe reuse.
-RUN mv /app/app/scanner/engine.py /app/app/scanner/engine_v05.py \
-    && mv /app/app/scanner/rules.py /app/app/scanner/rules_v05.py
-COPY scanner_v06/engine.py /app/app/scanner/engine.py
-COPY scanner_v06/rules.py /app/app/scanner/rules.py
-RUN python -m py_compile /app/app/scanner/engine.py /app/app/scanner/rules.py \
-    && sed -i 's/SecuraScan worker v0.5 started/SecuraScan worker v0.6 started/' /app/app/worker.py
-
-COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
-
-# Preserve the validated v0.5 scanner so v0.6 can extend it without regressions.
+# Preserve the validated v0.5 engine/rules and layer v0.6 on top.
 RUN cp /app/app/scanner/engine.py /app/app/scanner/engine_v05.py \
     && cp /app/app/scanner/rules.py /app/app/scanner/rules_v05.py
-
-# Apply SecuraScan v0.6 scanner layer.
 COPY scanner_v06/engine.py /app/app/scanner/engine.py
 COPY scanner_v06/rules.py /app/app/scanner/rules.py
 COPY scanner_v06/selftest.py /app/scanner_v06_selftest.py
+COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
 COPY e2e_v06_vulnlab.py /app/e2e_v06_vulnlab.py
+
 RUN sed -i 's/SecuraScan worker v0.5 started/SecuraScan worker v0.6 started/' /app/app/worker.py \
     && sed -i 's/scanner_version="0.4.0"/scanner_version="0.6.0"/g' /app/app/services/scans.py \
     && sed -i 's/ruleset_version="0.4.0"/ruleset_version="0.6.0"/g' /app/app/services/scans.py
