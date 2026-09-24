@@ -6,6 +6,7 @@
   <title>VulnLab - Web deliberadamente insegura</title>
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
   <script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- TODO: API_KEY=demo-not-a-real-key -->
   <style>
     body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
     .card { border: 1px solid #ccc; border-radius: 12px; padding: 20px; margin: 18px 0; }
@@ -15,27 +16,63 @@
 </head>
 <body>
   <h1>VulnLab</h1>
-  <p>Aplicación de laboratorio creada a propósito con malas configuraciones de seguridad.</p>
+  <p>Aplicación de laboratorio creada a propósito con malas configuraciones y endpoints vulnerables para regresión de SecuraScan.</p>
+
   <div class="card">
     <h2>Formulario HTTP inseguro</h2>
-    <p>El formulario envía credenciales a una URL <code>http://</code>.</p>
     <form action="http://example.com/login" method="post">
       <input name="username" placeholder="Usuario" value="demo">
       <input name="password" type="password" placeholder="Contraseña" value="password123">
       <button type="submit">Entrar de forma insegura</button>
     </form>
   </div>
+
+  <div class="card">
+    <h2>Password por GET</h2>
+    <form action="/search" method="get">
+      <input name="id" value="1">
+      <input name="password" type="password" value="demo">
+      <button type="submit">Buscar</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>POST sin CSRF</h2>
+    <form action="/profile/update" method="post">
+      <input name="display_name" value="demo">
+      <button type="submit">Actualizar perfil</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Upload surface</h2>
+    <form action="/profile/update" method="post" enctype="multipart/form-data">
+      <input name="avatar" type="file">
+      <button type="submit">Subir</button>
+    </form>
+  </div>
+
   <div class="card">
     <h2>Mixed content</h2>
-    <p>Esta imagen se solicita mediante HTTP y debería ser detectada si la página principal está bajo HTTPS.</p>
     <img src="http://httpbin.org/image/png" alt="Recurso HTTP" width="180">
   </div>
+
+  <div class="card">
+    <h2>Pruebas activas controladas</h2>
+    <ul>
+      <li><a href="/search?id=1">SQLi fixture</a></li>
+      <li><a href="/reflect?q=hello">HTML reflection fixture</a></li>
+      <li><a href="/redirect?next=/">Open redirect fixture</a></li>
+      <li><a href="/files/">Directory listing fixture</a></li>
+    </ul>
+  </div>
+
   <div class="card">
     <h2>API con CORS inseguro</h2>
-    <p>Endpoint de prueba: <code>/api/profile</code>.</p>
     <button onclick="loadProfile()">Leer perfil</button>
     <pre id="result">Sin consultar</pre>
   </div>
+
   <div class="card">
     <h2>Headers deliberadamente ausentes</h2>
     <ul>
@@ -47,10 +84,14 @@
       <li>Permissions-Policy</li>
     </ul>
   </div>
+
   <script>
     async function loadProfile() {
       const r = await fetch('/api/profile', { credentials: 'include' });
       document.getElementById('result').textContent = JSON.stringify(await r.json(), null, 2);
+    }
+    function intentionallyRiskyDemo(value) {
+      document.getElementById('result').innerHTML = value;
     }
   </script>
 </body>
