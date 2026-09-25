@@ -73,13 +73,13 @@ def main():
                 missing_findings = sorted(EXPECTED - types)
                 missing_checks = sorted(REQUIRED_CHECKS - check_keys)
                 browser = next((c for c in checks if c.check_key == "browser_v07"), None)
-                browser_data = browser.data_json if browser else {}
+                browser_data = browser.result_json if browser else {}
                 if isinstance(browser_data, str):
                     try: browser_data = json.loads(browser_data)
                     except Exception: browser_data = {}
                 browser_available = bool((browser_data or {}).get("available"))
                 profile = next((c for c in checks if c.check_key == "scan_profile_v07"), None)
-                profile_data = profile.data_json if profile else {}
+                profile_data = profile.result_json if profile else {}
                 if isinstance(profile_data, str):
                     try: profile_data = json.loads(profile_data)
                     except Exception: profile_data = {}
