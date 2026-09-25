@@ -6,7 +6,7 @@
   <meta name="generator" content="VulnLab CMS 0.6">
   <title>VulnLab - Web deliberadamente insegura</title>
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-  <script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>\n  <script src="/static/app.js"></script>
   <!-- TODO: API_KEY=demo-not-a-real-key -->
   <style>
     body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
@@ -73,7 +73,7 @@
       <li><a href="/search?id=1">SQLi fixture</a></li>
       <li><a href="/reflect?q=hello">Reflection fixture</a></li>
       <li><a href="/redirect?next=/">Open redirect fixture</a></li>
-      <li><a href="/files/">Directory listing fixture</a></li>
+      <li><a href="/files/">Directory listing fixture</a></li>\n      <li><a href="/host-reflect">Forwarded-host reflection fixture</a></li>
     </ul>
   </div>
 
@@ -93,5 +93,5 @@
       document.getElementById('result').innerHTML = value;
     }
   </script>
-</body>
+  <div id="result"></div>\n</body>
 </html>
