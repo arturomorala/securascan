@@ -104,6 +104,7 @@ RUN apt-get update \
 
 COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
 COPY e2e_v06_vulnlab.py /app/e2e_v06_vulnlab.py
+COPY e2e_v07_vulnlab.py /app/e2e_v07_vulnlab.py
 
 RUN pip install --no-cache-dir -r requirements.txt "playwright>=1.55,<2" \
     && python -m compileall -q /app/app \
