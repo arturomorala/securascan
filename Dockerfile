@@ -80,10 +80,33 @@ RUN cp /app/app/scanner/engine.py /app/app/scanner/engine_v06_base.py \
 COPY v063_patch/engine.py /app/app/scanner/engine.py
 COPY v063_patch/rules.py /app/app/scanner/rules.py
 
+# SecuraScan v0.7: scan profiles, Evidence/Confidence Engine, browser-assisted
+# crawling, OpenAPI inventory, discovery documents, source maps and CSP/host checks.
+RUN cp /app/app/scanner/engine.py /app/app/scanner/engine_v063_base.py \
+    && cp /app/app/scanner/rules.py /app/app/scanner/rules_v063_base.py
+COPY v07_overlay_chunks /tmp/v07_overlay_chunks
+RUN cat /tmp/v07_overlay_chunks/v07c*.txt | base64 -d > /tmp/v07_patch.zip \
+    && unzip -t /tmp/v07_patch.zip \
+    && unzip /tmp/v07_patch.zip -d /tmp/v07 \
+    && cp /tmp/v07/v07_patch/engine.py /app/app/scanner/engine.py \
+    && cp /tmp/v07/v07_patch/rules.py /app/app/scanner/rules.py \
+    && python /tmp/v07/v07_patch/apply_patch.py \
+    && cp /tmp/v07/v07_patch/selftest.py /app/v07_selftest.py \
+    && rm -rf /tmp/v07_overlay_chunks /tmp/v07 /tmp/v07_patch.zip
+
+RUN sed -i 's/SecuraScan worker v0.6 started/SecuraScan worker v0.7 started/' /app/app/worker.py
+
+# Playwright uses the distro Chromium binary. It is only exercised for DEEP/LAB
+# scans; SAFE remains the default and does not start a browser.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends chromium \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY e2e_v05_vulnlab.py /app/e2e_v05_vulnlab.py
 COPY e2e_v06_vulnlab.py /app/e2e_v06_vulnlab.py
 
-RUN pip install --no-cache-dir -r requirements.txt \
-    && python -m compileall -q /app/app
+RUN pip install --no-cache-dir -r requirements.txt "playwright>=1.55,<2" \
+    && python -m compileall -q /app/app \
+    && python /app/v07_selftest.py
 
 CMD ["sh", "scripts/start-web.sh"]
