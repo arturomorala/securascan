@@ -100,6 +100,37 @@ class VulnerableHandler(BaseHTTPRequestHandler):
                 self._send(200, json.dumps({"data": {"__typename": "Query"}}), "application/json")
             return
 
+        if path == "/robots.txt":
+            self._send(200, "User-agent: *\nDisallow: /admin-lab\nSitemap: /sitemap.xml\n", "text/plain")
+            return
+
+        if path == "/sitemap.xml":
+            self._send(200, """<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://securascan-v04-web-production.up.railway.app/reflect?q=hello</loc></url><url><loc>https://securascan-v04-web-production.up.railway.app/host-reflect</loc></url></urlset>""", "application/xml")
+            return
+
+        if path == "/static/app.js":
+            self._send(200, """function vulnLabDemo(v){document.querySelector('#result')?.insertAdjacentHTML('beforeend', v)}\n//# sourceMappingURL=app.js.map\n""", "application/javascript")
+            return
+
+        if path == "/static/app.js.map":
+            self._send(200, json.dumps({
+                "version": 3,
+                "file": "app.js",
+                "sources": ["src/app.js"],
+                "sourcesContent": ["export const api='/api/profile'; export function render(v){ document.querySelector('#result').innerHTML=v; }"],
+                "names": [],
+                "mappings": ""
+            }), "application/json")
+            return
+
+        if path == "/host-reflect":
+            forwarded = self.headers.get("X-Forwarded-Host")
+            if forwarded:
+                self._send(302, b"", "text/plain", {"Location": f"https://{forwarded}/reset-demo"})
+            else:
+                self._send(200, "<html><body>Host header lab fixture</body></html>")
+            return
+
         if path == "/openapi.json":
             self._send(200, json.dumps({
                 "openapi": "3.0.3",
